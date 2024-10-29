@@ -46,5 +46,3 @@ describe('GET /getTagsWithQuestionNumber', () => {
   });
 });
 
-
-// New comment line to test branches on git
