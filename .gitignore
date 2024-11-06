@@ -108,3 +108,5 @@ server/package-lock.json
 .stryker-tmp/
 server/reports
 
+# Firebase Admin SDK
+/server/fall24-swe-208-firebase-adminsdk-1cfav-b5bfb31042.json
