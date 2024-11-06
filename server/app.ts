@@ -1,7 +1,3 @@
-// The server should run on localhost port 8000.
-// This is where you should start writing server-side code for this application.
-// startServer() is a function that starts the server
-// the server will listen on .env.CLIENT_URL if set, otherwise 8000
 import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
@@ -13,6 +9,7 @@ import answerController from './controller/answer';
 import questionController from './controller/question';
 import tagController from './controller/tag';
 import commentController from './controller/comment';
+import authController from './controller/auth';  // Add this import
 import { FakeSOSocket } from './types';
 
 dotenv.config();
@@ -22,8 +19,9 @@ const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:3000';
 const port = parseInt(process.env.PORT || '8000');
 
 mongoose
-  .connect(MONGO_URL)
-  .catch(err => console.log('MongoDB connection error: ', err));
+    .connect(MONGO_URL)
+    .then(() => console.log('MongoDB connected successfully'))  // Add success log
+    .catch(err => console.log('MongoDB connection error: ', err));
 
 const app = express();
 const server = http.createServer(app);
@@ -54,11 +52,14 @@ process.on('SIGINT', () => {
   socket.close();
 });
 
+// CORS configuration with more detailed options
 app.use(
-  cors({
-    credentials: true,
-    origin: [CLIENT_URL],
-  }),
+    cors({
+      credentials: true,
+      origin: [CLIENT_URL],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Add explicit methods
+      allowedHeaders: ['Content-Type', 'Authorization'],      // Add Authorization header
+    }),
 );
 
 app.use(express.json());
@@ -68,10 +69,19 @@ app.get('/', (req: Request, res: Response) => {
   res.end();
 });
 
+// Add auth routes before other routes
+app.use('/auth', authController(socket));
+
 app.use('/question', questionController(socket));
 app.use('/tag', tagController());
 app.use('/answer', answerController(socket));
 app.use('/comment', commentController(socket));
+
+// Add basic error handling
+app.use((err: Error, req: Request, res: Response, next: Function) => {
+  console.error('Server error:', err);
+  res.status(500).send('Internal Server Error');
+});
 
 // Export the app instance
 export { app, server, startServer };
