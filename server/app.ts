@@ -9,7 +9,6 @@ import answerController from './controller/answer';
 import questionController from './controller/question';
 import tagController from './controller/tag';
 import commentController from './controller/comment';
-import authController from './controller/auth';  // Add this import
 import { FakeSOSocket } from './types';
 
 dotenv.config();
@@ -20,68 +19,87 @@ const port = parseInt(process.env.PORT || '8000');
 
 mongoose
     .connect(MONGO_URL)
-    .then(() => console.log('MongoDB connected successfully'))  // Add success log
+    .then(() => console.log('MongoDB connected successfully'))
     .catch(err => console.log('MongoDB connection error: ', err));
 
 const app = express();
 const server = http.createServer(app);
 const socket: FakeSOSocket = new Server(server, {
-  cors: { origin: '*' },
+    cors: { origin: '*' },
 });
 
-function startServer() {
-  server.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-  });
-}
+// Authentication middleware
+const authenticateRequest = (req: Request, res: Response, next: Function) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return next(); // Allow requests without auth header for now
+    }
 
-socket.on('connection', socket => {
-  console.log('A user connected ->', socket.id);
+    // If you want to verify Firebase tokens on the server side:
+    // const token = authHeader.split('Bearer ')[1];
+    // admin.auth().verifyIdToken(token)
+    //   .then(decodedToken => {
+    //     req.user = decodedToken;
+    //     next();
+    //   })
+    //   .catch(error => {
+    //     res.status(401).json({ error: 'Unauthorized' });
+    //   });
 
-  socket.on('disconnect', () => {
-    console.log('User disconnected');
-  });
-});
+    next();
+};
 
-process.on('SIGINT', () => {
-  server.close(() => {
-    mongoose.disconnect();
-    console.log('Server closed.');
-    process.exit(0);
-  });
-  socket.close();
-});
-
-// CORS configuration with more detailed options
+// CORS configuration
 app.use(
     cors({
-      credentials: true,
-      origin: [CLIENT_URL],
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // Add explicit methods
-      allowedHeaders: ['Content-Type', 'Authorization'],      // Add Authorization header
+        credentials: true,
+        origin: [CLIENT_URL],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
     }),
 );
 
 app.use(express.json());
+app.use(authenticateRequest); // Add authentication middleware
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('hello world');
-  res.end();
+    res.send('hello world');
 });
-
-// Add auth routes before other routes
-app.use('/auth', authController(socket));
 
 app.use('/question', questionController(socket));
 app.use('/tag', tagController());
 app.use('/answer', answerController(socket));
 app.use('/comment', commentController(socket));
 
-// Add basic error handling
+// Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: Function) => {
-  console.error('Server error:', err);
-  res.status(500).send('Internal Server Error');
+    console.error('Server error:', err);
+    res.status(500).send('Internal Server Error');
 });
 
-// Export the app instance
+// Socket connection handling
+socket.on('connection', socket => {
+    console.log('A user connected ->', socket.id);
+
+    socket.on('disconnect', () => {
+        console.log('User disconnected');
+    });
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+    server.close(() => {
+        mongoose.disconnect();
+        console.log('Server closed.');
+        process.exit(0);
+    });
+    socket.close();
+});
+
+function startServer() {
+    server.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+    });
+}
+
 export { app, server, startServer };
