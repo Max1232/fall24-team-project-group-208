@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Response } from 'express';
 import admin from 'firebase-admin';
 import { AuthRequest, FakeSOSocket, ProfileCreatedPayload } from '../types';
 import UserModel from '../models/users';
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('../fall24-swe-208-firebase-adminsdk-1cfav-f33342b870.json');
+const serviceAccount = require('../fall24-swe-208-firebase-adminsdk-1cfav-ebd9a2eafb.json');
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -24,7 +25,7 @@ const authController = (socket: FakeSOSocket) => {
   /**
    * Middleware to verify Firebase token from request headers
    */
-  const verifyToken = async (req: AuthRequest, res: Response, next: Function) => {
+  const verifyToken = async (req: AuthRequest, res: Response, next: express.NextFunction) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
 
     if (!token) {

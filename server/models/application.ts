@@ -14,6 +14,7 @@ import AnswerModel from './answers';
 import QuestionModel from './questions';
 import TagModel from './tags';
 import CommentModel from './comments';
+import UserModel from './users';
 
 /**
  * Parses tags from a search string.
@@ -358,6 +359,16 @@ export const fetchAndIncrementQuestionViewsById = async (
 export const saveQuestion = async (question: Question): Promise<QuestionResponse> => {
   try {
     const result = await QuestionModel.create(question);
+    if (result) {
+      try {
+        await UserModel.findOneAndUpdate(
+          { username: question.askedBy },
+          { $inc: { reputation: 2 } },
+        );
+      } catch (updateError) {
+        return { error: 'Error when updating user reputation' };
+      }
+    }
     return result;
   } catch (error) {
     return { error: 'Error when saving a question' };

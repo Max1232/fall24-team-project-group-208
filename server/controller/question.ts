@@ -18,6 +18,7 @@ import {
   populateDocument,
   saveQuestion,
 } from '../models/application';
+import UserModel from '../models/users';
 
 const questionController = (socket: FakeSOSocket) => {
   const router = express.Router();
@@ -140,6 +141,22 @@ const questionController = (socket: FakeSOSocket) => {
       const result = await saveQuestion(questionswithtags);
       if ('error' in result) {
         throw new Error(result.error);
+      }
+
+      // Increment user's reputation by 2
+      try {
+        await UserModel.findOneAndUpdate(
+          { username: question.askedBy },
+          { $inc: { reputation: 2 } },
+        );
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.log('Error flagged');
+          res.status(500).send(`Error when updating user reputation: ${err.message}`);
+          return;
+        }
+        res.status(500).send(`Error when updating user reputation`);
+        return;
       }
 
       // Populates the fields of the question that was added, and emits the new object
