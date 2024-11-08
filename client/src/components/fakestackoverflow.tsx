@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
 import Layout from './layout';
 import Login from './login';
 import { FakeSOSocket, User } from '../types';
@@ -10,22 +11,8 @@ import TagPage from './main/tagPage';
 import NewQuestionPage from './main/newQuestion';
 import NewAnswerPage from './main/newAnswer';
 import AnswerPage from './main/answerPage';
-
-const ProtectedRoute = ({
-  user,
-  socket,
-  children,
-}: {
-  user: User | null;
-  socket: FakeSOSocket | null;
-  children: JSX.Element;
-}) => {
-  if (!user || !socket) {
-    return <Navigate to='/' />;
-  }
-
-  return <UserContext.Provider value={{ user, socket }}>{children}</UserContext.Provider>;
-};
+import auth from '../config/firebase';
+import ProtectedRoute from './auth/ProtectedRoute';
 
 /**
  * Represents the main component of the application.
@@ -34,6 +21,20 @@ const ProtectedRoute = ({
 const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
   const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
+      if (firebaseUser) {
+        setUser({
+          username: firebaseUser.email || 'Anonymous',
+        });
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <LoginContext.Provider value={{ setUser }}>
       <Routes>
@@ -41,20 +42,23 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
         <Route path='/' element={<Login />} />
 
         {/* Protected Routes */}
-        {
-          <Route
-            element={
-              <ProtectedRoute user={user} socket={socket}>
+        <Route
+          element={
+            <UserContext.Provider value={{ user: user!, socket: socket! }}>
+              <ProtectedRoute>
                 <Layout />
               </ProtectedRoute>
-            }>
-            <Route path='/home' element={<QuestionPage />} />
-            <Route path='tags' element={<TagPage />} />
-            <Route path='/question/:qid' element={<AnswerPage />} />
-            <Route path='/new/question' element={<NewQuestionPage />} />
-            <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
-          </Route>
-        }
+            </UserContext.Provider>
+          }>
+          <Route path='/home' element={<QuestionPage />} />
+          <Route path='tags' element={<TagPage />} />
+          <Route path='/question/:qid' element={<AnswerPage />} />
+          <Route path='/new/question' element={<NewQuestionPage />} />
+          <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
+        </Route>
+
+        {/* Catch-all route */}
+        <Route path='*' element={<Navigate to='/' replace />} />
       </Routes>
     </LoginContext.Provider>
   );
