@@ -63,7 +63,7 @@ const useLogin = () => {
     try {
       if (isLogin) {
         // Handle login
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth, email, password);
         setUser({ username: email.split('@')[0] }); // Temporary username from email
         navigate('/home');
       } else {
