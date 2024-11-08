@@ -4,7 +4,7 @@ import { AuthRequest, FakeSOSocket, ProfileCreatedPayload } from '../types';
 import UserModel from '../models/users';
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('../fall24-swe-208-firebase-adminsdk-1cfav-b5bfb31042.json');
+const serviceAccount = require('../fall24-swe-208-firebase-adminsdk-1cfav-f33342b870.json');
 
 if (!admin.apps.length) {
   admin.initializeApp({
