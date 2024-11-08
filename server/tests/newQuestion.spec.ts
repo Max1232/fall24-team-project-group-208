@@ -184,6 +184,8 @@ describe('POST /addQuestion', () => {
     // Making the request
     const response = await supertest(app).post('/question/addQuestion').send(mockQuestion);
 
+    console.log('Response.text:', response.text); // Debugging
+    console.log('MockQuestion.askedBy:', mockQuestion.askedBy); // Debugging
     // Asserting the response
     expect(response.status).toBe(200);
     expect(response.body).toEqual(simplifyQuestion(result)); // Expect only unique tags
