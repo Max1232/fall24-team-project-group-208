@@ -151,6 +151,7 @@ const questionController = (socket: FakeSOSocket) => {
         );
       } catch (err: unknown) {
         if (err instanceof Error) {
+          // Error flagged
           console.log('Error flagged');
           res.status(500).send(`Error when updating user reputation: ${err.message}`);
           return;
