@@ -1,8 +1,14 @@
+/* eslint-disable no-console */
 import mongoose from 'mongoose';
 import supertest from 'supertest';
+import { mock } from 'node:test';
 import { app } from '../app';
 import * as util from '../models/application';
-import { Answer, Question, Tag } from '../types';
+import UserModel from '../models/users';
+import { Answer, Question, Tag, User } from '../types';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockingoose = require('mockingoose');
 
 const tag1: Tag = {
   _id: new mongoose.Types.ObjectId('507f191e810c19729de860ea'),
@@ -15,13 +21,22 @@ const tag2: Tag = {
   description: 'tag2 description',
 };
 
+const UID: string = new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(); // Removed unused variable
+
+const mockUser: User = {
+  uid: UID,
+  username: 'question3_user',
+  reputation: 10,
+  joinedDate: new Date('2024-01-01'),
+};
+
 const mockQuestion: Question = {
   _id: new mongoose.Types.ObjectId('65e9b58910afe6e94fc6e6fe'),
   title: 'New Question Title',
   text: 'New Question Text',
   tags: [tag1, tag2],
   answers: [],
-  askedBy: 'question3_user',
+  askedBy: mockUser.username,
   askDateTime: new Date('2024-06-06'),
   views: [],
   upVotes: [],
@@ -40,6 +55,11 @@ const simplifyQuestion = (question: Question) => ({
   })), // Converting answer ObjectId
   askDateTime: question.askDateTime.toISOString(),
 });
+
+const getUserById = async (username: string) => {
+  const user = await UserModel.findOne({ username });
+  return user?._id; // This will return the user's ID if found
+};
 
 describe('POST /addQuestion', () => {
   afterEach(async () => {
@@ -184,10 +204,66 @@ describe('POST /addQuestion', () => {
     // Making the request
     const response = await supertest(app).post('/question/addQuestion').send(mockQuestion);
 
-    console.log('Response.text:', response.text); // Debugging
-    console.log('MockQuestion.askedBy:', mockQuestion.askedBy); // Debugging
     // Asserting the response
     expect(response.status).toBe(200);
     expect(response.body).toEqual(simplifyQuestion(result)); // Expect only unique tags
+  });
+
+  // New tests
+  it('should increase user reputation by 2 when a question is posted', async () => {
+    jest.spyOn(util, 'processTags').mockResolvedValue([tag1, tag2] as Tag[]);
+    jest.spyOn(util, 'saveQuestion').mockResolvedValueOnce(mockQuestion as Question);
+    jest.spyOn(util, 'populateDocument').mockResolvedValueOnce(mockQuestion as Question);
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { ...mockUser, reputation: mockUser.reputation + 2 },
+      'findOneAndUpdate',
+    );
+
+    // Making the request
+    const response = await supertest(app).post('/question/addQuestion').send(mockQuestion);
+
+    // Asserting the response that addQuestion returns
+    expect(response.status).toBe(200);
+    expect(response.body.askedBy).toBe(mockQuestion.askedBy);
+
+    // Fetching the updated user
+    // Mocking UserModel with mockingoose to return the updated user
+    mockingoose(UserModel).toReturn(
+      { ...mockUser, reputation: mockUser.reputation + 2 },
+      'findOne',
+    );
+
+    const updatedUser = await UserModel.findOne({ username: mockQuestion.askedBy });
+    console.log('updatedUser?.reputation:', updatedUser?.reputation);
+
+    // Asserting the user reputation has increased by 2
+    expect(updatedUser?.reputation).toBe(mockUser.reputation + 2);
+  });
+
+  it('should not increase user reputation if the question save returns an error', async () => {
+    jest.spyOn(util, 'processTags').mockResolvedValue([tag1, tag2] as Tag[]);
+    jest
+      .spyOn(util, 'saveQuestion')
+      .mockResolvedValueOnce({ error: 'Error while saving question' });
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(mockUser, 'findOneAndUpdate');
+
+    // Making the request
+    const response = await supertest(app).post('/question/addQuestion').send(mockQuestion);
+
+    // Asserting the response that addQuestion returns
+    expect(response.status).toBe(500);
+
+    // Fetching the user to ensure reputation has not changed
+    mockingoose(UserModel).toReturn(mockUser, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ username: mockQuestion.askedBy });
+    console.log('updatedUser?.reputation:', updatedUser?.reputation);
+
+    // Asserting the user reputation has not increased
+    expect(updatedUser?.reputation).toBe(mockUser.reputation);
   });
 });

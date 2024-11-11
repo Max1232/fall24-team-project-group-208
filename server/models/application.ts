@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
 import {
@@ -350,6 +351,32 @@ export const fetchAndIncrementQuestionViewsById = async (
 };
 
 /**
+ * Increases the reputation of a user by a given number.
+ *
+ * @param {string} username - The username of the user whose reputation is to be increased
+ * @param {number} amount - The amount by which to increase the reputation
+ *
+ * @returns {Promise<{ success: boolean; error?: string }>} - An object indicating success or failure
+ */
+const increaseReputation = async (
+  username: string,
+  amount: number,
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const updateResult = await UserModel.findOneAndUpdate(
+      { username },
+      { $inc: { reputation: amount } },
+    );
+    if (!updateResult) {
+      return { success: false, error: 'User not found or update failed' };
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Error when updating user reputation' };
+  }
+};
+
+/**
  * Saves a new question to the database.
  *
  * @param {Question} question - The question to save
@@ -357,20 +384,21 @@ export const fetchAndIncrementQuestionViewsById = async (
  * @returns {Promise<QuestionResponse>} - The saved question, or error message
  */
 export const saveQuestion = async (question: Question): Promise<QuestionResponse> => {
+  console.log('Attempting to save a question...');
   try {
     const result = await QuestionModel.create(question);
+    console.log('Question saved successfully, trying to update user reputation...');
     if (result) {
-      try {
-        await UserModel.findOneAndUpdate(
-          { username: question.askedBy },
-          { $inc: { reputation: 2 } },
-        );
-      } catch (updateError) {
-        return { error: 'Error when updating user reputation' };
+      const reputationResult = await increaseReputation(question.askedBy, 2);
+      if (!reputationResult.success) {
+        console.log(reputationResult.error);
+        return { error: reputationResult.error || 'Unknown error' };
       }
+      console.log('User reputation updated successfully');
     }
     return result;
   } catch (error) {
+    console.log('Error when saving a question:', error);
     return { error: 'Error when saving a question' };
   }
 };
@@ -385,6 +413,14 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
 export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result = await AnswerModel.create(answer);
+    if (result) {
+      const reputationResult = await increaseReputation(answer.ansBy, 5);
+      if (!reputationResult.success) {
+        console.log(reputationResult.error);
+        return { error: reputationResult.error || 'Unknown error' };
+      }
+      console.log('User reputation updated successfully');
+    }
     return result;
   } catch (error) {
     return { error: 'Error when saving an answer' };
@@ -401,6 +437,14 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
 export const saveComment = async (comment: Comment): Promise<CommentResponse> => {
   try {
     const result = await CommentModel.create(comment);
+    if (result) {
+      const reputationResult = await increaseReputation(comment.commentBy, 1);
+      if (!reputationResult.success) {
+        console.log(reputationResult.error);
+        return { error: reputationResult.error || 'Unknown error' };
+      }
+      console.log('User reputation updated successfully');
+    }
     return result;
   } catch (error) {
     return { error: 'Error when saving a comment' };
@@ -535,6 +579,13 @@ export const addVoteToQuestion = async (
       msg = result.downVotes.includes(username)
         ? 'Question downvoted successfully'
         : 'Downvote cancelled successfully';
+    }
+
+    // Increase reputation by 1 for upvote
+    if (type === 'upvote' && result.upVotes.includes(username)) {
+      await increaseReputation(result.askedBy, 1);
+    } else if (type === 'upvote' && result.downVotes.includes(username)) {
+      await increaseReputation(result.askedBy, -1);
     }
 
     return {
