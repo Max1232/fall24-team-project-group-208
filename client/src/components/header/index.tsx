@@ -1,4 +1,6 @@
+/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import useHeader from '../../hooks/useHeader';
 import './index.css';
 
@@ -10,9 +12,14 @@ import './index.css';
 const Header: React.FC = () => {
   const { val, handleInputChange, handleKeyDown, user, handleSignOut, loading } = useHeader();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => {
     setDropdownOpen(!dropdownOpen);
+  };
+
+  const handleProfileNavigation = () => {
+    navigate('/profile');
   };
 
   // Header includes dropdown menu linking to logout and profile
@@ -33,6 +40,8 @@ const Header: React.FC = () => {
                     className='dropdown-item'
                     onClick={() => {
                       /* to be implemented */
+                      handleProfileNavigation();
+                      setDropdownOpen(false);
                     }}>
                     Profile
                   </li>
