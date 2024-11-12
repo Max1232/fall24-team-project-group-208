@@ -358,8 +358,9 @@ export const fetchAndIncrementQuestionViewsById = async (
  *
  * @returns {Promise<{ success: boolean; error?: string }>} - An object indicating success or failure
  */
-const increaseReputation = async (
+const updateUser = async (
   username: string,
+  attribute: 'reputation' | 'questions' | 'answers' | 'comments',
   amount: number,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
@@ -389,7 +390,7 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
     const result = await QuestionModel.create(question);
     console.log('Question saved successfully, trying to update user reputation...');
     if (result) {
-      const reputationResult = await increaseReputation(question.askedBy, 2);
+      const reputationResult = await updateUser(question.askedBy, 2);
       if (!reputationResult.success) {
         console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
@@ -414,7 +415,7 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result = await AnswerModel.create(answer);
     if (result) {
-      const reputationResult = await increaseReputation(answer.ansBy, 5);
+      const reputationResult = await updateUser(answer.ansBy, 5);
       if (!reputationResult.success) {
         console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
@@ -438,7 +439,7 @@ export const saveComment = async (comment: Comment): Promise<CommentResponse> =>
   try {
     const result = await CommentModel.create(comment);
     if (result) {
-      const reputationResult = await increaseReputation(comment.commentBy, 1);
+      const reputationResult = await updateUser(comment.commentBy, 1);
       if (!reputationResult.success) {
         console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
@@ -583,9 +584,9 @@ export const addVoteToQuestion = async (
 
     // Increase reputation by 1 for upvote
     if (type === 'upvote' && result.upVotes.includes(username)) {
-      await increaseReputation(result.askedBy, 1);
+      await updateUser(result.askedBy, 1);
     } else if (type === 'upvote' && result.downVotes.includes(username)) {
-      await increaseReputation(result.askedBy, -1);
+      await updateUser(result.askedBy, -1);
     }
 
     return {
