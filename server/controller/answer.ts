@@ -68,6 +68,8 @@ const answerController = (socket: FakeSOSocket) => {
       if (populatedAns && 'error' in populatedAns) {
         throw new Error(populatedAns.error as string);
       }
+      
+      
 
       // Populates the fields of the answer that was added and emits the new object
       socket.emit('answerUpdate', {
