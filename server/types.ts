@@ -245,6 +245,13 @@ export interface User {
   uid: string;  // Firebase User ID
   username: string;
   reputation: number;
+  level: number;
+  levelThreshold: number;
+  levelProgress: number;
+  answers: number;
+  questions: number;
+  acceptedAnswers: number;
+  comments: number;
   joinedDate: Date;
 }
 
