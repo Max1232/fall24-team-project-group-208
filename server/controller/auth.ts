@@ -1,10 +1,23 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Response } from 'express';
 import admin from 'firebase-admin';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 import { AuthRequest, FakeSOSocket, ProfileCreatedPayload } from '../types';
 import UserModel from '../models/users';
 
 // Initialize Firebase Admin SDK
-const serviceAccount = require('../fall24-swe-208-firebase-adminsdk-1cfav-f33342b870.json');
+
+dotenv.config();
+
+const SERVICE_ACCOUNT_PATH = process.env.KEY_PATH;
+if (!SERVICE_ACCOUNT_PATH) {
+  throw new Error('KEY_PATH is not defined in the environment variables');
+}
+
+// eslint-disable-next-line import/no-dynamic-require
+const serviceAccount = require(path.resolve(SERVICE_ACCOUNT_PATH));
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -24,7 +37,7 @@ const authController = (socket: FakeSOSocket) => {
   /**
    * Middleware to verify Firebase token from request headers
    */
-  const verifyToken = async (req: AuthRequest, res: Response, next: Function) => {
+  const verifyToken = async (req: AuthRequest, res: Response, next: express.NextFunction) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
 
     if (!token) {
