@@ -40,6 +40,10 @@ const userSchema: Schema = new Schema(
       type: Number,
       default: 0,
     },
+    comments: {
+      type: Number,
+      default: 0,
+    },
     joinedDate: {
       type: Date,
       default: Date.now,
