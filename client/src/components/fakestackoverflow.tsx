@@ -11,6 +11,7 @@ import TagPage from './main/tagPage';
 import NewQuestionPage from './main/newQuestion';
 import NewAnswerPage from './main/newAnswer';
 import AnswerPage from './main/answerPage';
+import ProfilePage from './header/profilePage';
 import auth from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
 
@@ -55,6 +56,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
           <Route path='/question/:qid' element={<AnswerPage />} />
           <Route path='/new/question' element={<NewQuestionPage />} />
           <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
+          <Route path='/profile' element={<ProfilePage />} />
         </Route>
 
         {/* Catch-all route */}
