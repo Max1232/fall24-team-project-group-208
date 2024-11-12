@@ -16,30 +16,6 @@ const userSchema: Schema = new Schema(
       type: Number,
       default: 0,
     },
-    level: {
-      type: Number,
-      default: 0,
-    },
-    levelThreshold: {
-      type: Number,
-      default: 0,
-    },
-    levelProgress: {
-      type: Number,
-      default: 0,
-    },
-    answers: {
-      type: Number,
-      default: 0,
-    },
-    questions: {
-      type: Number,
-      default: 0,
-    },
-    acceptedAnswers: {
-      type: Number,
-      default: 0,
-    },
     joinedDate: {
       type: Date,
       default: Date.now,
