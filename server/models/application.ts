@@ -354,23 +354,31 @@ export const fetchAndIncrementQuestionViewsById = async (
  * Increases the reputation of a user by a given number.
  *
  * @param {string} username - The username of the user whose reputation is to be increased
- * @param {number} amount - The amount by which to increase the reputation
+ * @param {'reputation' | 'questions' | 'answers' | 'comments' | 'acceptedAnswers'} attribute - The attribute to be updated
+ * @param {number} amount - The amount by which to increase the attribute
  *
  * @returns {Promise<{ success: boolean; error?: string }>} - An object indicating success or failure
  */
 const updateUser = async (
   username: string,
-  attribute: 'reputation' | 'questions' | 'answers' | 'comments',
+  attribute: 'reputation' | 'questions' | 'answers' | 'comments' | 'acceptedAnswers',
   amount: number,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
     const updateResult = await UserModel.findOneAndUpdate(
       { username },
-      { $inc: { reputation: amount } },
+      { $inc: { [attribute]: amount } },
     );
     if (!updateResult) {
       return { success: false, error: 'User not found or update failed' };
     }
+    // If the user level is 0 then update their level to level one after their first interaction with the site
+    const user = await UserModel.findOne({ username });
+
+    if (user && user?.level === 0) {
+      await UserModel.updateOne({ username }, { $set: { level: 1 } });
+    }
+
     return { success: true };
   } catch (error) {
     return { success: false, error: 'Error when updating user reputation' };
@@ -390,12 +398,17 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
     const result = await QuestionModel.create(question);
     console.log('Question saved successfully, trying to update user reputation...');
     if (result) {
-      const reputationResult = await updateUser(question.askedBy, 2);
+      const reputationResult = await updateUser(question.askedBy, 'reputation', 2);
       if (!reputationResult.success) {
         console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
       }
-      console.log('User reputation updated successfully');
+      const saveQuestionResult = await updateUser(question.askedBy, 'questions', 1);
+      if (!saveQuestionResult.success) {
+        console.log(saveQuestionResult.error);
+        return { error: saveQuestionResult.error || 'Unknown error' };
+      }
+      console.log('User attributes reputation & questions updated successfully');
     }
     return result;
   } catch (error) {
@@ -415,7 +428,17 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result = await AnswerModel.create(answer);
     if (result) {
-      const reputationResult = await updateUser(answer.ansBy, 5);
+      const reputationResult = await updateUser(answer.ansBy, 'reputation', 5);
+      if (!reputationResult.success) {
+        console.log(reputationResult.error);
+        return { error: reputationResult.error || 'Unknown error' };
+      }
+      const saveAnswerResult = await updateUser(answer.ansBy, 'answers', 1);
+      if (!saveAnswerResult.success) {
+        console.log(saveAnswerResult.error);
+        return { error: saveAnswerResult.error || 'Unknown error' };
+      }
+      console.log('User attributes reputation & answers updated successfully');
       if (!reputationResult.success) {
         console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
@@ -439,12 +462,17 @@ export const saveComment = async (comment: Comment): Promise<CommentResponse> =>
   try {
     const result = await CommentModel.create(comment);
     if (result) {
-      const reputationResult = await updateUser(comment.commentBy, 1);
+      const reputationResult = await updateUser(comment.commentBy, 'reputation', 1);
       if (!reputationResult.success) {
         console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
       }
-      console.log('User reputation updated successfully');
+      const saveCommentResult = await updateUser(comment.commentBy, 'comments', 1);
+      if (!saveCommentResult.success) {
+        console.log(saveCommentResult.error);
+        return { error: saveCommentResult.error || 'Unknown error' };
+      }
+      console.log('User attributes reputation & comments updated successfully');
     }
     return result;
   } catch (error) {
