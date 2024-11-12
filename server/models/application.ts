@@ -351,11 +351,11 @@ export const fetchAndIncrementQuestionViewsById = async (
 };
 
 /**
- * Increases the reputation of a user by a given number.
+ * Updates a user's attribute by a given amount.
  *
- * @param {string} username - The username of the user whose reputation is to be increased
+ * @param {string} username - The username of the user whose attribute is to be updated
  * @param {'reputation' | 'questions' | 'answers' | 'comments' | 'acceptedAnswers'} attribute - The attribute to be updated
- * @param {number} amount - The amount by which to increase the attribute
+ * @param {number} amount - The amount by which to update the attribute
  *
  * @returns {Promise<{ success: boolean; error?: string }>} - An object indicating success or failure
  */
@@ -365,23 +365,56 @@ const updateUser = async (
   amount: number,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
+    // Increment the specified attribute of the user by the given amount
     const updateResult = await UserModel.findOneAndUpdate(
       { username },
       { $inc: { [attribute]: amount } },
     );
     if (!updateResult) {
-      return { success: false, error: 'User not found or update failed' };
+      return { success: false, error: 'User not found or attribute update failed' };
     }
-    // If the user level is 0 then update their level to level one after their first interaction with the site
+
+    // Fetch the updated user to check their level
     const user = await UserModel.findOne({ username });
 
+    /*
+     * If the user's level is 0, update it to level 1 and set the level threshold.
+     * All users start at level 0, but after their first interaction with the site,
+     * they are leveled up to level 1. This is a handy spot to also set the level threshold.
+     */
     if (user && user?.level === 0) {
-      await UserModel.updateOne({ username }, { $set: { level: 1 } });
+      try {
+        await UserModel.updateOne({ username }, { $set: { level: 1 } });
+        const levelOneThreshold = user?.level ? user.level ** 10 * 2 : 0;
+        await UserModel.updateOne({ username }, { $set: { levelThreshold: levelOneThreshold } });
+      } catch (error) {
+        return { success: false, error: 'Error when updating user level from 0' };
+      }
+    }
+
+    // If the user's reputation exceeds their level threshold, increment their level
+    if (user?.level && user?.reputation) {
+      try {
+        const levelThreshold = user?.level ? user.level ** 10 * 2 : 0;
+        if (user.reputation >= levelThreshold) {
+          await UserModel.updateOne({ username }, { $inc: { level: 1 } });
+          const updatedUser = await UserModel.findOne({ username });
+          if (updatedUser?.level) {
+            const updatedLevelThreshold = user?.level ? user.level ** 10 * 2 : 0;
+            await UserModel.updateOne(
+              { username },
+              { $set: { levelThreshold: updatedLevelThreshold } },
+            );
+          }
+        }
+      } catch (error) {
+        return { success: false, error: 'Error when updating user level' };
+      }
     }
 
     return { success: true };
   } catch (error) {
-    return { success: false, error: 'Error when updating user reputation' };
+    return { success: false, error: 'Error when updating user attributes' };
   }
 };
 
