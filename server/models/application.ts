@@ -390,12 +390,17 @@ const updateUser = async (
       } catch (error) {
         return { success: false, error: 'Error when updating user level from 0' };
       }
+    } else {
+      return {
+        success: false,
+        error: 'Error when updating user level from 0, user attributes error',
+      };
     }
 
     // If the user's reputation exceeds their level threshold, increment their level
-    if (user?.level && user?.reputation) {
+    if (user?.level && user?.reputation && user?.levelThreshold && user.level !== 0) {
       try {
-        const levelThreshold = user?.level ? user.level ** 10 * 2 : 0;
+        const levelThreshold = user?.level ? user.level ** 2 * 10 : 0;
         if (user.reputation >= levelThreshold) {
           await UserModel.updateOne({ username }, { $inc: { level: 1 } });
           const updatedUser = await UserModel.findOne({ username });
@@ -410,6 +415,8 @@ const updateUser = async (
       } catch (error) {
         return { success: false, error: 'Error when updating user level' };
       }
+    } else {
+      return { success: false, error: 'Error when updating user level, user attributes error' };
     }
 
     return { success: true };
@@ -645,9 +652,9 @@ export const addVoteToQuestion = async (
 
     // Increase reputation by 1 for upvote
     if (type === 'upvote' && result.upVotes.includes(username)) {
-      await updateUser(result.askedBy, 1);
+      await updateUser(result.askedBy, 'reputation', 1);
     } else if (type === 'upvote' && result.downVotes.includes(username)) {
-      await updateUser(result.askedBy, -1);
+      await updateUser(result.askedBy, 'reputation', -1);
     }
 
     return {
