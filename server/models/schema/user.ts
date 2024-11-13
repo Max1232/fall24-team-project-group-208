@@ -18,11 +18,11 @@ const userSchema: Schema = new Schema(
     },
     level: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     levelThreshold: {
       type: Number,
-      default: 0,
+      default: 100,
     },
     levelProgress: {
       type: Number,
@@ -48,9 +48,17 @@ const userSchema: Schema = new Schema(
       type: Date,
       default: Date.now,
     },
+    __v: {
+      type: Number,
+      default: 0,
+    },
+    badges: {
+      type: [String],
+      default: [],
+    },
   },
   {
-    collection: 'users', // Make sure this matches your desired collection name
+    collection: 'users',
   },
 );
 

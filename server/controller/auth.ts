@@ -76,22 +76,37 @@ const authController = (socket: FakeSOSocket) => {
         return;
       }
 
-      // Create user profile
+      // Create user profile with all fields
       const user = await UserModel.create({
         uid,
         username,
         reputation: 0,
+        level: 1,
+        levelThreshold: 100,
+        levelProgress: 0,
+        answers: 0,
+        questions: 0,
+        acceptedAnswers: 0,
+        comments: 0,
+        badges: [],
         joinedDate: new Date(),
       });
 
       const profilePayload: ProfileCreatedPayload = {
         username: user.username,
         reputation: user.reputation,
+        level: user.level,
+        levelThreshold: user.levelThreshold,
+        levelProgress: user.levelProgress,
+        answers: user.answers,
+        questions: user.questions,
+        acceptedAnswers: user.acceptedAnswers,
+        comments: user.comments,
+        badges: user.badges,
         joinedDate: user.joinedDate,
       };
 
       socket.emit('profileCreated', profilePayload);
-
       res.status(201).json(profilePayload);
     } catch (error) {
       socket.emit('authError', {

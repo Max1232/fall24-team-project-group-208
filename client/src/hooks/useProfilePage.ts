@@ -1,4 +1,76 @@
-import { ChangeEvent, useState, KeyboardEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import auth from '../config/firebase';
+// src/hooks/useProfilePage.ts
+
+import { useState, useEffect } from 'react';
+import useUserContext from './useUserContext';
+import { User } from '../types';
+
+export const useProfilePage = () => {
+  const { user } = useUserContext();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [profileData, setProfileData] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const serverURL = process.env.REACT_APP_SERVER_URL;
+        if (!serverURL) {
+          throw new Error('Server URL not configured');
+        }
+
+        const response = await fetch(`${serverURL}/users/${user.username}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include', // Important for cookies/session
+        });
+
+        if (!response.ok) {
+          if (response.status === 404) {
+            // If user doesn't exist in database yet, use default values
+            setProfileData({
+              username: user.username,
+              reputation: 0,
+              level: 1,
+              levelThreshold: 100,
+              levelProgress: 0,
+              answers: 0,
+              questions: 0,
+              acceptedAnswers: 0,
+              comments: 0,
+              badges: [],
+              joinedDate: new Date(),
+            });
+            return;
+          }
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setProfileData({
+          ...data,
+          joinedDate: data.joinedDate ? new Date(data.joinedDate) : new Date(),
+        });
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        setError(
+          err instanceof Error ? err.message : 'An error occurred while fetching profile data',
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [user]);
+
+  return { profileData, loading, error };
+};
+
+export default useProfilePage;

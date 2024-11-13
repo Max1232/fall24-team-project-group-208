@@ -63,17 +63,29 @@ const useLogin = () => {
     try {
       if (isLogin) {
         // Handle login
-        await signInWithEmailAndPassword(auth, email, password);
-        setUser({ username: email.split('@')[0] }); // Temporary username from email
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const token = await userCredential.user.getIdToken();
+
+        // Fetch user profile
+        const response = await fetch(`http://localhost:8000/auth/profile/${email.split('@')[0]}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch user profile');
+        }
+
+        const userData = await response.json();
+        setUser(userData);
         navigate('/home');
       } else {
         // Handle registration
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-        // Get Firebase token
         const token = await userCredential.user.getIdToken();
 
-        // Create user profile in your backend
+        // Create user profile
         const response = await fetch('http://localhost:8000/auth/profile', {
           method: 'POST',
           headers: {
@@ -89,7 +101,7 @@ const useLogin = () => {
         }
 
         const userData = await response.json();
-        setUser({ username: userData.username });
+        setUser(userData);
         navigate('/home');
       }
     } catch (err) {
