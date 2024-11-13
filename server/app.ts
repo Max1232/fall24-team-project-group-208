@@ -10,6 +10,7 @@ import questionController from './controller/question';
 import tagController from './controller/tag';
 import commentController from './controller/comment';
 import authController from './controller/auth';
+import userController from './controller/user';
 import { FakeSOSocket } from './types';
 
 dotenv.config();
@@ -69,6 +70,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/auth', authController(socket));
 
+app.use('/users', userController());
 app.use('/question', questionController(socket));
 app.use('/tag', tagController());
 app.use('/answer', answerController(socket));

@@ -23,11 +23,29 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
+    const unsubscribe = onAuthStateChanged(auth, async firebaseUser => {
       if (firebaseUser) {
-        setUser({
-          username: firebaseUser.email || 'Anonymous',
-        });
+        try {
+          const token = await firebaseUser.getIdToken();
+          const response = await fetch(
+            `http://localhost:8000/auth/profile/${firebaseUser.email?.split('@')[0]}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
+
+          if (response.ok) {
+            const userData = await response.json();
+            setUser(userData);
+          } else {
+            setUser(null);
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+          setUser(null);
+        }
       } else {
         setUser(null);
       }

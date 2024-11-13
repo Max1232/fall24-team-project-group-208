@@ -1,77 +1,97 @@
 import React from 'react';
+// eslint-disable-next-line import/no-named-as-default
+import useProfilePage from '../../../hooks/useProfilePage';
 import './index.css';
 
-/**
- * ProfilePage component that displays the user's information.
- * Components are not final
- */
+const StatCard = ({ label, value }: { label: string; value: number | undefined }) => (
+  <div className='profile-stat'>
+    <span className='stat-label'>{label}</span>
+    <span className='stat-value'>{value ?? 0}</span>
+  </div>
+);
+
 const ProfilePage: React.FC = () => {
-  // Temp. test user
-  const user = {
-    name: 'John Developer',
-    level: 'Level 1',
-    reputationPoints: 125, // Based on karma rep
-    progressToNextLevel: 125, // based on karma rep
-    levelThreshold: 200, // will change this to be based on level (higher levels take more)
-    // not sure how we track this
-    answers: 23,
-    questions: 15,
-    acceptedAnswers: 12,
-    badges: ['First Answer', 'Knowledge Seeker', 'Expert'],
-  };
+  const { profileData, loading, error } = useProfilePage();
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500' />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='bg-red-50 text-red-600 p-4 rounded-lg'>{error}</div>
+      </div>
+    );
+  }
+
+  if (!profileData) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='text-gray-500'>No profile data available</div>
+      </div>
+    );
+  }
 
   return (
     <div className='profile-page-container'>
       <div className='profile-card'>
         <div className='profile-header'>
           <div className='profile-avatar'>
-            {/* Avatar */}
-            <span className='avatar-icon'>:O</span>
+            <span className='avatar-icon'>
+              {profileData.username.charAt(0).toUpperCase()}
+              {profileData.username.charAt(1).toUpperCase()}
+            </span>
           </div>
           <div className='profile-info'>
-            <h2 className='profile-name'>{user.name}</h2>
+            <h1 className='profile-name'>{profileData.username}</h1>
             <p className='profile-level'>
-              {user.level} - {user.reputationPoints} reputation points
+              Level {profileData.level ?? 1} • {profileData.reputation ?? 0} reputation points
             </p>
           </div>
         </div>
+
         <div className='profile-progress'>
-          <span className='progress-label'>
-            Progress to Level {parseInt(user.level.split(' ')[1], 10) + 1}
-          </span>
+          <span className='progress-label'>Progress to Level {(profileData.level ?? 1) + 1}</span>
           <div className='progress-bar'>
             <div
               className='progress-filled'
-              style={{ width: `${(user.progressToNextLevel / user.levelThreshold) * 100}%` }}></div>
+              style={{
+                width: `${((profileData.levelProgress ?? 0) / (profileData.levelThreshold ?? 100)) * 100}%`,
+              }}
+            />
           </div>
           <span className='progress-values'>
-            {user.progressToNextLevel}/{user.levelThreshold}
+            {profileData.levelProgress ?? 0}/{profileData.levelThreshold ?? 100}
           </span>
         </div>
+
         <div className='profile-stats'>
-          <div className='profile-stat'>
-            <span className='stat-label'>Answers</span>
-            <span className='stat-value'>{user.answers}</span>
-          </div>
-          <div className='profile-stat'>
-            <span className='stat-label'>Questions</span>
-            <span className='stat-value'>{user.questions}</span>
-          </div>
-          <div className='profile-stat'>
-            <span className='stat-label'>Accepted Answers</span>
-            <span className='stat-value'>{user.acceptedAnswers}</span>
-          </div>
+          <StatCard label='Answers' value={profileData.answers} />
+          <StatCard label='Questions' value={profileData.questions} />
+          <StatCard label='Accepted Answers' value={profileData.acceptedAnswers} />
         </div>
+
         <div className='profile-badges'>
-          <h3 className='badges-title'>Badges</h3>
+          <h2 className='badges-title'>Badges ({(profileData.badges ?? []).length})</h2>
           <div className='badges-list'>
-            {user.badges.map((badge, index) => (
+            {(profileData.badges ?? []).map((badge, index) => (
               <div key={index} className='badge-item'>
                 {badge}
               </div>
             ))}
           </div>
         </div>
+
+        {profileData.joinedDate && (
+          <div className='profile-join-date'>
+            Member since {new Date(profileData.joinedDate).toLocaleDateString()}
+          </div>
+        )}
       </div>
     </div>
   );

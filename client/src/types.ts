@@ -3,10 +3,21 @@ import { Socket } from 'socket.io-client';
 export type FakeSOSocket = Socket<ServerToClientEvents>;
 
 /**
- * Represents a user in the application.
+ * Represents a user in the client application.
+ * Contains only the fields needed for display and client-side functionality.
  */
 export interface User {
   username: string;
+  reputation?: number;
+  level?: number;
+  levelThreshold?: number;
+  levelProgress?: number;
+  answers?: number;
+  questions?: number;
+  acceptedAnswers?: number;
+  comments?: number;
+  joinedDate?: Date;
+  badges?: string[];
 }
 
 /**

@@ -55,6 +55,7 @@ const Login = () => {
         />
 
         <button type='submit' className='login-button' disabled={loading}>
+          {/* eslint-disable-next-line no-nested-ternary */}
           {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
         </button>
 

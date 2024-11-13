@@ -219,6 +219,14 @@ export interface AuthUpdatePayload {
 export interface ProfileCreatedPayload {
   username: string;
   reputation: number;
+  level: number;
+  levelThreshold: number;
+  levelProgress: number;
+  answers: number;
+  questions: number;
+  acceptedAnswers: number;
+  comments: number;
+  badges: string[];
   joinedDate: Date;
 }
 
@@ -241,11 +249,23 @@ export interface ServerToClientEvents {
   authError: (error: { message: string }) => void;
 }
 
+/**
+ * Represents a user in the server/database.
+ * Contains all fields from the MongoDB schema.
+ */
 export interface User {
   uid: string;  // Firebase User ID
   username: string;
   reputation: number;
+  level: number;
+  levelThreshold: number;
+  levelProgress: number;
+  answers: number;
+  questions: number;
+  acceptedAnswers: number;
+  comments: number;
   joinedDate: Date;
+  badges: string[];
 }
 
 export interface AuthRequest extends Request {
