@@ -114,3 +114,4 @@ server/authKey.json
 server/.env
 client/.env
 .aider*
+server/results.json
