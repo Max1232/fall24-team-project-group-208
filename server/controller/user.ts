@@ -1,5 +1,3 @@
-// server/controller/user.ts
-
 import express, { Request, Response } from 'express';
 import UserModel from '../models/users';
 
