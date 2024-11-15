@@ -3,8 +3,14 @@
 # Welcome message
 echo 'Welcome to the test script'
 
-# Define the output file
-OUTPUT_FILE="testResults.json"
+# Get the current date time in the format of "HHHH_DDMONTHYYYY" with shortened month name
+CURRENT_DATE=$(date +"%H%M_%b%Y")
+
+# Create the output file
+touch "testResults"$CURRENT_DATE".json"
+
+# Define the output file with the current date time
+OUTPUT_FILE="testResults"$CURRENT_DATE".json"
 
 # Default test path
 TEST_PATH="tests/*"
