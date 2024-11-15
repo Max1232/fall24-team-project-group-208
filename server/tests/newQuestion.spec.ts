@@ -26,7 +26,7 @@ const UID: string = new mongoose.Types.ObjectId('507f191e810c19729de860eb').toSt
 const mockUser: User = {
   uid: UID,
   username: 'question3_user',
-  reputation: 10,
+  reputation: 0,
   joinedDate: new Date('2024-01-01'),
   level: 0,
   levelThreshold: 0,
@@ -222,6 +222,12 @@ describe('POST /addQuestion', () => {
     jest.spyOn(util, 'saveQuestion').mockResolvedValueOnce(mockQuestion as Question);
     jest.spyOn(util, 'populateDocument').mockResolvedValueOnce(mockQuestion as Question);
 
+    // Asserting the user reputation has increased by 2
+    expect(mockUser?.reputation).toBe(0);
+
+    // Asserting the user's level has increased to 1
+    expect(mockUser?.level).toBe(0);
+
     // Mocking UserModel with mockingoose
     mockingoose(UserModel).toReturn(
       { ...mockUser, reputation: mockUser.reputation + 2 },
@@ -275,5 +281,8 @@ describe('POST /addQuestion', () => {
 
     // Asserting the user reputation has not increased
     expect(updatedUser?.reputation).toBe(mockUser.reputation);
+
+    // Asserting the user level has not increased
+    expect(updatedUser?.level).toBe(mockUser.level);
   });
 });
