@@ -21,10 +21,8 @@ const tag2: Tag = {
   description: 'tag2 description',
 };
 
-const UID: string = new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(); // Removed unused variable
-
 const mockUser: User = {
-  uid: UID,
+  uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
   username: 'question3_user',
   reputation: 0,
   joinedDate: new Date('2024-01-01'),

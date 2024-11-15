@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
 import Tags from '../models/tags';
 import QuestionModel from '../models/questions';
 import {
@@ -16,9 +17,10 @@ import {
   addComment,
   addVoteToQuestion,
 } from '../models/application';
-import { Answer, Question, Tag, Comment } from '../types';
+import { Answer, Question, Tag, Comment, User } from '../types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
 import AnswerModel from '../models/answers';
+import * as util from '../models/application';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
@@ -41,10 +43,24 @@ const tag3: Tag = {
   description: T3_DESC,
 };
 
+const com1MockUser: User = {
+  uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
+  username: 'com_by1',
+  reputation: 0,
+  joinedDate: new Date('2024-01-01'),
+  level: 0,
+  levelThreshold: 0,
+  levelProgress: 0,
+  answers: 0,
+  questions: 0,
+  acceptedAnswers: 0,
+  comments: 0,
+};
+
 const com1: Comment = {
   _id: new ObjectId('65e9b58910afe6e94fc6e6de'),
   text: 'com1',
-  commentBy: 'com_by1',
+  commentBy: com1MockUser.username,
   commentDateTime: new Date('2023-11-18T09:25:00'),
 };
 
@@ -402,11 +418,25 @@ describe('application module', () => {
 
     describe('saveQuestion', () => {
       test('saveQuestion should return the saved question', async () => {
+        const mockQnMockUser: User = {
+          uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
+          username: 'question3_user',
+          reputation: 0,
+          joinedDate: new Date('2024-01-01'),
+          level: 0,
+          levelThreshold: 0,
+          levelProgress: 0,
+          answers: 0,
+          questions: 0,
+          acceptedAnswers: 0,
+          comments: 0,
+        };
+
         const mockQn = {
           title: 'New Question Title',
           text: 'New Question Text',
           tags: [tag1, tag2],
-          askedBy: 'question3_user',
+          askedBy: mockQnMockUser.username,
           askDateTime: new Date('2024-06-06'),
           answers: [],
           views: [],
@@ -414,6 +444,7 @@ describe('application module', () => {
           downVotes: [],
           comments: [],
         };
+        jest.spyOn(util, 'saveQuestion').mockResolvedValueOnce(mockQn as Question);
         // TODO: Fix the errors in the saveQuestion function
         // They are failing because we are not mocking the user
         // to which to increase their reputation.
