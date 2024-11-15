@@ -1,5 +1,3 @@
-// src/hooks/useProfilePage.ts
-
 import { useState, useEffect } from 'react';
 import useUserContext from './useUserContext';
 import { User } from '../types';
@@ -20,7 +18,9 @@ export const useProfilePage = () => {
       try {
         const serverURL = process.env.REACT_APP_SERVER_URL;
         if (!serverURL) {
-          throw new Error('Server URL not configured');
+          setError('Server URL not configured');
+          setLoading(false);
+          return;
         }
 
         const response = await fetch(`${serverURL}/users/${user.username}`, {
@@ -49,7 +49,9 @@ export const useProfilePage = () => {
             });
             return;
           }
-          throw new Error(`HTTP error! status: ${response.status}`);
+          setError(`HTTP error! status: ${response.status}`);
+          setLoading(false);
+          return;
         }
 
         const data = await response.json();
@@ -58,10 +60,7 @@ export const useProfilePage = () => {
           joinedDate: data.joinedDate ? new Date(data.joinedDate) : new Date(),
         });
       } catch (err) {
-        console.error('Error fetching profile:', err);
-        setError(
-          err instanceof Error ? err.message : 'An error occurred while fetching profile data',
-        );
+        setError(`Error fetching profile: ${(err as Error).message}`);
       } finally {
         setLoading(false);
       }

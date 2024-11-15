@@ -43,8 +43,8 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             setUser(null);
           }
         } catch (error) {
-          console.error('Error fetching user profile:', error);
           setUser(null);
+          throw new Error(`Error fetching user profile: ${(error as Error).message}`);
         }
       } else {
         setUser(null);

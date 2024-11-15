@@ -42,7 +42,7 @@ const useHeader = () => {
       // Navigate to root path instead of /login
       navigate('/', { replace: true });
     } catch (error) {
-      console.error('Error signing out:', error);
+      throw new Error(`Error signing out: ${error}`);
     }
   };
 
