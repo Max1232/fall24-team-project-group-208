@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Welcome message
-echo 'Welcome to the test script'
+# Clear screen
+clear
 
 # Get the current date time in the format of "HHHH_DDMONTHYYYY" with shortened month name
 CURRENT_DATE=$(date +"%H%M_%b%Y")
