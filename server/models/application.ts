@@ -10,6 +10,7 @@ import {
   Question,
   QuestionResponse,
   Tag,
+  User,
 } from '../types';
 import AnswerModel from './answers';
 import QuestionModel from './questions';
@@ -359,30 +360,33 @@ export const fetchAndIncrementQuestionViewsById = async (
  */
 const checkUserTier = async (username: string): Promise<{ success: boolean; error?: string }> => {
   // Fetch the updated user to check their level
-  const user = await UserModel.findOne({ username });
+  let user = (await UserModel.findOne({ username }, { level: 0 })) as User | null;
 
   /*
    * If the user's level is 0, update it to level 1 and set the level threshold.
    * All users start at level 0, but after their first interaction with the site,
    * they are leveled up to level 1.
    */
-  if (user && user?.level === 0) {
+  if (user) {
     try {
+      console.log('Attempting to update user level from 0...');
       await UserModel.updateOne({ username }, { $set: { level: 1 } });
       const levelOneThreshold = user?.level ? user.level ** 10 * 2 : 0;
       await UserModel.updateOne({ username }, { $set: { levelThreshold: levelOneThreshold } });
     } catch (error) {
-      return { success: false, error: 'Error when updating user level from 0' };
+      return {
+        success: false,
+        error: 'Error when updating user level from 0',
+      };
     }
   } else {
-    return {
-      success: false,
-      error: 'Error when updating user level from 0, user attributes error',
-    };
+    console.log('User level is not 0...');
+    user = (await UserModel.findOne({ username })) as User | null;
   }
 
   // If the user's reputation exceeds their level threshold, increment their level
-  if (user?.level && user?.reputation && user?.levelThreshold && user.level !== 0) {
+  if (user) {
+    console.log('Attempting to update user level...');
     try {
       /**
        * Calculate the level threshold based on the user's current level
@@ -410,6 +414,7 @@ const checkUserTier = async (username: string): Promise<{ success: boolean; erro
       return { success: false, error: 'Error when updating user level' };
     }
   } else {
+    console.log('User not found...');
     return { success: false, error: 'Error when updating user level, user attributes error' };
   }
 
@@ -431,6 +436,7 @@ const updateUser = async (
   amount: number,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
+    console.log('Attempting to update user attributes...');
     // Increment the specified attribute of the user by the given amount
     const updateResult = await UserModel.findOneAndUpdate(
       { username },
@@ -441,9 +447,12 @@ const updateUser = async (
     }
 
     // Check and update the user's tier
-    const tierResult = await checkUserTier(username);
-    if (!tierResult.success) {
-      return { success: false, error: tierResult.error };
+    if (attribute === 'reputation') {
+      console.log('Given attribute is reputation...');
+      const tierResult = await checkUserTier(username);
+      if (!tierResult.success) {
+        return { success: false, error: tierResult.error };
+      }
     }
 
     return { success: true };
