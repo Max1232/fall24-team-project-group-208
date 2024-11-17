@@ -66,8 +66,8 @@ fi
 
 # Check if the $OUTPUT_FILE contains the string "COMMAND_EXIT_CODE="130""
 if grep -q "COMMAND_EXIT_CODE=\"130\"" $OUTPUT_FILE; then
-    echo "Test script was interrupted"
-    echo "Removing the $OUTPUT_FILE"
+    echo ""
+    echo "Test script was interrupted, removing the $OUTPUT_FILE"
     rm $OUTPUT_FILE
 else    
     mv $OUTPUT_FILE testResults/
