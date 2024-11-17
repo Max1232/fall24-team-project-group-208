@@ -61,11 +61,6 @@ const simplifyQuestion = (question: Question) => ({
   askDateTime: question.askDateTime.toISOString(),
 });
 
-const getUserById = async (username: string) => {
-  const user = await UserModel.findOne({ username });
-  return user?._id; // This will return the user's ID if found
-};
-
 describe('POST /addQuestion', () => {
   afterEach(async () => {
     await mongoose.connection.close(); // Ensure the connection is properly closed

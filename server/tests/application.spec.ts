@@ -1,10 +1,9 @@
+/* eslint-disable no-console */
 import { ObjectId } from 'mongodb';
-import mongoose, { set } from 'mongoose';
-// import supertest from 'supertest';
-import { mock } from 'node:test';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import Tags from '../models/tags';
 import QuestionModel from '../models/questions';
-// import { app } from '../app';
 import {
   addTag,
   getQuestionsByOrder,
@@ -17,13 +16,10 @@ import {
   addAnswerToQuestion,
   getTagCountMap,
   saveComment,
-  addComment,
   addVoteToQuestion,
 } from '../models/application';
 import { Answer, Question, Tag, Comment, User } from '../types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
-// import AnswerModel from '../models/answers';
-import * as util from '../models/application';
 import UserModel from '../models/users';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -155,15 +151,32 @@ const QUESTIONS: Question[] = [
   },
 ];
 
+let mongoServer: MongoMemoryServer;
+
 describe('application module', () => {
   beforeEach(() => {
     mockingoose.resetAll();
   });
-  describe('Question model', () => {
-    beforeEach(() => {
-      mockingoose.resetAll();
-    });
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
+  });
+  afterAll(async () => {
+    await mongoose.connection.close(); // Ensure the connection is properly closed
+    await mongoose.disconnect();
+    await mongoServer.stop();
+  });
+  afterEach(async () => {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(mongoServer.getUri());
+    }
+    if (mongoose.connection.db) {
+      await mongoose.connection.db.dropDatabase();
+    }
+  });
 
+  describe('Question model', () => {
     describe('filterQuestionsBySearch', () => {
       test('filter questions with empty search string should return all questions', () => {
         const result = filterQuestionsBySearch(QUESTIONS, '');
@@ -421,9 +434,6 @@ describe('application module', () => {
     });
 
     describe('saveQuestion', () => {
-      beforeEach(() => {
-        mockingoose.resetAll();
-      });
       test('saveQuestion should return the saved question', async () => {
         const mockQnMockUser: User = {
           uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
@@ -935,6 +945,5 @@ describe('application module', () => {
         expect(result.commentDateTime).toEqual(com1.commentDateTime);
       });
     });
-    // ...existing code...
   });
 });

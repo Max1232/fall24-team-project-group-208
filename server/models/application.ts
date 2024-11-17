@@ -402,7 +402,7 @@ const checkUserTier = async (username: string): Promise<{ success: boolean; erro
         const updatedUser = await UserModel.findOne({ username });
         if (updatedUser?.level) {
           // Calculate the new level threshold based on the updated level
-          const updatedLevelThreshold = user?.level ? user.level ** 10 * 2 : 0;
+          const updatedLevelThreshold = user?.level ? user.level ** 2 * 10 : 0;
           // Update the user's level threshold
           await UserModel.updateOne(
             { username },
@@ -515,11 +515,6 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
         return { error: saveAnswerResult.error || 'Unknown error' };
       }
       console.log('User attributes reputation & answers updated successfully');
-      if (!reputationResult.success) {
-        console.log(reputationResult.error);
-        return { error: reputationResult.error || 'Unknown error' };
-      }
-      console.log('User reputation updated successfully');
     }
     return result;
   } catch (error) {
@@ -773,6 +768,26 @@ export const addComment = async (
     return result;
   } catch (error) {
     return { error: `Error when adding comment: ${(error as Error).message}` };
+  }
+};
+
+/**
+ * Fetches user data from the database based on the provided username.
+ *
+ * @param {string} username - The username of the user to fetch data for
+ *
+ * @returns {Promise<User | null>} - A promise that resolves to the user data if found, or null if not found or an error occurs
+ */
+export const getUserData = async (username: string): Promise<User | null> => {
+  try {
+    const user = await UserModel.findOne({ username })
+      .populate('questions')
+      .populate('answers')
+      .populate('comments');
+    return user;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
   }
 };
 

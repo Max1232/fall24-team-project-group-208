@@ -14,10 +14,8 @@ const popDocSpy = jest.spyOn(util, 'populateDocument');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
-const UID: string = new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString();
-
 const mockUser: User = {
-  uid: UID,
+  uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
   username: 'answer_user',
   reputation: 10,
   joinedDate: new Date('2024-01-01'),
