@@ -360,19 +360,18 @@ export const fetchAndIncrementQuestionViewsById = async (
  */
 const checkUserTier = async (username: string): Promise<{ success: boolean; error?: string }> => {
   // Fetch the updated user to check their level
-  let user = (await UserModel.findOne({ username }, { level: 0 })) as User | null;
+  const user = (await UserModel.findOne({ username })) as User | null;
 
   /*
    * If the user's level is 0, update it to level 1 and set the level threshold.
    * All users start at level 0, but after their first interaction with the site,
    * they are leveled up to level 1.
    */
-  if (user) {
+  if (user != null && user.level === 0) {
     try {
       console.log('Attempting to update user level from 0...');
-      await UserModel.updateOne({ username }, { $set: { level: 1 } });
-      const levelOneThreshold = user?.level ? user.level ** 10 * 2 : 0;
-      await UserModel.updateOne({ username }, { $set: { levelThreshold: levelOneThreshold } });
+      await UserModel.updateOne({ username }, { $set: { level: 1, levelThreshold: 10 } });
+      return { success: true };
     } catch (error) {
       return {
         success: false,
@@ -381,11 +380,10 @@ const checkUserTier = async (username: string): Promise<{ success: boolean; erro
     }
   } else {
     console.log('User level is not 0...');
-    user = (await UserModel.findOne({ username })) as User | null;
   }
 
   // If the user's reputation exceeds their level threshold, increment their level
-  if (user) {
+  if (user != null && user.level != null) {
     console.log('Attempting to update user level...');
     try {
       /**
@@ -396,19 +394,14 @@ const checkUserTier = async (username: string): Promise<{ success: boolean; erro
       const levelThreshold = user?.level ? user.level ** 2 * 10 : 0;
       // Check if the user's reputation meets or exceeds the level threshold
       if (user.reputation >= levelThreshold) {
-        // Increment the user's level by 1
-        await UserModel.updateOne({ username }, { $inc: { level: 1 } });
-        // Fetch the updated user to get the new level
-        const updatedUser = await UserModel.findOne({ username });
-        if (updatedUser?.level) {
-          // Calculate the new level threshold based on the updated level
-          const updatedLevelThreshold = user?.level ? user.level ** 2 * 10 : 0;
-          // Update the user's level threshold
-          await UserModel.updateOne(
-            { username },
-            { $set: { levelThreshold: updatedLevelThreshold } },
-          );
-        }
+        // Increment the user's level by 1 and update the level threshold in one call
+        await UserModel.updateOne(
+          { username },
+          {
+            $inc: { level: 1 },
+            $set: { levelThreshold: (user.level + 1) ** 2 * 10 },
+          },
+        );
       }
     } catch (error) {
       return { success: false, error: 'Error when updating user level' };
