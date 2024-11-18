@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ChangeEvent, useState, KeyboardEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';

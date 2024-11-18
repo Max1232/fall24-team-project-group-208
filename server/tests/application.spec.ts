@@ -1,4 +1,7 @@
+/* eslint-disable no-console */
 import { ObjectId } from 'mongodb';
+import mongoose from 'mongoose';
+import { MongoMemoryServer } from 'mongodb-memory-server';
 import Tags from '../models/tags';
 import QuestionModel from '../models/questions';
 import {
@@ -13,13 +16,13 @@ import {
   addAnswerToQuestion,
   getTagCountMap,
   saveComment,
-  addComment,
   addVoteToQuestion,
+  addComment,
 } from '../models/application';
-import { Answer, Question, Tag, Comment } from '../types';
+import { Answer, Question, Tag, Comment, User } from '../types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
+import UserModel from '../models/users';
 import AnswerModel from '../models/answers';
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
@@ -41,10 +44,24 @@ const tag3: Tag = {
   description: T3_DESC,
 };
 
+const com1MockUser: User = {
+  uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
+  username: 'com_by1',
+  reputation: 0,
+  joinedDate: new Date('2024-01-01'),
+  level: 0,
+  levelThreshold: 0,
+  levelProgress: 0,
+  answers: 0,
+  questions: 0,
+  acceptedAnswers: 0,
+  comments: 0,
+};
+
 const com1: Comment = {
   _id: new ObjectId('65e9b58910afe6e94fc6e6de'),
   text: 'com1',
-  commentBy: 'com_by1',
+  commentBy: com1MockUser.username,
   commentDateTime: new Date('2023-11-18T09:25:00'),
 };
 
@@ -135,15 +152,32 @@ const QUESTIONS: Question[] = [
   },
 ];
 
+let mongoServer: MongoMemoryServer;
+
 describe('application module', () => {
   beforeEach(() => {
     mockingoose.resetAll();
   });
-  describe('Question model', () => {
-    beforeEach(() => {
-      mockingoose.resetAll();
-    });
+  beforeAll(async () => {
+    mongoServer = await MongoMemoryServer.create();
+    const uri = mongoServer.getUri();
+    await mongoose.connect(uri);
+  });
+  afterAll(async () => {
+    await mongoose.connection.close(); // Ensure the connection is properly closed
+    await mongoose.disconnect();
+    await mongoServer.stop();
+  });
+  afterEach(async () => {
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(mongoServer.getUri());
+    }
+    if (mongoose.connection.db) {
+      await mongoose.connection.db.dropDatabase();
+    }
+  });
 
+  describe('Question model', () => {
     describe('filterQuestionsBySearch', () => {
       test('filter questions with empty search string should return all questions', () => {
         const result = filterQuestionsBySearch(QUESTIONS, '');
@@ -402,11 +436,25 @@ describe('application module', () => {
 
     describe('saveQuestion', () => {
       test('saveQuestion should return the saved question', async () => {
+        const mockQnMockUser: User = {
+          uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
+          username: 'question3_user',
+          reputation: 0,
+          joinedDate: new Date('2024-01-01'),
+          level: 0,
+          levelThreshold: 0,
+          levelProgress: 0,
+          answers: 0,
+          questions: 0,
+          acceptedAnswers: 0,
+          comments: 0,
+        };
+
         const mockQn = {
           title: 'New Question Title',
           text: 'New Question Text',
           tags: [tag1, tag2],
-          askedBy: 'question3_user',
+          askedBy: mockQnMockUser.username,
           askDateTime: new Date('2024-06-06'),
           answers: [],
           views: [],
@@ -414,6 +462,17 @@ describe('application module', () => {
           downVotes: [],
           comments: [],
         };
+
+        mockingoose(UserModel).toReturn(
+          { ...mockQnMockUser, reputation: mockQnMockUser.reputation + 2 },
+          'findOneAndUpdate',
+        );
+
+        // Mocking UserModel to return the updated user with increased level
+        mockingoose(UserModel).toReturn(
+          { ...mockQnMockUser, reputation: mockQnMockUser.reputation + 2, level: 1 },
+          'findOne',
+        );
 
         const result = (await saveQuestion(mockQn)) as Question;
 
@@ -593,13 +652,45 @@ describe('application module', () => {
   describe('Answer model', () => {
     describe('saveAnswer', () => {
       test('saveAnswer should return the saved answer', async () => {
+        const answerMockUser: User = {
+          uid: new mongoose.Types.ObjectId('507f191e810c19729de860eb').toString(),
+          username: 'dummyUserId',
+          reputation: 0,
+          joinedDate: new Date('2024-01-01'),
+          level: 0,
+          levelThreshold: 0,
+          levelProgress: 0,
+          answers: 0,
+          questions: 0,
+          acceptedAnswers: 0,
+          comments: 0,
+        };
         const mockAnswer = {
           text: 'This is a test answer',
-          ansBy: 'dummyUserId',
+          ansBy: answerMockUser.username,
           ansDateTime: new Date('2024-06-06'),
           comments: [],
         };
 
+        mockingoose(UserModel).toReturn(
+          { ...answerMockUser, reputation: answerMockUser.reputation + 1 },
+          'findOneAndUpdate',
+        );
+        mockingoose(UserModel).toReturn(answerMockUser, 'findOne');
+        mockingoose(UserModel).toReturn(
+          { ...answerMockUser, set: answerMockUser.level + 1 },
+          'updateOne',
+        );
+        const updatedLevelThreshold = answerMockUser?.level ? answerMockUser.level ** 10 * 2 : 0;
+        mockingoose(UserModel).toReturn(
+          { ...answerMockUser, set: { levelThreshold: updatedLevelThreshold } },
+          'updateOne',
+        );
+        // saveComment -> updateUser(answer.answerBy, 'answer', 1);
+        mockingoose(UserModel).toReturn(
+          { ...answerMockUser, answer: answerMockUser.answers + 1 },
+          'findOneAndUpdate',
+        );
         const result = (await saveAnswer(mockAnswer)) as Answer;
 
         expect(result._id).toBeDefined();
@@ -807,17 +898,6 @@ describe('application module', () => {
   });
 
   describe('Comment model', () => {
-    describe('saveComment', () => {
-      test('saveComment should return the saved comment', async () => {
-        const result = (await saveComment(com1)) as Comment;
-
-        expect(result._id).toBeDefined();
-        expect(result.text).toEqual(com1.text);
-        expect(result.commentBy).toEqual(com1.commentBy);
-        expect(result.commentDateTime).toEqual(com1.commentDateTime);
-      });
-    });
-
     describe('addComment', () => {
       test('addComment should return the updated question when given `question`', async () => {
         // copy the question to avoid modifying the original
@@ -881,6 +961,128 @@ describe('application module', () => {
           expect(err).toBeInstanceOf(Error);
           if (err instanceof Error) expect(err.message).toBe('Invalid comment');
         }
+      });
+    });
+    describe('addComment', () => {
+      test('addComment should return the updated question when given `question`', async () => {
+        // copy the question to avoid modifying the original
+        const question = { ...QUESTIONS[0], comments: [com1] };
+        mockingoose(QuestionModel).toReturn(question, 'findOneAndUpdate');
+
+        const result = (await addComment(
+          question._id?.toString() as string,
+          'question',
+          com1,
+        )) as Question;
+
+        expect(result.comments.length).toEqual(1);
+        expect(result.comments).toContain(com1._id);
+      });
+
+      test('addComment should return the updated answer when given `answer`', async () => {
+        // copy the answer to avoid modifying the original
+        const answer: Answer = {
+          _id: new ObjectId('65e9b58910afe6e94fc6e6dc'),
+          text: 'ans1',
+          ansBy: 'ansBy1',
+          ansDateTime: new Date('2023-11-18T09:24:00'),
+          comments: [],
+        };
+        // const answer: Answer = { ...ans1 };
+        (answer.comments as Comment[]).push(com1);
+        expect(answer.comments.length).toEqual(1);
+
+        mockingoose(AnswerModel).toReturn(answer, 'findOneAndUpdate');
+
+        const result = (await addComment(
+          answer._id?.toString() as string,
+          'answer',
+          com1,
+        )) as Answer;
+
+        expect(result.comments.length).toEqual(1);
+        expect(result.comments).toContain(com1._id);
+      });
+
+      test('addComment should return an object with error if findOneAndUpdate throws an error', async () => {
+        const question = QUESTIONS[0];
+        mockingoose(QuestionModel).toReturn(
+          new Error('Error from findOneAndUpdate'),
+          'findOneAndUpdate',
+        );
+        const result = await addComment(question._id?.toString() as string, 'question', com1);
+        expect(result).toEqual({ error: 'Error when adding comment: Error from findOneAndUpdate' });
+      });
+
+      test('addComment should return an object with error if findOneAndUpdate returns null', async () => {
+        const answer: Answer = { ...ans1 };
+        mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
+        const result = await addComment(answer._id?.toString() as string, 'answer', com1);
+        expect(result).toEqual({ error: 'Error when adding comment: Failed to add comment' });
+      });
+
+      test('addComment should throw an error if a required field is missing in the comment', async () => {
+        const invalidComment: Partial<Comment> = {
+          text: 'This is an answer text',
+          commentBy: 'user123', // Missing commentDateTime
+        };
+
+        const qid = 'validQuestionId';
+
+        try {
+          await addComment(qid, 'question', invalidComment as Comment);
+        } catch (err: unknown) {
+          expect(err).toBeInstanceOf(Error);
+          if (err instanceof Error) expect(err.message).toBe('Invalid comment');
+        }
+      });
+    });
+    describe('saveComment', () => {
+      test('saveComment should return the saved comment', async () => {
+        // All of SaveComment's calls to UseModel to mockingoose
+        /** SaveComment makes these calls
+         * First call
+         * updateUser(comment.commentBy, 'reputation', 1); ->
+         * updateUser -> await UserModel.findOneAndUpdate({ username },{ $inc: { [attribute]: amount } },
+         * updateUser -> checkUserTier(username);
+         * updateUser -> checkUserTier -> UserModel.findOne({ username });
+         * updateUser -> checkUserTier -> UserModel.updateOne({ username }, { $set: { level: 1 } });
+         * updateUser-> checkUserTier -> UserModel.updateOne({ username }, { $set: { levelThreshold: levelOneThreshold } })
+         * updateUser -> checkUserTier -> end
+         * updateUser -> end
+         * Second call
+         * updateUser(comment.commentBy, 'comments', 1);
+         * updateUser -> await UserModel.findOneAndUpdate({ username },{ $inc: { [attribute]: amount } },
+         * */
+
+        // Mocking UserModel with mockingoose
+        // saveComment -> updateUser(comment.commentBy, 'reputation', 1);
+        mockingoose(UserModel).toReturn(
+          { ...com1MockUser, reputation: com1MockUser.reputation + 1 },
+          'findOneAndUpdate',
+        );
+        mockingoose(UserModel).toReturn(com1MockUser, 'findOne');
+        mockingoose(UserModel).toReturn(
+          { ...com1MockUser, set: com1MockUser.level + 1 },
+          'updateOne',
+        );
+        const updatedLevelThreshold = com1MockUser?.level ? com1MockUser.level ** 10 * 2 : 0;
+        mockingoose(UserModel).toReturn(
+          { ...com1MockUser, set: { levelThreshold: updatedLevelThreshold } },
+          'updateOne',
+        );
+        // saveComment -> updateUser(comment.commentBy, 'comments', 1);
+        mockingoose(UserModel).toReturn(
+          { ...com1MockUser, comments: com1MockUser.comments + 1 },
+          'findOneAndUpdate',
+        );
+
+        const result = (await saveComment(com1)) as Comment;
+
+        expect(result._id).toBeDefined();
+        expect(result.text).toEqual(com1.text);
+        expect(result.commentBy).toEqual(com1.commentBy);
+        expect(result.commentDateTime).toEqual(com1.commentDateTime);
       });
     });
   });

@@ -22,7 +22,7 @@ const userSchema: Schema = new Schema(
     },
     levelThreshold: {
       type: Number,
-      default: 10,
+      default: 0,
     },
     levelProgress: {
       type: Number,

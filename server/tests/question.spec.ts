@@ -3,6 +3,10 @@ import mongoose from 'mongoose';
 import { app } from '../app';
 import * as util from '../models/application';
 import { Question } from '../types';
+import UserModel from '../models/users';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockingoose = require('mockingoose');
 
 const addVoteToQuestionSpy = jest.spyOn(util, 'addVoteToQuestion');
 
@@ -200,6 +204,98 @@ describe('POST /upvoteQuestion', () => {
 
     expect(response.status).toBe(400);
   });
+
+  it('should increase user reputation by 1 when a question is upvoted', async () => {
+    const mockReqBody = {
+      qid: '65e9b5a995b6c7045a30d823',
+      username: 'new-user',
+    };
+
+    const mockResponse = {
+      msg: 'Question upvoted successfully',
+      upVotes: ['new-user'],
+      downVotes: [],
+    };
+
+    addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { username: 'question2_user', reputation: 11 },
+      'findOneAndUpdate',
+    );
+
+    const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(mockResponse);
+
+    // Fetching the updated user
+    mockingoose(UserModel).toReturn({ username: 'question2_user', reputation: 11 }, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ username: 'question2_user' });
+    expect(updatedUser?.reputation).toBe(11);
+  });
+
+  it('should not increase user reputation if the upvote does not pass', async () => {
+    const mockReqBody = {
+      qid: '65e9b5a995b6c7045a30d823',
+      username: 'new-user',
+    };
+
+    const mockResponse = {
+      error: 'Question not found!',
+    };
+
+    addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { username: 'question2_user', reputation: 10 },
+      'findOneAndUpdate',
+    );
+
+    const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error when upvoteing: Question not found!');
+
+    // Fetching the updated user
+    mockingoose(UserModel).toReturn({ username: 'question2_user', reputation: 10 }, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ username: 'question2_user' });
+    expect(updatedUser?.reputation).toBe(10);
+  });
+
+  it('should not increase user reputation if there is an error when adding upvote', async () => {
+    const mockReqBody = {
+      qid: '65e9b5a995b6c7045a30d823',
+      username: 'new-user',
+    };
+
+    const mockResponse = {
+      error: 'Error when adding upvote to question',
+    };
+
+    addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { username: 'question2_user', reputation: 10 },
+      'findOneAndUpdate',
+    );
+
+    const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error when upvoteing: Error when adding upvote to question');
+
+    // Fetching the updated user
+    mockingoose(UserModel).toReturn({ username: 'question2_user', reputation: 10 }, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ username: 'question2_user' });
+    expect(updatedUser?.reputation).toBe(10);
+  });
 });
 
 describe('POST /downvoteQuestion', () => {
@@ -306,6 +402,107 @@ describe('POST /downvoteQuestion', () => {
     const response = await supertest(app).post(`/question/downvoteQuestion`).send(mockReqBody);
 
     expect(response.status).toBe(400);
+  });
+  it('should decrease user reputation by 1 when an upvote is cancelled', async () => {
+    const mockReqBody = {
+      qid: '65e9b5a995b6c7045a30d823',
+      username: 'new-user',
+    };
+
+    const mockResponse = {
+      msg: 'Question upvoted successfully',
+      upVotes: ['new-user'],
+      downVotes: [],
+    };
+
+    addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+    await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+    const mockSecondResponse = {
+      msg: 'Upvote cancelled successfully',
+      upVotes: [],
+      downVotes: [],
+    };
+
+    addVoteToQuestionSpy.mockResolvedValueOnce(mockSecondResponse);
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { username: 'question2_user', reputation: 9 },
+      'findOneAndUpdate',
+    );
+
+    const response = await supertest(app).post('/question/upvoteQuestion').send(mockReqBody);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(mockSecondResponse);
+
+    // Fetching the updated user
+    mockingoose(UserModel).toReturn({ username: 'question2_user', reputation: 9 }, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ username: 'question2_user' });
+    expect(updatedUser?.reputation).toBe(9);
+  });
+
+  it('should not decrease user reputation if the downvote does not pass', async () => {
+    const mockReqBody = {
+      qid: '65e9b5a995b6c7045a30d823',
+      username: 'new-user',
+    };
+
+    const mockResponse = {
+      error: 'Question not found!',
+    };
+
+    addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { username: 'question2_user', reputation: 10 },
+      'findOneAndUpdate',
+    );
+
+    const response = await supertest(app).post('/question/downvoteQuestion').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error when downvoteing: Question not found!');
+
+    // Fetching the updated user
+    mockingoose(UserModel).toReturn({ username: 'question2_user', reputation: 10 }, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ username: 'question2_user' });
+    expect(updatedUser?.reputation).toBe(10);
+  });
+
+  it('should not decrease user reputation if there is an error when adding downvote', async () => {
+    const mockReqBody = {
+      qid: '65e9b5a995b6c7045a30d823',
+      username: 'new-user',
+    };
+
+    const mockResponse = {
+      error: 'Error when adding downvote to question',
+    };
+
+    addVoteToQuestionSpy.mockResolvedValueOnce(mockResponse);
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { username: 'question2_user', reputation: 10 },
+      'findOneAndUpdate',
+    );
+
+    const response = await supertest(app).post('/question/downvoteQuestion').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toEqual('Error when downvoteing: Error when adding downvote to question');
+
+    // Fetching the updated user
+    mockingoose(UserModel).toReturn({ username: 'question2_user', reputation: 10 }, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ username: 'question2_user' });
+    expect(updatedUser?.reputation).toBe(10);
   });
 });
 

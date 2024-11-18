@@ -2,11 +2,15 @@ import mongoose from 'mongoose';
 import supertest from 'supertest';
 import { app } from '../app';
 import * as util from '../models/application';
+import UserModel from '../models/users';
 import { Question } from '../types';
 
 const saveCommentSpy = jest.spyOn(util, 'saveComment');
 const addCommentSpy = jest.spyOn(util, 'addComment');
 const popDocSpy = jest.spyOn(util, 'populateDocument');
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const mockingoose = require('mockingoose');
 
 describe('POST /addComment', () => {
   afterEach(async () => {
@@ -360,5 +364,124 @@ describe('POST /addComment', () => {
 
     expect(response.status).toBe(500);
     expect(response.text).toBe('Error when adding comment: Error when populating document');
+  });
+
+  it('should increase user reputation by 1 when a comment is posted', async () => {
+    const validQid = new mongoose.Types.ObjectId();
+    const validCid = new mongoose.Types.ObjectId();
+    const mockReqBody = {
+      id: validQid.toString(),
+      type: 'question',
+      comment: {
+        text: 'This is a test comment',
+        commentBy: 'dummyUserId',
+        commentDateTime: new Date('2024-06-03'),
+      },
+    };
+
+    const mockComment = {
+      _id: validCid,
+      text: 'This is a test comment',
+      commentBy: 'dummyUserId',
+      commentDateTime: new Date('2024-06-03'),
+    };
+
+    const mockUser = {
+      uid: 'dummyUserId',
+      username: 'testUser',
+      reputation: 10,
+      joinedDate: new Date('2024-01-01'),
+    };
+
+    saveCommentSpy.mockResolvedValueOnce(mockComment);
+
+    addCommentSpy.mockResolvedValueOnce({
+      _id: validQid,
+      title: 'This is a test question',
+      text: 'This is a test question',
+      tags: [],
+      askedBy: 'dummyUserId',
+      askDateTime: new Date('2024-06-03'),
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      answers: [],
+      comments: [mockComment._id],
+    } as Question);
+
+    popDocSpy.mockResolvedValueOnce({
+      _id: validQid,
+      title: 'This is a test question',
+      text: 'This is a test question',
+      tags: [],
+      askedBy: 'dummyUserId',
+      askDateTime: new Date('2024-06-03'),
+      views: [],
+      upVotes: [],
+      downVotes: [],
+      answers: [],
+      comments: [mockComment],
+    });
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(
+      { ...mockUser, reputation: mockUser.reputation + 1 },
+      'findOneAndUpdate',
+    );
+
+    const response = await supertest(app).post('/comment/addComment').send(mockReqBody);
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      _id: validCid.toString(),
+      text: 'This is a test comment',
+      commentBy: 'dummyUserId',
+      commentDateTime: mockComment.commentDateTime.toISOString(),
+    });
+
+    // Fetching the updated user
+    mockingoose(UserModel).toReturn(
+      { ...mockUser, reputation: mockUser.reputation + 1 },
+      'findOne',
+    );
+
+    const updatedUser = await UserModel.findOne({ uid: 'dummyUserId' });
+    expect(updatedUser?.reputation).toBe(mockUser.reputation + 1);
+  });
+
+  it('should not increase user reputation if the comment save returns an error', async () => {
+    const validQid = new mongoose.Types.ObjectId();
+    const mockReqBody = {
+      id: validQid.toString(),
+      type: 'question',
+      comment: {
+        text: 'This is a test comment',
+        commentBy: 'dummyUserId',
+        commentDateTime: new Date('2024-06-03'),
+      },
+    };
+
+    const mockUser = {
+      uid: 'dummyUserId',
+      username: 'testUser',
+      reputation: 10,
+      joinedDate: new Date('2024-01-01'),
+    };
+
+    saveCommentSpy.mockResolvedValueOnce({ error: 'Error when saving a comment' });
+
+    // Mocking UserModel with mockingoose
+    mockingoose(UserModel).toReturn(mockUser, 'findOneAndUpdate');
+
+    const response = await supertest(app).post('/comment/addComment').send(mockReqBody);
+
+    expect(response.status).toBe(500);
+    expect(response.text).toBe('Error when adding comment: Error when saving a comment');
+
+    // Fetching the user to ensure reputation has not changed
+    mockingoose(UserModel).toReturn(mockUser, 'findOne');
+
+    const updatedUser = await UserModel.findOne({ uid: 'dummyUserId' });
+    expect(updatedUser?.reputation).toBe(mockUser.reputation);
   });
 });
