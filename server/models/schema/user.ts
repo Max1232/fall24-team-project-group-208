@@ -18,11 +18,11 @@ const userSchema: Schema = new Schema(
     },
     level: {
       type: Number,
-      default: 1,
+      default: 0,
     },
     levelThreshold: {
       type: Number,
-      default: 100,
+      default: 10,
     },
     levelProgress: {
       type: Number,
