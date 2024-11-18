@@ -111,8 +111,8 @@ server/reports
 # Firebase Admin SDK
 # /server/authKey.json
 # server/authKey.json
-server/.env
-client/.env
+# server/.env
+# client/.env
 .aider*
 server/testResults*
 server/test.sh
