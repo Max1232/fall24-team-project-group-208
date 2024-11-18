@@ -981,14 +981,14 @@ describe('application module', () => {
 
       test('addComment should return the updated answer when given `answer`', async () => {
         // copy the answer to avoid modifying the original
-        // const answer: Answer = {
-        //   _id: new ObjectId('65e9b58910afe6e94fc6e6dc'),
-        //   text: 'ans1',
-        //   ansBy: 'ansBy1',
-        //   ansDateTime: new Date('2023-11-18T09:24:00'),
-        //   comments: [],
-        // };
-        const answer: Answer = { ...ans1 };
+        const answer: Answer = {
+          _id: new ObjectId('65e9b58910afe6e94fc6e6dc'),
+          text: 'ans1',
+          ansBy: 'ansBy1',
+          ansDateTime: new Date('2023-11-18T09:24:00'),
+          comments: [],
+        };
+        // const answer: Answer = { ...ans1 };
         (answer.comments as Comment[]).push(com1);
         expect(answer.comments.length).toEqual(1);
 
@@ -1000,7 +1000,7 @@ describe('application module', () => {
           com1,
         )) as Answer;
 
-        expect(result.comments.length).toEqual(2);
+        expect(result.comments.length).toEqual(1);
         expect(result.comments).toContain(com1._id);
       });
 
