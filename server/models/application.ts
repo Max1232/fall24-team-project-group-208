@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
 import {
@@ -9,11 +10,13 @@ import {
   Question,
   QuestionResponse,
   Tag,
+  User,
 } from '../types';
 import AnswerModel from './answers';
 import QuestionModel from './questions';
 import TagModel from './tags';
 import CommentModel from './comments';
+import UserModel from './users';
 
 /**
  * Parses tags from a search string.
@@ -349,6 +352,109 @@ export const fetchAndIncrementQuestionViewsById = async (
 };
 
 /**
+ * Checks and updates the user's tier based on their level and reputation.
+ *
+ * @param {string} username - The username of the user to check and update
+ *
+ * @returns {Promise<{ success: boolean; error?: string }>} - An object indicating success or failure
+ */
+const checkUserTier = async (username: string): Promise<{ success: boolean; error?: string }> => {
+  // Fetch the updated user to check their level
+  const user = (await UserModel.findOne({ username })) as User | null;
+
+  /*
+   * If the user's level is 0, update it to level 1 and set the level threshold.
+   * All users start at level 0, but after their first interaction with the site,
+   * they are leveled up to level 1.
+   */
+  if (user != null && user.level === 0) {
+    try {
+      console.log('Attempting to update user level from 0...');
+      await UserModel.updateOne({ username }, { $set: { level: 1, levelThreshold: 10 } });
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Error when updating user level from 0',
+      };
+    }
+  } else {
+    console.log('User level is not 0...');
+  }
+
+  // If the user's reputation exceeds their level threshold, increment their level
+  if (user != null && user.level != null) {
+    console.log('Attempting to update user level...');
+    try {
+      /**
+       * Calculate the level threshold based on the user's current level
+       * The level threshold is calculated as the square of the user's level multiplied by 10
+       * (e.g., level 1 has a threshold of 10, level 2 has a threshold of 40, level 3 has a threshold of 90, etc.)
+       */
+      const levelThreshold = user?.level ? user.level ** 2 * 10 : 0;
+      // Check if the user's reputation meets or exceeds the level threshold
+      if (user.reputation >= levelThreshold) {
+        // Increment the user's level by 1 and update the level threshold in one call
+        await UserModel.updateOne(
+          { username },
+          {
+            $inc: { level: 1 },
+            $set: { levelThreshold: (user.level + 1) ** 2 * 10 },
+          },
+        );
+      }
+    } catch (error) {
+      return { success: false, error: 'Error when updating user level' };
+    }
+  } else {
+    console.log('User not found...');
+    return { success: false, error: 'Error when updating user level, user attributes error' };
+  }
+
+  return { success: true };
+};
+
+/**
+ * Updates a user's attribute by a given amount.
+ *
+ * @param {string} username - The username of the user whose attribute is to be updated
+ * @param {'reputation' | 'questions' | 'answers' | 'comments' | 'acceptedAnswers'} attribute - The attribute to be updated
+ * @param {number} amount - The amount by which to update the attribute
+ *
+ * @returns {Promise<{ success: boolean; error?: string }>} - An object indicating success or failure
+ */
+const updateUser = async (
+  username: string,
+  attribute: 'reputation' | 'questions' | 'answers' | 'comments' | 'acceptedAnswers',
+  amount: number,
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    console.log('Attempting to update user attributes...');
+    // Increment the specified attribute of the user by the given amount
+    const updateResult = await UserModel.findOneAndUpdate(
+      { username },
+      { $inc: { [attribute]: amount } },
+    );
+    if (!updateResult) {
+      return { success: false, error: 'User not found or attribute update failed' };
+    }
+
+    // Check and update the user's tier
+    if (attribute === 'reputation') {
+      console.log('Given attribute is reputation...');
+      const tierResult = await checkUserTier(username);
+      if (!tierResult.success) {
+        return { success: false, error: tierResult.error };
+      }
+    }
+
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: 'Error when updating user attributes' };
+  }
+};
+
+/**
  * Saves a new question to the database.
  *
  * @param {Question} question - The question to save
@@ -356,10 +462,26 @@ export const fetchAndIncrementQuestionViewsById = async (
  * @returns {Promise<QuestionResponse>} - The saved question, or error message
  */
 export const saveQuestion = async (question: Question): Promise<QuestionResponse> => {
+  console.log('Attempting to save a question...');
   try {
     const result = await QuestionModel.create(question);
+    console.log('Question saved successfully, trying to update user reputation...');
+    if (result) {
+      const reputationResult = await updateUser(question.askedBy, 'reputation', 2);
+      if (!reputationResult.success) {
+        console.log(reputationResult.error);
+        return { error: reputationResult.error || 'Unknown error' };
+      }
+      const saveQuestionResult = await updateUser(question.askedBy, 'questions', 1);
+      if (!saveQuestionResult.success) {
+        console.log(saveQuestionResult.error);
+        return { error: saveQuestionResult.error || 'Unknown error' };
+      }
+      console.log('User attributes reputation & questions updated successfully');
+    }
     return result;
   } catch (error) {
+    console.log('Error when saving a question:', error);
     return { error: 'Error when saving a question' };
   }
 };
@@ -374,6 +496,19 @@ export const saveQuestion = async (question: Question): Promise<QuestionResponse
 export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
   try {
     const result = await AnswerModel.create(answer);
+    if (result) {
+      const reputationResult = await updateUser(answer.ansBy, 'reputation', 5);
+      if (!reputationResult.success) {
+        console.log(reputationResult.error);
+        return { error: reputationResult.error || 'Unknown error' };
+      }
+      const saveAnswerResult = await updateUser(answer.ansBy, 'answers', 1);
+      if (!saveAnswerResult.success) {
+        console.log(saveAnswerResult.error);
+        return { error: saveAnswerResult.error || 'Unknown error' };
+      }
+      console.log('User attributes reputation & answers updated successfully');
+    }
     return result;
   } catch (error) {
     return { error: 'Error when saving an answer' };
@@ -390,6 +525,19 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
 export const saveComment = async (comment: Comment): Promise<CommentResponse> => {
   try {
     const result = await CommentModel.create(comment);
+    if (result) {
+      const reputationResult = await updateUser(comment.commentBy, 'reputation', 1);
+      if (!reputationResult.success) {
+        console.log(reputationResult.error);
+        return { error: reputationResult.error || 'Unknown error' };
+      }
+      const saveCommentResult = await updateUser(comment.commentBy, 'comments', 1);
+      if (!saveCommentResult.success) {
+        console.log(saveCommentResult.error);
+        return { error: saveCommentResult.error || 'Unknown error' };
+      }
+      console.log('User attributes reputation & comments updated successfully');
+    }
     return result;
   } catch (error) {
     return { error: 'Error when saving a comment' };
@@ -526,6 +674,13 @@ export const addVoteToQuestion = async (
         : 'Downvote cancelled successfully';
     }
 
+    // Increase reputation by 1 for upvote
+    if (type === 'upvote' && result.upVotes.includes(username)) {
+      await updateUser(result.askedBy, 'reputation', 1);
+    } else if (type === 'upvote' && result.downVotes.includes(username)) {
+      await updateUser(result.askedBy, 'reputation', -1);
+    }
+
     return {
       msg,
       upVotes: result.upVotes || [],
@@ -606,6 +761,26 @@ export const addComment = async (
     return result;
   } catch (error) {
     return { error: `Error when adding comment: ${(error as Error).message}` };
+  }
+};
+
+/**
+ * Fetches user data from the database based on the provided username.
+ *
+ * @param {string} username - The username of the user to fetch data for
+ *
+ * @returns {Promise<User | null>} - A promise that resolves to the user data if found, or null if not found or an error occurs
+ */
+export const getUserData = async (username: string): Promise<User | null> => {
+  try {
+    const user = await UserModel.findOne({ username })
+      .populate('questions')
+      .populate('answers')
+      .populate('comments');
+    return user;
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    return null;
   }
 };
 
