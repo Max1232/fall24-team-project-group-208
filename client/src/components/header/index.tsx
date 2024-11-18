@@ -19,9 +19,8 @@ const Header: React.FC = () => {
   return (
     <div id='header' className='header'>
       <div className='auth-status'>
-        {loading ? (
-          <span className='auth-loading'>Loading...</span>
-        ) : user ? (
+        {loading && <span className='auth-loading'>Loading...</span>}
+        {!loading && user && (
           <div className='user-info'>
             <button className='user-dropdown-btn' onClick={toggleDropdown}>
               {user.email}
@@ -43,7 +42,7 @@ const Header: React.FC = () => {
               </div>
             )}
           </div>
-        ) : null}
+        )}
       </div>
       <div className='title'>Fake Stack Overflow</div>
       <input

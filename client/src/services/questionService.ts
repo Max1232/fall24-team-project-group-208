@@ -10,10 +10,7 @@ const QUESTION_API_URL = `${process.env.REACT_APP_SERVER_URL}/question`;
  * @param search - The search term to filter questions. Default is an empty string.
  * @throws Error if there is an issue fetching or filtering questions.
  */
-const getQuestionsByFilter = async (
-  order: string = 'newest',
-  search: string = '',
-): Promise<Question[]> => {
+const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Question[]> => {
   const res = await api.get(`${QUESTION_API_URL}/getQuestion?order=${order}&search=${search}`);
   if (res.status !== 200) {
     throw new Error('Error when fetching or filtering questions');
