@@ -109,8 +109,8 @@ server/package-lock.json
 server/reports
 
 # Firebase Admin SDK
-/server/authKey.json
-server/authKey.json
+# /server/authKey.json
+# server/authKey.json
 server/.env
 client/.env
 .aider*
