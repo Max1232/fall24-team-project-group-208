@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { ObjectId } from 'mongodb';
 import mongoose from 'mongoose';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import Tags from '../models/tags';
 import QuestionModel from '../models/questions';
@@ -56,6 +57,7 @@ const com1MockUser: User = {
   questions: 0,
   acceptedAnswers: 0,
   comments: 0,
+  badges: [],
 };
 
 const com1: Comment = {
@@ -448,6 +450,7 @@ describe('application module', () => {
           questions: 0,
           acceptedAnswers: 0,
           comments: 0,
+          badges: [],
         };
 
         const mockQn = {
@@ -664,6 +667,7 @@ describe('application module', () => {
           questions: 0,
           acceptedAnswers: 0,
           comments: 0,
+          badges: [],
         };
         const mockAnswer = {
           text: 'This is a test answer',
