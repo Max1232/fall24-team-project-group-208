@@ -108,3 +108,11 @@ server/package-lock.json
 .stryker-tmp/
 server/reports
 
+# Firebase Admin SDK
+# /server/authKey.json
+# server/authKey.json
+server/.env
+client/.env
+.aider*
+server/testResults*
+server/test.sh

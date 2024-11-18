@@ -1,3 +1,4 @@
+/* General styles for the header component */
 .header {
   display: flex;
   align-items: center;
@@ -7,7 +8,85 @@
   background: #dddddd;
 }
 
+/* Loading indicator style */
+.auth-loading {
+  color: #666;
+  font-size: 14px;
+}
+
+/* User dropdown button style */
+.user-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.user-dropdown-btn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: underline;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
+
+.user-dropdown-btn:hover {
+  text-decoration: none;
+}
+
+/* Dropdown menu styles */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  z-index: 1000;
+  width: 150px;
+}
+
+.dropdown-menu ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-item {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Title and search bar styles */
 .title {
   font-size: 32px;
   font-weight: 800;
+}
+
+#searchBar {
+  padding: 8px;
+  font-size: 16px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#searchBar:focus {
+  border-color: #007bff;
+  outline: none;
 }

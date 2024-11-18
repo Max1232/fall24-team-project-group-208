@@ -201,6 +201,33 @@ export interface AnswerUpdatePayload {
 }
 
 /**
+ * Interface representing the payload for an authentication event, which contains:
+ * - uid - The Firebase User ID.
+ * - username - The username of the authenticated user.
+ */
+export interface AuthUpdatePayload {
+  uid: string;
+  username: string;
+  reputation: number;
+}
+
+/**
+ * Interface representing the payload for a profile creation event, which contains:
+ * - username - The username of the created profile.
+ * - reputation - The initial reputation value.
+ */
+export interface ProfileCreatedPayload {
+  username: string;
+  reputation: number;
+  joinedDate: Date;
+}
+
+/**
+ * Type representing the possible responses for an Auth-related operation.
+ */
+export type AuthResponse = User | { error: string };
+
+/**
  * Interface representing the possible events that the server can emit to the client.
  */
 export interface ServerToClientEvents {
@@ -209,4 +236,30 @@ export interface ServerToClientEvents {
   viewsUpdate: (question: QuestionResponse) => void;
   voteUpdate: (vote: VoteUpdatePayload) => void;
   commentUpdate: (comment: CommentUpdatePayload) => void;
+  authUpdate: (auth: AuthUpdatePayload) => void;
+  profileCreated: (profile: ProfileCreatedPayload) => void;
+  authError: (error: { message: string }) => void;
+}
+
+export interface User {
+  uid: string;  // Firebase User ID
+  username: string;
+  reputation: number;
+  level: number;
+  levelThreshold: number;
+  levelProgress: number;
+  answers: number;
+  questions: number;
+  acceptedAnswers: number;
+  comments: number;
+  joinedDate: Date;
+}
+
+export interface AuthRequest extends Request {
+  user?: {
+    uid: string;
+  };
+  body: {
+    username?: string;
+  };
 }

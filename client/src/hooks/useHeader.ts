@@ -1,42 +1,49 @@
-import { ChangeEvent, useState, KeyboardEvent } from 'react';
+/* eslint-disable no-console */
+import { ChangeEvent, useState, KeyboardEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { onAuthStateChanged, signOut, User } from 'firebase/auth';
+import auth from '../config/firebase';
 
-/**
- * Custom hook to manage the state and logic for a header search input.
- * It handles input changes and triggers a search action on 'Enter' key press.
- *
- * @returns val - the current value of the input.
- * @returns setVal - function to update the value of the input.
- * @returns handleInputChange - function to handle changes in the input field.
- * @returns handleKeyDown - function to handle 'Enter' key press and trigger the search.
- */
 const useHeader = () => {
   const navigate = useNavigate();
-
   const [val, setVal] = useState<string>('');
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  /**
-   * Function to handle changes in the input field.
-   *
-   * @param e - the event object.
-   */
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, currentUser => {
+      setUser(currentUser);
+      setLoading(false);
+
+      // If not authenticated and not on the main page, redirect to main page
+      if (!currentUser && window.location.pathname !== '/') {
+        navigate('/');
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate]);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setVal(e.target.value);
   };
 
-  /**
-   * Function to handle 'Enter' key press and trigger the search.
-   *
-   * @param e - the event object.
-   */
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-
       const searchParams = new URLSearchParams();
       searchParams.set('search', e.currentTarget.value);
-
       navigate(`/home?${searchParams.toString()}`);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      // Navigate to root path instead of /login
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error('Error signing out:', error);
     }
   };
 
@@ -45,6 +52,9 @@ const useHeader = () => {
     setVal,
     handleInputChange,
     handleKeyDown,
+    user,
+    loading,
+    handleSignOut,
   };
 };
 
