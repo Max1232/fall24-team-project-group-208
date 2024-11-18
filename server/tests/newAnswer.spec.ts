@@ -4,7 +4,7 @@ import { ObjectId } from 'mongodb';
 import { app } from '../app';
 import * as util from '../models/application';
 import UserModel from '../models/users';
-import { Answer, Question, User } from '../types';
+import { User } from '../types';
 
 const saveAnswerSpy = jest.spyOn(util, 'saveAnswer');
 const addAnswerToQuestionSpy = jest.spyOn(util, 'addAnswerToQuestion');
@@ -26,6 +26,7 @@ const mockUser: User = {
   questions: 0,
   acceptedAnswers: 0,
   comments: 0,
+  badges: [],
 };
 
 describe('POST /addAnswer', () => {
@@ -321,7 +322,6 @@ describe('POST /addAnswer', () => {
     );
 
     const updatedUser = await UserModel.findOne({ username: mockUser.username });
-    console.log('updatedUser?.reputation:', updatedUser?.reputation);
 
     // Asserting the user reputation has increased by 5
     expect(updatedUser?.reputation).toBe(mockUser.reputation + 5);
@@ -351,7 +351,6 @@ describe('POST /addAnswer', () => {
     mockingoose(UserModel).toReturn(mockUser, 'findOne');
 
     const updatedUser = await UserModel.findOne({ username: mockUser.username });
-    console.log('updatedUser?.reputation:', updatedUser?.reputation);
 
     // Asserting the user reputation has not increased
     expect(updatedUser?.reputation).toBe(mockUser.reputation);

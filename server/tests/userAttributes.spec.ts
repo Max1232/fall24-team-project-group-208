@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import mongoose from 'mongoose';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import UserModel from '../models/users';
 import { saveAnswer, saveQuestion, saveComment } from '../models/application';
@@ -35,6 +36,7 @@ describe('User Attribute Modification Tests', () => {
       questions: 0,
       acceptedAnswers: 0,
       comments: 0,
+      badges: [],
     };
     // Save the initial user to the database
     const savedUser = await UserModel.create(initialUser);
@@ -84,6 +86,7 @@ describe('User Attribute Modification Tests', () => {
       questions: 0,
       acceptedAnswers: 0,
       comments: 0,
+      badges: [],
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -123,6 +126,7 @@ describe('User Attribute Modification Tests', () => {
       questions: 0,
       acceptedAnswers: 0,
       comments: 0,
+      badges: [],
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -155,6 +159,7 @@ describe('User Attribute Modification Tests', () => {
       questions: 0,
       acceptedAnswers: 0,
       comments: 0,
+      badges: [],
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -191,6 +196,7 @@ describe('User Attribute Modification Tests', () => {
       questions: 0,
       acceptedAnswers: 0,
       comments: 0,
+      badges: [],
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -227,6 +233,7 @@ describe('User Attribute Modification Tests', () => {
       questions: 0,
       acceptedAnswers: 0,
       comments: 0,
+      badges: [],
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();

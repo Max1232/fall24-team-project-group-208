@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import mongoose from 'mongoose';
 import supertest from 'supertest';
-import { mock } from 'node:test';
 import { app } from '../app';
 import * as util from '../models/application';
 import UserModel from '../models/users';
@@ -33,6 +32,7 @@ const mockUser: User = {
   questions: 0,
   acceptedAnswers: 0,
   comments: 0,
+  badges: [],
 };
 
 const mockQuestion: Question = {
