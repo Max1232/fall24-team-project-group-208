@@ -17,11 +17,12 @@ import {
   getTagCountMap,
   saveComment,
   addVoteToQuestion,
+  addComment,
 } from '../models/application';
 import { Answer, Question, Tag, Comment, User } from '../types';
 import { T1_DESC, T2_DESC, T3_DESC } from '../data/posts_strings';
 import UserModel from '../models/users';
-
+import AnswerModel from '../models/answers';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const mockingoose = require('mockingoose');
 
@@ -897,6 +898,145 @@ describe('application module', () => {
   });
 
   describe('Comment model', () => {
+    describe('addComment', () => {
+      test('addComment should return the updated question when given `question`', async () => {
+        // copy the question to avoid modifying the original
+        const question = { ...QUESTIONS[0], comments: [com1] };
+        mockingoose(QuestionModel).toReturn(question, 'findOneAndUpdate');
+
+        const result = (await addComment(
+          question._id?.toString() as string,
+          'question',
+          com1,
+        )) as Question;
+
+        expect(result.comments.length).toEqual(1);
+        expect(result.comments).toContain(com1._id);
+      });
+
+      test('addComment should return the updated answer when given `answer`', async () => {
+        // copy the answer to avoid modifying the original
+        const answer: Answer = { ...ans1 };
+        (answer.comments as Comment[]).push(com1);
+        mockingoose(AnswerModel).toReturn(answer, 'findOneAndUpdate');
+
+        const result = (await addComment(
+          answer._id?.toString() as string,
+          'answer',
+          com1,
+        )) as Answer;
+
+        expect(result.comments.length).toEqual(1);
+        expect(result.comments).toContain(com1._id);
+      });
+
+      test('addComment should return an object with error if findOneAndUpdate throws an error', async () => {
+        const question = QUESTIONS[0];
+        mockingoose(QuestionModel).toReturn(
+          new Error('Error from findOneAndUpdate'),
+          'findOneAndUpdate',
+        );
+        const result = await addComment(question._id?.toString() as string, 'question', com1);
+        expect(result).toEqual({ error: 'Error when adding comment: Error from findOneAndUpdate' });
+      });
+
+      test('addComment should return an object with error if findOneAndUpdate returns null', async () => {
+        const answer: Answer = { ...ans1 };
+        mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
+        const result = await addComment(answer._id?.toString() as string, 'answer', com1);
+        expect(result).toEqual({ error: 'Error when adding comment: Failed to add comment' });
+      });
+
+      test('addComment should throw an error if a required field is missing in the comment', async () => {
+        const invalidComment: Partial<Comment> = {
+          text: 'This is an answer text',
+          commentBy: 'user123', // Missing commentDateTime
+        };
+
+        const qid = 'validQuestionId';
+
+        try {
+          await addComment(qid, 'question', invalidComment as Comment);
+        } catch (err: unknown) {
+          expect(err).toBeInstanceOf(Error);
+          if (err instanceof Error) expect(err.message).toBe('Invalid comment');
+        }
+      });
+    });
+    describe('addComment', () => {
+      test('addComment should return the updated question when given `question`', async () => {
+        // copy the question to avoid modifying the original
+        const question = { ...QUESTIONS[0], comments: [com1] };
+        mockingoose(QuestionModel).toReturn(question, 'findOneAndUpdate');
+
+        const result = (await addComment(
+          question._id?.toString() as string,
+          'question',
+          com1,
+        )) as Question;
+
+        expect(result.comments.length).toEqual(1);
+        expect(result.comments).toContain(com1._id);
+      });
+
+      test('addComment should return the updated answer when given `answer`', async () => {
+        // copy the answer to avoid modifying the original
+        // const answer: Answer = {
+        //   _id: new ObjectId('65e9b58910afe6e94fc6e6dc'),
+        //   text: 'ans1',
+        //   ansBy: 'ansBy1',
+        //   ansDateTime: new Date('2023-11-18T09:24:00'),
+        //   comments: [],
+        // };
+        const answer: Answer = { ...ans1 };
+        (answer.comments as Comment[]).push(com1);
+        expect(answer.comments.length).toEqual(1);
+
+        mockingoose(AnswerModel).toReturn(answer, 'findOneAndUpdate');
+
+        const result = (await addComment(
+          answer._id?.toString() as string,
+          'answer',
+          com1,
+        )) as Answer;
+
+        expect(result.comments.length).toEqual(2);
+        expect(result.comments).toContain(com1._id);
+      });
+
+      test('addComment should return an object with error if findOneAndUpdate throws an error', async () => {
+        const question = QUESTIONS[0];
+        mockingoose(QuestionModel).toReturn(
+          new Error('Error from findOneAndUpdate'),
+          'findOneAndUpdate',
+        );
+        const result = await addComment(question._id?.toString() as string, 'question', com1);
+        expect(result).toEqual({ error: 'Error when adding comment: Error from findOneAndUpdate' });
+      });
+
+      test('addComment should return an object with error if findOneAndUpdate returns null', async () => {
+        const answer: Answer = { ...ans1 };
+        mockingoose(AnswerModel).toReturn(null, 'findOneAndUpdate');
+        const result = await addComment(answer._id?.toString() as string, 'answer', com1);
+        expect(result).toEqual({ error: 'Error when adding comment: Failed to add comment' });
+      });
+
+      test('addComment should throw an error if a required field is missing in the comment', async () => {
+        const invalidComment: Partial<Comment> = {
+          text: 'This is an answer text',
+          commentBy: 'user123', // Missing commentDateTime
+        };
+
+        const qid = 'validQuestionId';
+
+        try {
+          await addComment(qid, 'question', invalidComment as Comment);
+        } catch (err: unknown) {
+          expect(err).toBeInstanceOf(Error);
+          if (err instanceof Error) expect(err.message).toBe('Invalid comment');
+        }
+      });
+    });
     describe('saveComment', () => {
       test('saveComment should return the saved comment', async () => {
         // All of SaveComment's calls to UseModel to mockingoose
