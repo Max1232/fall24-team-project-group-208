@@ -17,6 +17,15 @@ const Login = () => {
     toggleMode,
   } = useLogin();
 
+  let buttonText;
+  if (loading) {
+    buttonText = 'Processing...';
+  } else if (isLogin) {
+    buttonText = 'Sign In';
+  } else {
+    buttonText = 'Create Account';
+  }
+
   return (
     <div className='container'>
       <h2>Welcome to FakeStackOverflow!</h2>
@@ -53,10 +62,10 @@ const Login = () => {
           required
           className='input-text'
         />
-
         <button type='submit' className='login-button' disabled={loading}>
           {/* eslint-disable-next-line no-nested-ternary */}
           {loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account'}
+
         </button>
 
         <button type='button' onClick={toggleMode} className='toggle-button'>
