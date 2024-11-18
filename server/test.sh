@@ -17,7 +17,7 @@ TEST_PATH="tests/*"
 
 # Boolean variable to control verbosity
 # True by default
-VERBOSE=false
+VERBOSE=true
 
 # Set verbosity option
 if [ "$VERBOSE" == true ]; then

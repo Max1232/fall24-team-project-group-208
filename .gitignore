@@ -115,3 +115,4 @@ server/.env
 client/.env
 .aider*
 server/testResults*
+server/test.sh
