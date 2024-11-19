@@ -1,7 +1,6 @@
 import React from 'react';
 // eslint-disable-next-line import/no-named-as-default
 import useProfilePage from '../../../hooks/useProfilePage';
-import './index.css';
 
 const StatCard = ({ label, value }: { label: string; value: number | undefined }) => (
   <div className='profile-stat'>
