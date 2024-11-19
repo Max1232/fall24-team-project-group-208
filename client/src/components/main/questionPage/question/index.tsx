@@ -1,8 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './index.css';
 import { getMetaData } from '../../../../tool';
 import { Question } from '../../../../types';
+import { Card, CardContent, Typography, Button, Box } from '@mui/material';
+import { Visibility, CheckCircle }from '@mui/icons-material';
 
 /**
  * Interface representing the props for the Question component.
@@ -45,39 +46,66 @@ const QuestionView = ({ q }: QuestionProps) => {
   };
 
   return (
-    <div
-      className='question right_padding'
+    <Card
+      variant='outlined'
+      sx={{
+        borderColor: 'primary.main',
+        borderRadius: 1,
+        mb: 2,
+        position: 'relative',
+        padding: 2,
+        width: '95%',
+      }}
       onClick={() => {
         if (q._id) {
           handleAnswer(q._id);
         }
       }}>
-      <div className='postStats'>
-        <div>{q.answers.length || 0} answers</div>
-        <div>{q.views.length} views</div>
-      </div>
-      <div className='question_mid'>
-        <div className='postTitle'>{q.title}</div>
-        <div className='question_tags'>
-          {q.tags.map((tag, idx) => (
-            <button
-              key={idx}
-              className='question_tag_button'
-              onClick={e => {
-                e.stopPropagation();
-                clickTag(tag.name);
-              }}>
-              {tag.name}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className='lastActivity'>
-        <div className='question_author'>{q.askedBy}</div>
-        <div>&nbsp;</div>
-        <div className='question_meta'>asked {getMetaData(new Date(q.askDateTime))}</div>
-      </div>
-    </div>
+      <CardContent>
+        <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
+          <Box display='flex' alignItems='center'>
+            <Box className='postStats' mr={2}>
+                <Typography>
+                <CheckCircle sx={{ verticalAlign: 'middle', mr:'3px' }} />
+                  {q.answers.length || 0} answers</Typography>
+              <Typography>
+                <Visibility sx={{ verticalAlign: 'middle' }} /> {q.views.length} views
+              </Typography>
+            </Box>
+            <Box className='question_mid'>
+              <Typography variant='body1' className='postTitle'>
+                {q.title}
+              </Typography>
+              <Box className='question_tags'>
+                {q.tags.map((tag, idx) => (
+                  <Button
+                    key={idx}
+                    variant='outlined'
+                    size='small'
+                    sx={{ mr: 1, mb: 1 }}
+                    onClick={e => {
+                      e.stopPropagation();
+                      clickTag(tag.name);
+                    }}>
+                    {tag.name}
+                  </Button>
+                ))}
+              </Box>
+            </Box>
+          </Box>
+          <Box
+            className='lastActivity'
+            sx={{
+              textAlign: 'right',
+            }}>
+            <Typography className='question_author'>{q.askedBy}</Typography>
+            <Typography className='question_meta'>
+              asked {getMetaData(new Date(q.askDateTime))}
+            </Typography>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 
