@@ -1,8 +1,8 @@
-import React from 'react';
-import './index.css';
+import React, { useState } from 'react';
 import OrderButton from './orderButton';
 import { OrderType, orderTypeDisplayName } from '../../../../types';
 import AskQuestionButton from '../../askQuestionButton';
+import { Box, Typography } from '@mui/material';
 
 /**
  * Interface representing the props for the QuestionHeader component.
@@ -26,25 +26,34 @@ interface QuestionHeaderProps {
  * @param qcnt - The number of questions displayed in the header.
  * @param setQuestionOrder - Function to set the order of questions based on input message.
  */
-const QuestionHeader = ({ titleText, qcnt, setQuestionOrder }: QuestionHeaderProps) => (
-  <div>
-    <div className='space_between right_padding'>
-      <div className='bold_title'>{titleText}</div>
-      <AskQuestionButton />
-    </div>
-    <div className='space_between right_padding'>
-      <div id='question_count'>{qcnt} questions</div>
-      <div className='btns'>
+const QuestionHeader: React.FC<QuestionHeaderProps> = ({ titleText, qcnt, setQuestionOrder }) => {
+  const [activeOrder, setActiveOrder] = useState<OrderType | null>(null);
+
+  const handleOrderChange = (order: OrderType) => {
+    setQuestionOrder(order);
+    setActiveOrder(order);
+  };
+
+  return (
+    <Box display="flex" alignItems="center">
+      <Typography variant="h3" color="primary.main">
+        {titleText}
+      </Typography>
+      <Typography variant="body2" sx={{ fontStyle: 'italic', ml: 1 }}>
+        ({qcnt})
+      </Typography>
+      <Box display="flex" ml={2}>
         {Object.keys(orderTypeDisplayName).map((order, idx) => (
           <OrderButton
             key={idx}
             orderType={order as OrderType}
-            setQuestionOrder={setQuestionOrder}
+            setQuestionOrder={handleOrderChange}
+            isActive={activeOrder === order}
           />
         ))}
-      </div>
-    </div>
-  </div>
-);
+      </Box>
+    </Box>
+  );
+};
 
 export default QuestionHeader;
