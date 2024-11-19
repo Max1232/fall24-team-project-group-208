@@ -3,7 +3,6 @@ import useNewQuestion from '../../../hooks/useNewQuestion';
 import Form from '../baseComponents/form';
 import Input from '../baseComponents/input';
 import TextArea from '../baseComponents/textarea';
-import './index.css';
 
 /**
  * NewQuestionPage component allows users to submit a new question with a title,
