@@ -11,7 +11,7 @@ import UserModel from '../models/users';
 
 dotenv.config();
 
-const SERVICE_ACCOUNT_PATH = path.resolve(__dirname, '../authKey.json');
+const SERVICE_ACCOUNT_PATH = process.env.KEY_PATH;
 if (!SERVICE_ACCOUNT_PATH) {
   throw new Error('KEY_PATH is not defined in the environment variables');
 }

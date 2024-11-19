@@ -24,7 +24,6 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   }
 
   if (!isAuthenticated) {
-    // Redirect to root instead of /login
     return <Navigate to='/' replace />;
   }
 
