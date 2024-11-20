@@ -1,18 +1,28 @@
-import { useContext } from 'react';
-import UserContext, { UserContextType } from '../contexts/UserContext';
+import { useContext, useEffect } from 'react';
+import UserContext, { UserContextType, getStoredUser } from '../contexts/UserContext';
 
-/**
- * Custom hook to access the current user context.
- *
- * @returns context - Returns the user context object, which contains user and socket information.
- *
- * @throws it will throw an error if the context is not found or is null.
- */
 const useUserContext = (): UserContextType => {
   const context = useContext(UserContext);
 
+  useEffect(() => {
+    // If context exists but user is missing, try to restore from localStorage
+    if (context && !context.user) {
+      const storedUser = getStoredUser();
+      if (storedUser) {
+        // You'll need to update your UserContext Provider to accept this
+        context.user = storedUser;
+      }
+    }
+  }, [context]);
+
   if (context === null) {
     throw new Error('User context is null.');
+  }
+
+  // Always try to get fresh user data from storage first
+  const storedUser = getStoredUser();
+  if (storedUser && (!context.user || context.user.username !== storedUser.username)) {
+    context.user = storedUser;
   }
 
   return context;
