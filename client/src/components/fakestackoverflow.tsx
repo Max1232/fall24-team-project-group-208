@@ -61,6 +61,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
                     <Layout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
                   </ProtectedRoute>
                 }>
+                <Route path = '/login'element={<Login />} />
                 <Route path='/home' element={<QuestionPage />} />
                 <Route path='tags' element={<TagPage />} />
                 <Route path='/question/:qid' element={<AnswerPage />} />

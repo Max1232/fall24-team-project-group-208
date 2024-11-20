@@ -1,6 +1,7 @@
 import React from 'react';
-import './index.css';
+import { TextField, Button, Typography, Container, Paper } from '@mui/material';
 import useLogin from '../../hooks/useLogin';
+import Blobs from './blobs';
 
 const Login = () => {
   const {
@@ -27,50 +28,81 @@ const Login = () => {
   }
 
   return (
-    <div className='container'>
-      <h2>Welcome to FakeStackOverflow!</h2>
-      <h4>{isLogin ? 'Please sign in.' : 'Create your account.'}</h4>
-
-      <form onSubmit={handleSubmit}>
-        {error && <div className='error-message'>{error}</div>}
-
-        <input
-          type='email'
-          value={email}
-          onChange={handleEmailChange}
-          placeholder='Enter your email'
-          required
-          className='input-text'
-        />
-
-        {!isLogin && (
-          <input
-            type='text'
-            value={username}
-            onChange={handleUsernameChange}
-            placeholder='Choose a username'
+    <Container component="main" maxWidth="xs" style={{ position: 'relative', minHeight: '100vh' }}>
+      <Blobs />
+      <Paper elevation={3} style={{ padding: '20px', position: 'relative', zIndex: 2 }}>
+        <Typography component="div" variant="h4" textAlign="center">
+          <img src="/devask-logo_pink-circle.png" alt="Icon" style={{ width: '170px', height: '170px' }} />
+        </Typography>
+        <Typography component="h1" variant="h1" textAlign="center">
+          DevAsk
+        </Typography>
+        <Typography component="h2" variant="subtitle1">
+          {isLogin ? 'Please sign in.' : 'Create your account.'}
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          {error && <Typography color="error">{error}</Typography>}
+          <TextField
+            variant="outlined"
+            margin="normal"
             required
-            className='input-text'
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+            value={email}
+            onChange={handleEmailChange}
           />
-        )}
-
-        <input
-          type='password'
-          value={password}
-          onChange={handlePasswordChange}
-          placeholder='Enter your password'
-          required
-          className='input-text'
-        />
-        <button type='submit' className='login-button' disabled={loading}>
-          {buttonText}
-        </button>
-
-        <button type='button' onClick={toggleMode} className='toggle-button'>
-          {isLogin ? 'Need an account? Register' : 'Already have an account? Sign In'}
-        </button>
-      </form>
-    </div>
+          {!isLogin && (
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="username"
+              label="Username"
+              name="username"
+              autoComplete="username"
+              value={username}
+              onChange={handleUsernameChange}
+            />
+          )}
+          <TextField
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={handlePasswordChange}
+          />
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            style={{ margin: '10px 0' }}
+          >
+            {buttonText}
+          </Button>
+          <Button
+            fullWidth
+            variant="text"
+            color="secondary"
+            onClick={toggleMode}
+          >
+            {isLogin ? 'Need an account? Register' : 'Already have an account? Sign In'}
+          </Button>
+        </form>
+      </Paper>
+    </Container>
   );
 };
 
