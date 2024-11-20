@@ -64,10 +64,14 @@ const QuestionView = ({ q }: QuestionProps) => {
       <CardContent>
         <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
           <Box display='flex' alignItems='center'>
-            <Box className='postStats' mr={2}>
-                <Typography>
+            <Box className='postStats' mr={2} mt={1} alignContent="center">
+            <Typography fontWeight={600}>
+                  {q.upVotes.length} votes
+              </Typography>
+              <Typography>
                 <CheckCircle sx={{ verticalAlign: 'middle', mr:'3px' }} />
-                  {q.answers.length || 0} answers</Typography>
+                  {q.answers.length || 0} answers
+              </Typography>
               <Typography>
                 <Visibility sx={{ verticalAlign: 'middle' }} /> {q.views.length} views
               </Typography>
