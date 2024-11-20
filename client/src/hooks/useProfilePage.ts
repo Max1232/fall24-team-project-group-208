@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useUserContext from './useUserContext';
 import { User } from '../types';
 
@@ -6,70 +6,93 @@ export const useProfilePage = () => {
   const { user } = useUserContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [profileData, setProfileData] = useState<User | null>(null);
+  const [profileData, setProfileData] = useState<User | null>(() => {
+    // Initialize from localStorage if available
+    const savedProfile = localStorage.getItem(`profile_${user.username}`);
+    if (savedProfile) {
+      const parsed = JSON.parse(savedProfile);
+      // Safely parse the date
+      parsed.joinedDate = parsed.joinedDate ? new Date(parsed.joinedDate) : new Date();
+      return parsed;
+    }
+    return null;
+  });
 
-  useEffect(() => {
-    const fetchProfileData = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
+  const fetchProfileData = useCallback(async () => {
+    if (!user?.username) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const serverURL = process.env.REACT_APP_SERVER_URL;
+      if (!serverURL) {
+        throw new Error('Server URL not configured');
       }
 
-      try {
-        const serverURL = process.env.REACT_APP_SERVER_URL;
-        if (!serverURL) {
-          setError('Server URL not configured');
-          setLoading(false);
-          return;
-        }
+      const response = await fetch(`${serverURL}/users/${user.username}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
-        const response = await fetch(`${serverURL}/users/${user.username}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          credentials: 'include', // Important for cookies/session
-        });
+      let data: User;
 
-        if (!response.ok) {
-          if (response.status === 404) {
-            // If user doesn't exist in database yet, use default values
-            setProfileData({
-              username: user.username,
-              reputation: 0,
-              level: 1,
-              levelThreshold: 100,
-              levelProgress: 0,
-              answers: 0,
-              questions: 0,
-              acceptedAnswers: 0,
-              comments: 0,
-              badges: [],
-              joinedDate: new Date(),
-            });
-            return;
-          }
-          setError(`HTTP error! status: ${response.status}`);
-          setLoading(false);
-          return;
-        }
-
-        const data = await response.json();
-        setProfileData({
-          ...data,
-          joinedDate: data.joinedDate ? new Date(data.joinedDate) : new Date(),
-        });
-      } catch (err) {
-        setError(`Error fetching profile: ${(err as Error).message}`);
-      } finally {
-        setLoading(false);
+      if (response.status === 404) {
+        // Default user data for new users
+        data = {
+          username: user.username,
+          uid: user.uid,
+          reputation: 0,
+          level: 1,
+          levelThreshold: 40,
+          levelProgress: 0,
+          answers: 0,
+          questions: 0,
+          acceptedAnswers: 0,
+          comments: 0,
+          badges: [],
+          joinedDate: new Date(),
+        };
+      } else if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      } else {
+        data = await response.json();
+        // Safely parse the date
+        data.joinedDate = data.joinedDate ? new Date(data.joinedDate) : new Date();
       }
-    };
 
-    fetchProfileData();
+      // Store in localStorage
+      localStorage.setItem(`profile_${user.username}`, JSON.stringify(data));
+      setProfileData(data);
+    } catch (err) {
+      setError(`Error fetching profile: ${(err as Error).message}`);
+      // Try to use cached data if available
+      const cachedProfile = localStorage.getItem(`profile_${user.username}`);
+      if (cachedProfile) {
+        const parsed = JSON.parse(cachedProfile);
+        // Safely parse the date for cached data
+        parsed.joinedDate = parsed.joinedDate ? new Date(parsed.joinedDate) : new Date();
+        setProfileData(parsed);
+      }
+    } finally {
+      setLoading(false);
+    }
   }, [user]);
 
-  return { profileData, loading, error };
+  useEffect(() => {
+    fetchProfileData();
+  }, [fetchProfileData]);
+
+  const refreshProfile = async () => {
+    setLoading(true);
+    localStorage.removeItem(`profile_${user.username}`);
+    await fetchProfileData();
+  };
+
+  return { profileData, loading, error, refreshProfile };
 };
 
 export default useProfilePage;
