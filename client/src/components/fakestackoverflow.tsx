@@ -14,7 +14,7 @@ import NewAnswerPage from './main/newAnswer';
 import AnswerPage from './main/answerPage';
 import auth from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
-import ProfilePage from './header/profilePage';
+import ProfilePage from './profilePage';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from '../theme';
 
