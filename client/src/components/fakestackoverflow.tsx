@@ -17,6 +17,7 @@ import ProtectedRoute from './auth/ProtectedRoute';
 import ProfilePage from './profilePage';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from '../theme';
+import QuizPage from './main/quizPage';
 
 /**
  * Represents the main component of the application.
@@ -68,6 +69,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
               <Route path='/new/question' element={<NewQuestionPage />} />
               <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
               <Route path='/profile' element={<ProfilePage />} />
+              <Route path='/quizzes' element={<QuizPage />} />
             </Route>
 
             {/* Catch-all route */}
