@@ -32,8 +32,8 @@ const OrderButton: React.FC<OrderButtonProps> = ({ orderType, setQuestionOrder, 
     <Box m={1}>
       <Button
         variant={isActive ? 'contained' : 'outlined'}
-        color="primary"
-        size="small"
+        color='primary'
+        size='small'
         onClick={handleClick}
       >
         {orderTypeDisplayName[orderType]}

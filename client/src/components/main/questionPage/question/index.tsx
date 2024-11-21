@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getMetaData } from '../../../../tool';
 import { Question } from '../../../../types';
 import { Card, CardContent, Typography, Button, Box } from '@mui/material';
-import { Visibility, CheckCircle }from '@mui/icons-material';
+import { Visibility, CheckCircle } from '@mui/icons-material';
 
 /**
  * Interface representing the props for the Question component.
@@ -60,17 +60,16 @@ const QuestionView = ({ q }: QuestionProps) => {
         if (q._id) {
           handleAnswer(q._id);
         }
-      }}>
+      }}
+    >
       <CardContent>
         <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
           <Box display='flex' alignItems='center'>
-            <Box className='postStats' mr={2} mt={1} alignContent="center">
-            <Typography fontWeight={600}>
-                  {q.upVotes.length} votes
-              </Typography>
+            <Box className='postStats' mr={2} mt={1} alignContent='center'>
+              <Typography fontWeight={600}>{q.upVotes.length} votes</Typography>
               <Typography>
-                <CheckCircle sx={{ verticalAlign: 'middle', mr:'3px' }} />
-                  {q.answers.length || 0} answers
+                <CheckCircle sx={{ verticalAlign: 'middle', mr: '3px' }} />
+                {q.answers.length || 0} answers
               </Typography>
               <Typography>
                 <Visibility sx={{ verticalAlign: 'middle' }} /> {q.views.length} views
@@ -90,7 +89,8 @@ const QuestionView = ({ q }: QuestionProps) => {
                     onClick={e => {
                       e.stopPropagation();
                       clickTag(tag.name);
-                    }}>
+                    }}
+                  >
                     {tag.name}
                   </Button>
                 ))}
@@ -101,7 +101,8 @@ const QuestionView = ({ q }: QuestionProps) => {
             className='lastActivity'
             sx={{
               textAlign: 'right',
-            }}>
+            }}
+          >
             <Typography className='question_author'>{q.askedBy}</Typography>
             <Typography className='question_meta'>
               asked {getMetaData(new Date(q.askDateTime))}

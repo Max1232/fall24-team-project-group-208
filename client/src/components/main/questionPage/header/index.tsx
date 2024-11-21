@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import OrderButton from './orderButton';
 import { OrderType, orderTypeDisplayName } from '../../../../types';
-import { Box, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+} from '@mui/material';
 import useNewQuestion from '../../../../hooks/useNewQuestion';
 
 /**
@@ -58,14 +67,14 @@ const QuestionHeader: React.FC<QuestionHeaderProps> = ({ titleText, qcnt, setQue
 
   return (
     <>
-      <Box display="flex" alignItems="center">
-        <Typography variant="h3" color="primary.main">
+      <Box display='flex' alignItems='center'>
+        <Typography variant='h3' color='primary.main'>
           {titleText}
         </Typography>
-        <Typography variant="body2" sx={{ fontStyle: 'italic', ml: 1 }}>
+        <Typography variant='body2' sx={{ fontStyle: 'italic', ml: 1 }}>
           ({qcnt})
         </Typography>
-        <Box display="flex" ml={2}>
+        <Box display='flex' ml={2}>
           {Object.keys(orderTypeDisplayName).map((order, idx) => (
             <OrderButton
               key={idx}
@@ -75,7 +84,7 @@ const QuestionHeader: React.FC<QuestionHeaderProps> = ({ titleText, qcnt, setQue
             />
           ))}
         </Box>
-        <Button variant="contained" color="primary" onClick={handleClickOpen} sx={{ ml: 2 }}>
+        <Button variant='contained' color='primary' onClick={handleClickOpen} sx={{ ml: 2 }}>
           Ask a New Question
         </Button>
       </Box>
@@ -84,40 +93,40 @@ const QuestionHeader: React.FC<QuestionHeaderProps> = ({ titleText, qcnt, setQue
         <DialogContent>
           <TextField
             autoFocus
-            margin="dense"
-            label="Question Title"
-            type="text"
+            margin='dense'
+            label='Question Title'
+            type='text'
             fullWidth
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={e => setTitle(e.target.value)}
             error={!!titleErr}
             helperText={titleErr}
           />
           <TextField
-            margin="dense"
-            label="Question Text"
-            type="text"
+            margin='dense'
+            label='Question Text'
+            type='text'
             fullWidth
             multiline
             rows={4}
             value={text}
-            onChange={(e) => setText(e.target.value)}
+            onChange={e => setText(e.target.value)}
             error={!!textErr}
             helperText={textErr}
           />
           <TextField
-            margin="dense"
-            label="Tags"
-            type="text"
+            margin='dense'
+            label='Tags'
+            type='text'
             fullWidth
             value={tagNames}
-            onChange={(e) => setTagNames(e.target.value)}
+            onChange={e => setTagNames(e.target.value)}
             error={!!tagErr}
             helperText={tagErr}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={handleClose} color='primary'>
             Cancel
           </Button>
           <Button
@@ -125,7 +134,7 @@ const QuestionHeader: React.FC<QuestionHeaderProps> = ({ titleText, qcnt, setQue
               postQuestion();
               handleClose();
             }}
-            color="primary"
+            color='primary'
           >
             Post Question
           </Button>
