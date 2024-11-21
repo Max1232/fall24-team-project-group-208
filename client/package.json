@@ -4,6 +4,10 @@
   "private": true,
   "dependencies": {
     "@cypress/instrument-cra": "^1.4.0",
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/icons-material": "^6.1.8",
+    "@mui/material": "^6.1.8",
     "axios": "^1.7.2",
     "bcrypt": "^5.1.1",
     "firebase": "^11.0.1",

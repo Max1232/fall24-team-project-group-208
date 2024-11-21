@@ -254,7 +254,7 @@ export interface ServerToClientEvents {
  * Contains all fields from the MongoDB schema.
  */
 export interface User {
-  uid: string;  // Firebase User ID
+  uid: string; // Firebase User ID
   username: string;
   reputation: number;
   level: number;

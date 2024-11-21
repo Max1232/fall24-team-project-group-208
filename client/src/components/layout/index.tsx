@@ -13,19 +13,19 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ toggleTheme, isDarkMode }) => {
-  const [sidebarWidth, setSidebarWidth] = useState(250); 
+  const [sidebarWidth, setSidebarWidth] = useState(250);
 
   const handleSidebarToggle = () => {
-    setSidebarWidth(sidebarWidth === 250 ? 90 : 250); 
+    setSidebarWidth(sidebarWidth === 250 ? 90 : 250);
   };
 
   return (
-    <Box display="flex">
+    <Box display='flex'>
       <SideBarNav onToggle={handleSidebarToggle} />
-      <Box flexGrow={1} ml={`${sidebarWidth}px`} sx={{transition: 'margin-left 0.6s ease'}}>
-        <Box id="main" className="main" mt={8}>
-        <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} sidebarWidth={sidebarWidth} />
-          <Box id="right_main" className="right_main">
+      <Box flexGrow={1} ml={`${sidebarWidth}px`} sx={{ transition: 'margin-left 0.6s ease' }}>
+        <Box id='main' className='main' mt={8}>
+          <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} sidebarWidth={sidebarWidth} />
+          <Box id='right_main' className='right_main'>
             <Outlet />
           </Box>
         </Box>

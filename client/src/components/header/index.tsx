@@ -2,7 +2,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useHeader from '../../hooks/useHeader';
-import { AppBar, Box, Toolbar, Typography, Button, CircularProgress, TextField, InputAdornment, IconButton, Switch } from '@mui/material';
+import {
+  AppBar,
+  Box,
+  Toolbar,
+  Typography,
+  Button,
+  CircularProgress,
+  TextField,
+  InputAdornment,
+  IconButton,
+  Switch,
+} from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
@@ -19,39 +30,34 @@ interface HeaderProps {
   sidebarWidth: number;
 }
 
-const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth  }) => {
+const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }) => {
   const { val, handleInputChange, handleKeyDown, user, handleSignOut, loading } = useHeader();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
-  };
-
-  const handleProfileNavigation = () => {
-    navigate('/profile');
-  };
-
   return (
-    <AppBar position="fixed" elevation={0}       
-    sx={{
-      backgroundColor: 'background.default',
-      width: `calc(100% - ${sidebarWidth}px)`,
-      transition: 'width 0.3s ease',
-    }}>
+    <AppBar
+      position='fixed'
+      elevation={0}
+      sx={{
+        backgroundColor: 'background.default',
+        width: `calc(100% - ${sidebarWidth}px)`,
+        transition: 'width 0.3s ease',
+      }}
+    >
       <Toolbar>
         <TextField
-          id="searchBar"
-          placeholder="Search ..."
-          type="text"
+          id='searchBar'
+          placeholder='Search ...'
+          type='text'
           value={val}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          variant="outlined"
-          size="small"
+          variant='outlined'
+          size='small'
           sx={{
-            mr: 2,
-            backgroundColor: 'background.default',
+            'mr': 2,
+            'backgroundColor': 'background.default',
             '& .MuiOutlinedInput-root': {
               '& fieldset': {
                 borderColor: 'primary.main',
@@ -66,24 +72,27 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth  
           }}
           InputProps={{
             startAdornment: (
-              <InputAdornment position="start">
+              <InputAdornment position='start'>
                 <IconButton>
-                  <SearchIcon color="primary" />
+                  <SearchIcon color='primary' />
                 </IconButton>
               </InputAdornment>
             ),
           }}
         />
-        <Typography variant="h6" sx={{ flexGrow: 1, textAlign: 'center' }}>
-       
-        </Typography>
+        <Typography variant='h6' sx={{ flexGrow: 1, textAlign: 'center' }}></Typography>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <IconButton onClick={toggleTheme} color="primary">
-            {isDarkMode ? <Brightness7Icon sx={{ fontSize: 30 }} /> : <Brightness4Icon sx={{ fontSize: 30 }} />}
-          </IconButton>          {loading && <CircularProgress size={24} sx={{ ml: 2 }} />}
+          <IconButton onClick={toggleTheme} color='primary'>
+            {isDarkMode ? (
+              <Brightness7Icon sx={{ fontSize: 30 }} />
+            ) : (
+              <Brightness4Icon sx={{ fontSize: 30 }} />
+            )}
+          </IconButton>{' '}
+          {loading && <CircularProgress size={24} sx={{ ml: 2 }} />}
           {!loading && user && (
-            <Button onClick={handleSignOut} variant="contained" color="primary" sx={{ ml: 2 }}>
-              <LogoutIcon/>
+            <Button onClick={handleSignOut} variant='contained' color='primary' sx={{ ml: 2 }}>
+              <LogoutIcon />
               Logout
             </Button>
           )}

@@ -14,10 +14,9 @@ import NewAnswerPage from './main/newAnswer';
 import AnswerPage from './main/answerPage';
 import auth from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
-import ProfilePage from "./header/profilePage";
-import { ThemeProvider, CssBaseline, Button } from '@mui/material';
+import ProfilePage from './header/profilePage';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from '../theme';
-import { BrowserRouter as Router } from 'react-router-dom';
 
 /**
  * Represents the main component of the application.
@@ -50,29 +49,30 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
       <CssBaseline />
       <LoginContext.Provider value={{ setUser }}>
         <UserContext.Provider value={{ user: user!, socket: socket! }}>
-            <Routes>
-              {/* Public Route */}
-              <Route path='/' element={<Login />} />
+          <Routes>
+            {/* Public Route */}
+            <Route path='/' element={<Login />} />
 
-              {/* Protected Routes */}
-              <Route
-                element={
-                  <ProtectedRoute>
-                    <Layout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-                  </ProtectedRoute>
-                }>
-                <Route path = '/login'element={<Login />} />
-                <Route path='/home' element={<QuestionPage />} />
-                <Route path='tags' element={<TagPage />} />
-                <Route path='/question/:qid' element={<AnswerPage />} />
-                <Route path='/new/question' element={<NewQuestionPage />} />
-                <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
-                <Route path='profile' element={<ProfilePage />} />
-              </Route>
+            {/* Protected Routes */}
+            <Route
+              element={
+                <ProtectedRoute>
+                  <Layout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+                </ProtectedRoute>
+              }
+            >
+              <Route path='/login' element={<Login />} />
+              <Route path='/home' element={<QuestionPage />} />
+              <Route path='tags' element={<TagPage />} />
+              <Route path='/question/:qid' element={<AnswerPage />} />
+              <Route path='/new/question' element={<NewQuestionPage />} />
+              <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
+              <Route path='/profile' element={<ProfilePage />} />
+            </Route>
 
-              {/* Catch-all route */}
-              <Route path='*' element={<Navigate to='/' replace />} />
-            </Routes>
+            {/* Catch-all route */}
+            <Route path='*' element={<Navigate to='/' replace />} />
+          </Routes>
         </UserContext.Provider>
       </LoginContext.Provider>
     </ThemeProvider>
