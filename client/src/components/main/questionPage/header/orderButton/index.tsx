@@ -1,5 +1,5 @@
 import React from 'react';
-import './index.css';
+import { Button, Box } from '@mui/material';
 import { OrderType, orderTypeDisplayName } from '../../../../../types';
 
 /**
@@ -11,6 +11,7 @@ import { OrderType, orderTypeDisplayName } from '../../../../../types';
 interface OrderButtonProps {
   orderType: OrderType;
   setQuestionOrder: (order: OrderType) => void;
+  isActive: boolean;
 }
 
 /**
@@ -20,15 +21,25 @@ interface OrderButtonProps {
  *
  * @param orderType - The label for the button and the value passed to setQuestionOrder function.
  * @param setQuestionOrder - Callback function to set the order of questions based on the input message.
+ * @param isActive - Boolean indicating if the button is active.
  */
-const OrderButton = ({ orderType, setQuestionOrder }: OrderButtonProps) => (
-  <button
-    className='btn'
-    onClick={() => {
-      setQuestionOrder(orderType);
-    }}>
-    {orderTypeDisplayName[orderType]}
-  </button>
-);
+const OrderButton: React.FC<OrderButtonProps> = ({ orderType, setQuestionOrder, isActive }) => {
+  const handleClick = () => {
+    setQuestionOrder(orderType);
+  };
+
+  return (
+    <Box m={1}>
+      <Button
+        variant={isActive ? 'contained' : 'outlined'}
+        color='primary'
+        size='small'
+        onClick={handleClick}
+      >
+        {orderTypeDisplayName[orderType]}
+      </Button>
+    </Box>
+  );
+};
 
 export default OrderButton;

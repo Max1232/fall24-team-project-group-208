@@ -1,32 +1,64 @@
-import './index.css';
-import React from 'react';
-import Form from '../baseComponents/form';
-import TextArea from '../baseComponents/textarea';
+import React, { useState } from 'react';
+import { Box, Button, TextField, Typography, Modal } from '@mui/material';
 import useAnswerForm from '../../../hooks/useAnswerForm';
 
 /**
- * NewAnswerPage component allows users to submit an answer to a specific question.
+ * NewAnswerModal component allows users to submit an answer to a specific question.
  */
-const NewAnswerPage = () => {
+interface NewAnswerModalProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+const NewAnswerModal: React.FC<NewAnswerModalProps> = ({ open, onClose }) => {
   const { text, textErr, setText, postAnswer } = useAnswerForm();
 
+  const handleSubmit = () => {
+    postAnswer();
+    onClose();
+  };
+
   return (
-    <Form>
-      <TextArea
-        title={'Answer Text'}
-        id={'answerTextInput'}
-        val={text}
-        setState={setText}
-        err={textErr}
-      />
-      <div className='btn_indicator_container'>
-        <button className='form_postBtn' onClick={postAnswer}>
-          Post Answer
-        </button>
-        <div className='mandatory_indicator'>* indicates mandatory fields</div>
-      </div>
-    </Form>
+    <Modal open={open} onClose={onClose} aria-labelledby="new-answer-modal-title">
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          border: '2px solid #000',
+          boxShadow: 24,
+          p: 4,
+        }}
+      >
+        <Typography id="new-answer-modal-title" variant="h6" component="h2">
+          Submit Your Answer
+        </Typography>
+        <TextField
+          fullWidth
+          multiline
+          rows={4}
+          variant="outlined"
+          label="Answer Text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          error={!!textErr}
+          helperText={textErr}
+          sx={{ mt: 2 }}
+        />
+        <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Post Answer
+          </Button>
+          <Typography variant="caption" color="textSecondary">
+            * indicates mandatory fields
+          </Typography>
+        </Box>
+      </Box>
+    </Modal>
   );
 };
 
-export default NewAnswerPage;
+export default NewAnswerModal;

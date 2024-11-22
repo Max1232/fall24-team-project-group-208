@@ -1,8 +1,9 @@
 import React from 'react';
-import './index.css';
+import { TextField, Button, Typography, Container, Paper } from '@mui/material';
 import useLogin from '../../hooks/useLogin';
+import Blobs from './blobs';
 
-const Login = () => {
+const Login: React.FC = () => {
   const {
     email,
     password,
@@ -17,60 +18,73 @@ const Login = () => {
     toggleMode,
   } = useLogin();
 
-  let buttonText;
-  if (loading) {
-    buttonText = 'Processing...';
-  } else if (isLogin) {
-    buttonText = 'Sign In';
-  } else {
-    buttonText = 'Create Account';
-  }
+  const buttonText = loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account';
 
   return (
-    <div className='container'>
-      <h2>Welcome to FakeStackOverflow!</h2>
-      <h4>{isLogin ? 'Please sign in.' : 'Create your account.'}</h4>
-
-      <form onSubmit={handleSubmit}>
-        {error && <div className='error-message'>{error}</div>}
-
-        <input
-          type='email'
-          value={email}
-          onChange={handleEmailChange}
-          placeholder='Enter your email'
-          required
-          className='input-text'
-        />
-
-        {!isLogin && (
-          <input
-            type='text'
-            value={username}
-            onChange={handleUsernameChange}
-            placeholder='Choose a username'
+    <Container component='main' maxWidth='xs' style={{ position: 'relative', minHeight: '100vh' }}>
+      <Blobs />
+      <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
+        <Typography component='h1' variant='h5'>
+          {isLogin ? 'Sign In' : 'Create Account'}
+        </Typography>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            variant='outlined'
+            margin='normal'
             required
-            className='input-text'
+            fullWidth
+            id='email'
+            label='Email Address'
+            name='email'
+            autoComplete='email'
+            autoFocus
+            value={email}
+            onChange={handleEmailChange}
           />
-        )}
-
-        <input
-          type='password'
-          value={password}
-          onChange={handlePasswordChange}
-          placeholder='Enter your password'
-          required
-          className='input-text'
-        />
-        <button type='submit' className='login-button' disabled={loading}>
-          {buttonText}
-        </button>
-
-        <button type='button' onClick={toggleMode} className='toggle-button'>
-          {isLogin ? 'Need an account? Register' : 'Already have an account? Sign In'}
-        </button>
-      </form>
-    </div>
+          {!isLogin && (
+            <TextField
+              variant='outlined'
+              margin='normal'
+              required
+              fullWidth
+              id='username'
+              label='Username'
+              name='username'
+              autoComplete='username'
+              value={username}
+              onChange={handleUsernameChange}
+            />
+          )}
+          <TextField
+            variant='outlined'
+            margin='normal'
+            required
+            fullWidth
+            name='password'
+            label='Password'
+            type='password'
+            id='password'
+            autoComplete='current-password'
+            value={password}
+            onChange={handlePasswordChange}
+          />
+          {error && <Typography color='error'>{error}</Typography>}
+          <Button
+            type='submit'
+            fullWidth
+            variant='contained'
+            color='primary'
+            disabled={loading}
+            style={{ margin: '24px 0 16px' }}
+          >
+            {buttonText}
+          </Button>
+          <Button onClick={toggleMode} fullWidth>
+            {isLogin ? 'Create an account' : 'Sign in with existing account'}
+          </Button>
+        </form>
+      </Paper>
+    </Container>
   );
 };
 

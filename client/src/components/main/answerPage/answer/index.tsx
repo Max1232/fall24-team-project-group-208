@@ -1,8 +1,8 @@
 import React from 'react';
 import { handleHyperlink } from '../../../../tool';
 import CommentSection from '../../commentSection';
-import './index.css';
 import { Comment } from '../../../../types';
+import { Card, CardContent, Box, Typography } from '@mui/material';
 
 /**
  * Interface representing the props for the AnswerView component.
@@ -31,17 +31,23 @@ interface AnswerProps {
  * @param comments An array of comments associated with the answer.
  * @param handleAddComment Function to handle adding a new comment.
  */
-const AnswerView = ({ text, ansBy, meta, comments, handleAddComment }: AnswerProps) => (
-  <div className='answer right_padding'>
-    <div id='answerText' className='answerText'>
-      {handleHyperlink(text)}
-    </div>
-    <div className='answerAuthor'>
-      <div className='answer_author'>{ansBy}</div>
-      <div className='answer_question_meta'>{meta}</div>
-    </div>
-    <CommentSection comments={comments} handleAddComment={handleAddComment} />
-  </div>
+const AnswerView: React.FC<AnswerProps> = ({ text, ansBy, meta, comments, handleAddComment }) => (
+  <Card variant="outlined" sx={{ mb: 2, p: 2 }}>
+    <CardContent>
+      <Box className='answerText' mb={2}>
+        <Typography variant="body1">{handleHyperlink(text)}</Typography>
+      </Box>
+      <Box className='answerAuthor' display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="body2" className='answer_author'>
+          {ansBy}
+        </Typography>
+        <Typography variant="body2" className='answer_question_meta' sx={{ml: 1}}>
+          {meta}
+        </Typography>
+      </Box>
+      <CommentSection comments={comments} handleAddComment={handleAddComment} />
+    </CardContent>
+  </Card>
 );
 
 export default AnswerView;
