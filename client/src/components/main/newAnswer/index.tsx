@@ -7,19 +7,19 @@ import useAnswerForm from '../../../hooks/useAnswerForm';
  */
 interface NewAnswerModalProps {
   open: boolean;
-  handleClose: () => void;
+  onClose: () => void;
 }
 
-const NewAnswerModal: React.FC<NewAnswerModalProps> = ({ open, handleClose }) => {
+const NewAnswerModal: React.FC<NewAnswerModalProps> = ({ open, onClose }) => {
   const { text, textErr, setText, postAnswer } = useAnswerForm();
 
   const handleSubmit = () => {
     postAnswer();
-    handleClose();
+    onClose();
   };
 
   return (
-    <Modal open={open} onClose={handleClose} aria-labelledby="new-answer-modal-title">
+    <Modal open={open} onClose={onClose} aria-labelledby="new-answer-modal-title">
       <Box
         sx={{
           position: 'absolute',

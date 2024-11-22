@@ -6,6 +6,7 @@ import CommentSection from '../commentSection';
 import AnswerView from './answer';
 import { getMetaData } from '../../../tool';
 import { Comment } from '../../../types';
+import NewAnswerModal from '../newAnswer';
 import useAnswerPage from '../../../hooks/useAnswerPage';
 
 /**
@@ -13,7 +14,16 @@ import useAnswerPage from '../../../hooks/useAnswerPage';
  * It also includes the functionality to vote, ask a new question, and post a new answer.
  */
 const AnswerPage: React.FC = () => {
-  const { question, handleNewComment, handleNewAnswer, questionID } = useAnswerPage();
+  const { question, handleNewComment,  questionID } = useAnswerPage();
+  const [open, setOpen] = React.useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   if (!question) {
     return (
@@ -22,6 +32,7 @@ const AnswerPage: React.FC = () => {
       </Box>
     );
   }
+
 
   return (
     <Box p={3}>
@@ -49,9 +60,10 @@ const AnswerPage: React.FC = () => {
         />
       ))}
       <Box mt={3} display='flex' justifyContent='center'>
-        <Button variant='contained' color='primary' onClick={handleNewAnswer}>
+        <Button variant='contained' color='primary' onClick={handleClickOpen}>
           Answer Question
         </Button>
+        <NewAnswerModal open={open} onClose={handleClose} />
       </Box>
     </Box>
   );
