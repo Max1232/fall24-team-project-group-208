@@ -55,6 +55,7 @@ const QuestionView = ({ q }: QuestionProps) => {
         position: 'relative',
         padding: 2,
         width: '95%',
+        cursor: 'pointer',
       }}
       onClick={() => {
         if (q._id) {

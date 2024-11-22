@@ -36,8 +36,8 @@ const TagPage = () => {
           </Grid>
         ))}
       </Grid>
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-        <NewQuestionPage />
+      <Dialog open={open} fullWidth maxWidth="md">
+        <NewQuestionPage onClose={handleClose}/>
       </Dialog>
     </Box>
   );
