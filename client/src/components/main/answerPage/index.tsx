@@ -1,28 +1,30 @@
 import React from 'react';
-import { getMetaData } from '../../../tool';
-import AnswerView from './answer';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import AnswerHeader from './header';
-import { Comment } from '../../../types';
-import './index.css';
 import QuestionBody from './questionBody';
-import VoteComponent from '../voteComponent';
 import CommentSection from '../commentSection';
+import AnswerView from './answer';
+import { getMetaData } from '../../../tool';
+import { Comment } from '../../../types';
 import useAnswerPage from '../../../hooks/useAnswerPage';
 
 /**
  * AnswerPage component that displays the full content of a question along with its answers.
  * It also includes the functionality to vote, ask a new question, and post a new answer.
  */
-const AnswerPage = () => {
-  const { questionID, question, handleNewComment, handleNewAnswer } = useAnswerPage();
+const AnswerPage: React.FC = () => {
+  const { question, handleNewComment, handleNewAnswer, questionID } = useAnswerPage();
 
   if (!question) {
-    return null;
+    return (
+      <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh'>
+        <CircularProgress color='primary' />
+      </Box>
+    );
   }
 
   return (
-    <>
-      <VoteComponent question={question} />
+    <Box p={3}>
       <AnswerHeader ansCount={question.answers.length} title={question.title} />
       <QuestionBody
         views={question.views.length}
@@ -30,10 +32,12 @@ const AnswerPage = () => {
         askby={question.askedBy}
         meta={getMetaData(new Date(question.askDateTime))}
       />
-      <CommentSection
-        comments={question.comments}
-        handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
-      />
+      <Box pt={2}>
+        <CommentSection
+          comments={question.comments}
+          handleAddComment={(comment: Comment) => handleNewComment(comment, 'question', questionID)}
+        />
+      </Box>
       {question.answers.map((a, idx) => (
         <AnswerView
           key={idx}
@@ -44,15 +48,12 @@ const AnswerPage = () => {
           handleAddComment={(comment: Comment) => handleNewComment(comment, 'answer', a._id)}
         />
       ))}
-      <button
-        className='bluebtn ansButton'
-        onClick={() => {
-          handleNewAnswer();
-        }}
-      >
-        Answer Question
-      </button>
-    </>
+      <Box mt={3} display='flex' justifyContent='center'>
+        <Button variant='contained' color='primary' onClick={handleNewAnswer}>
+          Answer Question
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

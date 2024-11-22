@@ -12,6 +12,7 @@ import {
   TextField,
 } from '@mui/material';
 import useNewQuestion from '../../../../hooks/useNewQuestion';
+import NewQuestionPage from '../../newQuestion';
 
 /**
  * Interface representing the props for the QuestionHeader component.
@@ -38,19 +39,6 @@ interface QuestionHeaderProps {
 const QuestionHeader: React.FC<QuestionHeaderProps> = ({ titleText, qcnt, setQuestionOrder }) => {
   const [activeOrder, setActiveOrder] = useState<OrderType | null>(null);
   const [open, setOpen] = useState(false);
-
-  const {
-    title,
-    setTitle,
-    text,
-    setText,
-    tagNames,
-    setTagNames,
-    titleErr,
-    textErr,
-    tagErr,
-    postQuestion,
-  } = useNewQuestion();
 
   const handleOrderChange = (order: OrderType) => {
     setQuestionOrder(order);
@@ -88,57 +76,8 @@ const QuestionHeader: React.FC<QuestionHeaderProps> = ({ titleText, qcnt, setQue
           Ask a New Question
         </Button>
       </Box>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Ask a New Question</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin='dense'
-            label='Question Title'
-            type='text'
-            fullWidth
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            error={!!titleErr}
-            helperText={titleErr}
-          />
-          <TextField
-            margin='dense'
-            label='Question Text'
-            type='text'
-            fullWidth
-            multiline
-            rows={4}
-            value={text}
-            onChange={e => setText(e.target.value)}
-            error={!!textErr}
-            helperText={textErr}
-          />
-          <TextField
-            margin='dense'
-            label='Tags'
-            type='text'
-            fullWidth
-            value={tagNames}
-            onChange={e => setTagNames(e.target.value)}
-            error={!!tagErr}
-            helperText={tagErr}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color='primary'>
-            Cancel
-          </Button>
-          <Button
-            onClick={() => {
-              postQuestion();
-              handleClose();
-            }}
-            color='primary'
-          >
-            Post Question
-          </Button>
-        </DialogActions>
+      <Dialog open={open}>
+        <NewQuestionPage onClose={handleClose} />
       </Dialog>
     </>
   );

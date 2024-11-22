@@ -1,13 +1,6 @@
 import React from 'react';
-import './index.css';
-import AskQuestionButton from '../../askQuestionButton';
+import { Box, Typography } from '@mui/material';
 
-/**
- * Interface representing the props for the AnswerHeader component.
- *
- * - ansCount - The number of answers to display in the header.
- * - title - The title of the question or discussion thread.
- */
 interface AnswerHeaderProps {
   ansCount: number;
   title: string;
@@ -20,12 +13,23 @@ interface AnswerHeaderProps {
  * @param ansCount The number of answers to display.
  * @param title The title of the question or discussion thread.
  */
-const AnswerHeader = ({ ansCount, title }: AnswerHeaderProps) => (
-  <div id='answersHeader' className='space_between right_padding'>
-    <div className='bold_title'>{ansCount} answers</div>
-    <div className='bold_title answer_question_title'>{title}</div>
-    <AskQuestionButton />
-  </div>
+const AnswerHeader: React.FC<AnswerHeaderProps> = ({ ansCount, title }) => (
+  <Box
+    id='answersHeader'
+    display='flex'
+    justifyContent='space-between'
+    alignItems='center'
+    p={2}
+    sx={{ backgroundColor: 'primary.main' }}
+  >
+    <Typography variant='h4' className='bold_title answer_question_title'>
+      {title}
+    </Typography>
+    <Typography variant='h6' className='bold_title' sx={{ ml: 'auto' }}>
+      {ansCount} answers
+    </Typography>
+    {/* Add "ask question button" */}
+  </Box>
 );
 
 export default AnswerHeader;
