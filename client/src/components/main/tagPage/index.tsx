@@ -1,8 +1,8 @@
-import React from 'react';
-import './index.css';
+import React, { useState } from 'react';
+import { Box, Typography, Grid, Button, Dialog } from '@mui/material';
 import TagView from './tag';
 import useTagPage from '../../../hooks/useTagPage';
-import AskQuestionButton from '../askQuestionButton';
+import NewQuestionPage from '../newQuestion';
 
 /**
  * Represents the TagPage component which displays a list of tags
@@ -10,20 +10,36 @@ import AskQuestionButton from '../askQuestionButton';
  */
 const TagPage = () => {
   const { tlist, clickTag } = useTagPage();
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
-    <>
-      <div className='space_between right_padding'>
-        <div className='bold_title'>{tlist.length} Tags</div>
-        <div className='bold_title'>All Tags</div>
-        <AskQuestionButton />
-      </div>
-      <div className='tag_list right_padding'>
+    <Box p={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4">All Tags</Typography>
+        <Typography variant="body1">{tlist.length} Tags</Typography>
+        <Button variant="contained" color="primary" onClick={handleOpen}>
+          Ask a Question
+        </Button>
+      </Box>
+      <Grid container spacing={2}>
         {tlist.map((t, idx) => (
-          <TagView key={idx} t={t} clickTag={clickTag} />
+          <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+            <TagView t={t} clickTag={clickTag} />
+          </Grid>
         ))}
-      </div>
-    </>
+      </Grid>
+      <Dialog open={open} fullWidth maxWidth="md">
+        <NewQuestionPage onClose={handleClose}/>
+      </Dialog>
+    </Box>
   );
 };
 

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { Box, Typography, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
 import { getMetaData } from '../../../tool';
 import { Comment } from '../../../types';
-import './index.css';
 import useUserContext from '../../../hooks/useUserContext';
 
 /**
@@ -48,45 +48,61 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
   };
 
   return (
-    <div className='comment-section'>
-      <button className='toggle-button' onClick={() => setShowComments(!showComments)}>
+    <Box className='comment-section'>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => setShowComments(!showComments)}
+        className='toggle-button'
+      >
         {showComments ? 'Hide Comments' : 'Show Comments'}
-      </button>
-
+      </Button>
+  
       {showComments && (
-        <div className='comments-container'>
-          <ul className='comments-list'>
+        <Box className='comments-container'>
+          <List className='comments-list'>
             {comments.length > 0 ? (
               comments.map((comment, index) => (
-                <li key={index} className='comment-item'>
-                  <p className='comment-text'>{comment.text}</p>
-                  <small className='comment-meta'>
-                    {comment.commentBy}, {getMetaData(new Date(comment.commentDateTime))}
-                  </small>
-                </li>
+                <ListItem key={index} className='comment-item' alignItems="flex-start">
+                  <ListItemText
+                    primary={<Typography className='comment-text'>{comment.text}</Typography>}
+                    secondary={
+                      <Typography className='comment-meta' variant="body2" color="textSecondary">
+                        {comment.commentBy}, {getMetaData(new Date(comment.commentDateTime))}
+                      </Typography>
+                    }
+                  />
+                </ListItem>
               ))
             ) : (
-              <p className='no-comments'>No comments yet.</p>
+              <Typography className='no-comments'>No comments yet.</Typography>
             )}
-          </ul>
-
-          <div className='add-comment'>
-            <div className='input-row'>
-              <textarea
-                placeholder='Comment'
-                value={text}
-                onChange={e => setText(e.target.value)}
-                className='comment-textarea'
-              />
-              <button className='add-comment-button' onClick={handleAddCommentClick}>
-                Add Comment
-              </button>
-            </div>
-            {textErr && <small className='error'>{textErr}</small>}
-          </div>
-        </div>
+          </List>
+  
+          <Box className='add-comment' mt={2}>
+            <TextField
+              placeholder='Comment'
+              value={text}
+              onChange={e => setText(e.target.value)}
+              className='comment-textarea'
+              fullWidth
+              multiline
+              rows={4}
+              variant="outlined"
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleAddCommentClick}
+              className='add-comment-button'
+              sx={{ mt: 1 }}
+            >
+              Add Comment
+            </Button>
+          </Box>
+        </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

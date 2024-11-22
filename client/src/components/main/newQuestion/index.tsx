@@ -1,15 +1,16 @@
 import React from 'react';
+import { DialogContent, DialogTitle, TextField, DialogActions, Button } from '@mui/material';
 import useNewQuestion from '../../../hooks/useNewQuestion';
-import Form from '../baseComponents/form';
-import Input from '../baseComponents/input';
-import TextArea from '../baseComponents/textarea';
-import './index.css';
+
+interface NewQuestionPageProps {
+  onClose: () => void;
+}
 
 /**
  * NewQuestionPage component allows users to submit a new question with a title,
  * description, tags, and username.
  */
-const NewQuestionPage = () => {
+const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
   const {
     title,
     setTitle,
@@ -23,43 +24,58 @@ const NewQuestionPage = () => {
     postQuestion,
   } = useNewQuestion();
 
+  const handleSubmit = () => {
+    postQuestion();
+    onClose();
+  };
+
   return (
-    <Form>
-      <Input
-        title={'Question Title'}
-        hint={'Limit title to 100 characters or less'}
-        id={'formTitleInput'}
-        val={title}
-        setState={setTitle}
-        err={titleErr}
-      />
-      <TextArea
-        title={'Question Text'}
-        hint={'Add details'}
-        id={'formTextInput'}
-        val={text}
-        setState={setText}
-        err={textErr}
-      />
-      <Input
-        title={'Tags'}
-        hint={'Add keywords separated by whitespace'}
-        id={'formTagInput'}
-        val={tagNames}
-        setState={setTagNames}
-        err={tagErr}
-      />
-      <div className='btn_indicator_container'>
-        <button
-          className='form_postBtn'
-          onClick={() => {
-            postQuestion();
-          }}>
+    <>
+      <DialogTitle>Ask a New Question</DialogTitle>
+      <DialogContent>
+        <TextField
+          autoFocus
+          margin='dense'
+          label='Question Title'
+          type='text'
+          fullWidth
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          error={!!titleErr}
+          helperText={titleErr}
+        />
+        <TextField
+          margin='dense'
+          label='Question Text'
+          type='text'
+          fullWidth
+          multiline
+          rows={4}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          error={!!textErr}
+          helperText={textErr}
+        />
+        <TextField
+          margin='dense'
+          label='Tags'
+          type='text'
+          fullWidth
+          value={tagNames}
+          onChange={(e) => setTagNames(e.target.value)}
+          error={!!tagErr}
+          helperText={tagErr}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color='primary'>
+          Cancel
+        </Button>
+        <Button onClick={handleSubmit} color='primary'>
           Post Question
-        </button>
-        <div className='mandatory_indicator'>* indicates mandatory fields</div>
-      </div>
-    </Form>
+        </Button>
+      </DialogActions>
+    </>
   );
 };
 
