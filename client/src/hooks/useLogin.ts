@@ -1,13 +1,17 @@
 import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
-import auth from '../config/firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserSessionPersistence,
+} from 'firebase/auth';
+import auth, { WINDOW_ID } from '../config/firebase';
 import useLoginContext from './useLoginContext';
+import AuthService from '../services/authService';
 
 /**
  * Custom hook to handle login and registration with Firebase Authentication.
- *
- * @returns Object containing login state and handlers
  */
 const useLogin = () => {
   const [email, setEmail] = useState<string>('');
@@ -20,58 +24,52 @@ const useLogin = () => {
   const { setUser } = useLoginContext();
   const navigate = useNavigate();
 
-  /**
-   * Handles email input changes
-   */
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     setError('');
   };
 
-  /**
-   * Handles password input changes
-   */
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     setError('');
   };
 
-  /**
-   * Handles username input changes
-   */
   const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
     setError('');
   };
 
-  /**
-   * Toggles between login and registration modes
-   */
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setError('');
   };
 
-  /**
-   * Handles form submission for both login and registration
-   */
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError('');
 
     try {
+      // Set session persistence before authentication
+      await setPersistence(auth, browserSessionPersistence);
+
       if (isLogin) {
         // Handle login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const token = await userCredential.user.getIdToken();
 
+        // Store the window ID in session storage
+        sessionStorage.setItem('auth_window_id', WINDOW_ID);
+
         // Fetch user profile
-        const response = await fetch(`http://localhost:8000/auth/profile/${email.split('@')[0]}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await fetch(
+          `${process.env.REACT_APP_SERVER_URL}/auth/profile/${email.split('@')[0]}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
         if (!response.ok) {
           throw new Error('Failed to fetch user profile');
@@ -79,14 +77,21 @@ const useLogin = () => {
 
         const userData = await response.json();
         setUser(userData);
+
+        // Store user data with window ID
+        sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(userData));
+
         navigate('/home');
       } else {
         // Handle registration
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const token = await userCredential.user.getIdToken();
 
+        // Store the window ID in session storage
+        sessionStorage.setItem('auth_window_id', WINDOW_ID);
+
         // Create user profile
-        const response = await fetch('http://localhost:8000/auth/profile', {
+        const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/auth/profile`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -102,9 +107,18 @@ const useLogin = () => {
 
         const userData = await response.json();
         setUser(userData);
+
+        // Store user data with window ID
+        sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(userData));
+
         navigate('/home');
       }
     } catch (err) {
+      // Clean up any partial authentication state on error
+      AuthService.clearAuth(WINDOW_ID);
+      sessionStorage.removeItem('auth_window_id');
+      sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
+
       let errorMessage = 'An error occurred';
       if (err instanceof Error) {
         errorMessage = err.message;
