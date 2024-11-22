@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { initializeApp } from 'firebase/app';
-import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { setPersistence, browserSessionPersistence } from 'firebase/auth';
+import AuthService from '../services/authService';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -13,11 +14,17 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
-// Set persistence to LOCAL (survives browser restarts)
-setPersistence(auth, browserLocalPersistence).catch(error => {
+// Generate a unique window ID
+const WINDOW_ID = crypto.randomUUID();
+
+// Get auth instance for this specific window
+const auth = AuthService.getAuth(app, WINDOW_ID);
+
+// Set persistence to SESSION instead of LOCAL
+setPersistence(auth, browserSessionPersistence).catch(error => {
   throw new Error(`Error setting persistence: ${error}`);
 });
 
+export { WINDOW_ID };
 export default auth;

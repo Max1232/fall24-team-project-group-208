@@ -7,6 +7,7 @@ export type FakeSOSocket = Socket<ServerToClientEvents>;
  * Contains only the fields needed for display and client-side functionality.
  */
 export interface User {
+  uid: string;
   username: string;
   reputation?: number;
   level?: number;

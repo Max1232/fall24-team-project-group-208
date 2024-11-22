@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -6,40 +5,115 @@ import Layout from './layout';
 import Login from './login';
 import { FakeSOSocket, User } from '../types';
 import LoginContext from '../contexts/LoginContext';
-import UserContext from '../contexts/UserContext';
+import UserContext, { getStoredUser } from '../contexts/UserContext';
 import QuestionPage from './main/questionPage';
 import TagPage from './main/tagPage';
 import NewQuestionPage from './main/newQuestion';
 import NewAnswerPage from './main/newAnswer';
 import AnswerPage from './main/answerPage';
-import auth from '../config/firebase';
+import auth, { WINDOW_ID } from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
 import ProfilePage from './profilePage';
 import { ThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from '../theme';
 import QuizPage from './main/quizPage';
+import AuthService from '../services/authService';
 
-/**
- * Represents the main component of the application.
- * It manages the state for search terms and the main title.
- */
+
 const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+const [user, setUser] = useState<User | null>(null);
+const [isDarkMode, setIsDarkMode] = useState(false);
+const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, firebaseUser => {
-      if (firebaseUser) {
-        setUser({
-          username: firebaseUser.email || 'Anonymous',
-        });
-      } else {
-        setUser(null);
-      }
-    });
+    // Check if this window should have an active session
+    const storedWindowId = sessionStorage.getItem('auth_window_id');
 
-    return () => unsubscribe();
-  }, []);
+    if (storedWindowId && storedWindowId !== WINDOW_ID) {
+      // This is a different window, clear the auth state
+      AuthService.clearAuth(WINDOW_ID);
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      firebaseUser => {
+        if (firebaseUser) {
+          // Only set user if this window owns the session
+          if (!storedWindowId || storedWindowId === WINDOW_ID) {
+            const storedData = sessionStorage.getItem(`user_data_${WINDOW_ID}`);
+            const existingData = storedData ? JSON.parse(storedData) : getStoredUser();
+
+            const userData: User = {
+              username: firebaseUser.email || 'Anonymous',
+              uid: firebaseUser.uid,
+              ...existingData,
+              reputation: existingData?.reputation ?? 0,
+              level: existingData?.level ?? 1,
+              levelThreshold: existingData?.levelThreshold ?? 40,
+              levelProgress: existingData?.levelProgress ?? 0,
+              answers: existingData?.answers ?? 0,
+              questions: existingData?.questions ?? 0,
+              acceptedAnswers: existingData?.acceptedAnswers ?? 0,
+              comments: existingData?.comments ?? 0,
+              badges: existingData?.badges ?? [],
+              joinedDate: existingData?.joinedDate ? new Date(existingData.joinedDate) : new Date(),
+            };
+
+            setUser(userData);
+            // Store data in session storage with window ID
+            sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(userData));
+            sessionStorage.setItem('auth_window_id', WINDOW_ID);
+          }
+        } else {
+          setUser(null);
+          // Clean up session data
+          sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
+          sessionStorage.removeItem('auth_window_id');
+          AuthService.clearAuth(WINDOW_ID);
+        }
+        setLoading(false);
+      },
+      error => {
+        console.error('Auth state change error:', error);
+        setLoading(false);
+        setUser(null);
+      },
+    );
+
+    return () => {
+      unsubscribe();
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [socket]);
+
+  const handleSetUser = (newUser: User | null) => {
+    setUser(newUser);
+    if (newUser) {
+      // Store in session storage with window ID
+      sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(newUser));
+      sessionStorage.setItem('auth_window_id', WINDOW_ID);
+    } else {
+      // Clean up session data
+      sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
+      sessionStorage.removeItem('auth_window_id');
+      AuthService.clearAuth(WINDOW_ID);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className='flex items-center justify-center min-h-screen'>
+        <div className='text-center'>
+          <h2>Loading...</h2>
+        </div>
+      </div>
+    );
+  }
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
@@ -47,36 +121,41 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
 
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-      <CssBaseline />
-      <LoginContext.Provider value={{ setUser }}>
-        <UserContext.Provider value={{ user: user!, socket: socket! }}>
-          <Routes>
-            {/* Public Route */}
-            <Route path='/' element={<Login />} />
+<CssBaseline />
+<LoginContext.Provider value={{ setUser: handleSetUser }}>
+  <Routes>
+    {/* Public Route with redirect logic */}
+    <Route path='/' element={user ? <Navigate to='/home' replace /> : <Login />} />
 
-            {/* Protected Routes */}
-            <Route
-              element={
-                <ProtectedRoute>
-                  <Layout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-                </ProtectedRoute>
-              }
-            >
-              <Route path='/login' element={<Login />} />
-              <Route path='/home' element={<QuestionPage />} />
-              <Route path='tags' element={<TagPage />} />
-              <Route path='/question/:qid' element={<AnswerPage />} />
-              <Route path='/new/answer/:qid' element={<Navigate to='/' replace />} />
-              <Route path='/profile' element={<ProfilePage />} />
-              <Route path='/quizzes' element={<QuizPage />} />
-            </Route>
+    {/* Protected Routes with proper user context */}
+    <Route
+      element={
+        user && socket ? (
+          <UserContext.Provider value={{ user, socket }}>
+            <ProtectedRoute>
+              <Layout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+            </ProtectedRoute>
+          </UserContext.Provider>
+        ) : (
+          <Navigate to='/' replace />
+        )
+      }
+    >
+      <Route path='/login' element={<Login />} />
+      <Route path='/home' element={<QuestionPage />} />
+      <Route path='tags' element={<TagPage />} />
+      <Route path='/question/:qid' element={<AnswerPage />} />
+      <Route path='/new/question' element={<NewQuestionPage />} />
+      <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
+      <Route path='/profile' element={<ProfilePage />} />
+      <Route path='/quizzes' element={<QuizPage />} />
+    </Route>
 
-            {/* Catch-all route */}
-            <Route path='*' element={<Navigate to='/' replace />} />
-          </Routes>
-        </UserContext.Provider>
-      </LoginContext.Provider>
-    </ThemeProvider>
+    {/* Catch-all route */}
+    <Route path='*' element={<Navigate to='/' replace />} />
+  </Routes>
+</LoginContext.Provider>
+</ThemeProvider>
   );
 };
 
