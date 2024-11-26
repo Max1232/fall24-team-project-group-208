@@ -228,6 +228,7 @@ export interface ProfileCreatedPayload {
   comments: number;
   badges: string[];
   joinedDate: Date;
+  role: number;
 }
 
 /**
@@ -266,6 +267,7 @@ export interface User {
   comments: number;
   joinedDate: Date;
   badges: string[];
+  role: number;
 }
 
 export interface AuthRequest extends Request {
