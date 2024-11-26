@@ -145,8 +145,6 @@ const [loading, setLoading] = useState(true);
       <Route path='/home' element={<QuestionPage />} />
       <Route path='tags' element={<TagPage />} />
       <Route path='/question/:qid' element={<AnswerPage />} />
-      <Route path='/new/question' element={<NewQuestionPage />} />
-      <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
       <Route path='/profile' element={<ProfilePage />} />
       <Route path='/quizzes' element={<QuizPage />} />
     </Route>

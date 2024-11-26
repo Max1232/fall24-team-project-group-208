@@ -19,6 +19,7 @@ export interface User {
   comments?: number;
   joinedDate?: Date;
   badges?: string[];
+  role: number;
 }
 
 /**

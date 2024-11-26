@@ -54,6 +54,7 @@ export const useProfilePage = () => {
           acceptedAnswers: 0,
           comments: 0,
           badges: [],
+          role: 1,
           joinedDate: new Date(),
         };
       } else if (!response.ok) {
