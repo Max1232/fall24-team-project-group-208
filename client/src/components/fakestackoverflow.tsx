@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import Layout from './layout';
 import Login from './login';
 import { FakeSOSocket, User } from '../types';
@@ -14,16 +15,14 @@ import AnswerPage from './main/answerPage';
 import auth, { WINDOW_ID } from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
 import ProfilePage from './profilePage';
-import { ThemeProvider, CssBaseline } from '@mui/material';
 import { lightTheme, darkTheme } from '../theme';
 import QuizPage from './main/quizPage';
 import AuthService from '../services/authService';
 
-
 const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
-const [user, setUser] = useState<User | null>(null);
-const [isDarkMode, setIsDarkMode] = useState(false);
-const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if this window should have an active session
@@ -121,41 +120,40 @@ const [loading, setLoading] = useState(true);
 
   return (
     <ThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
-<CssBaseline />
-<LoginContext.Provider value={{ setUser: handleSetUser }}>
-  <Routes>
-    {/* Public Route with redirect logic */}
-    <Route path='/' element={user ? <Navigate to='/home' replace /> : <Login />} />
+      <CssBaseline />
+      <LoginContext.Provider value={{ setUser: handleSetUser }}>
+        <Routes>
+          {/* Public Route with redirect logic */}
+          <Route path='/' element={user ? <Navigate to='/home' replace /> : <Login />} />
 
-    {/* Protected Routes with proper user context */}
-    <Route
-      element={
-        user && socket ? (
-          <UserContext.Provider value={{ user, socket }}>
-            <ProtectedRoute>
-              <Layout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-            </ProtectedRoute>
-          </UserContext.Provider>
-        ) : (
-          <Navigate to='/' replace />
-        )
-      }
-    >
-      <Route path='/login' element={<Login />} />
-      <Route path='/home' element={<QuestionPage />} />
-      <Route path='tags' element={<TagPage />} />
-      <Route path='/question/:qid' element={<AnswerPage />} />
-      <Route path='/new/question' element={<NewQuestionPage />} />
-      <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
-      <Route path='/profile' element={<ProfilePage />} />
-      <Route path='/quizzes' element={<QuizPage />} />
-    </Route>
+          {/* Protected Routes with proper user context */}
+          <Route
+            element={
+              user && socket ? (
+                <UserContext.Provider value={{ user, socket }}>
+                  <ProtectedRoute>
+                    <Layout toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+                  </ProtectedRoute>
+                </UserContext.Provider>
+              ) : (
+                <Navigate to='/' replace />
+              )
+            }>
+            <Route path='/login' element={<Login />} />
+            <Route path='/home' element={<QuestionPage />} />
+            <Route path='tags' element={<TagPage />} />
+            <Route path='/question/:qid' element={<AnswerPage />} />
+            <Route path='/new/question' element={<NewQuestionPage />} />
+            <Route path='/new/answer/:qid' element={<NewAnswerPage />} />
+            <Route path='/profile' element={<ProfilePage />} />
+            <Route path='/quizzes' element={<QuizPage />} />
+          </Route>
 
-    {/* Catch-all route */}
-    <Route path='*' element={<Navigate to='/' replace />} />
-  </Routes>
-</LoginContext.Provider>
-</ThemeProvider>
+          {/* Catch-all route */}
+          <Route path='*' element={<Navigate to='/' replace />} />
+        </Routes>
+      </LoginContext.Provider>
+    </ThemeProvider>
   );
 };
 

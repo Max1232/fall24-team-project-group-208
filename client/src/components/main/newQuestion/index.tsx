@@ -40,7 +40,7 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
           type='text'
           fullWidth
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={e => setTitle(e.target.value)}
           error={!!titleErr}
           helperText={titleErr}
         />
@@ -52,7 +52,7 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
           multiline
           rows={4}
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={e => setText(e.target.value)}
           error={!!textErr}
           helperText={textErr}
         />
@@ -62,7 +62,7 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
           type='text'
           fullWidth
           value={tagNames}
-          onChange={(e) => setTagNames(e.target.value)}
+          onChange={e => setTagNames(e.target.value)}
           error={!!tagErr}
           helperText={tagErr}
         />

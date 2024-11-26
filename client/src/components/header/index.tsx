@@ -1,7 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useHeader from '../../hooks/useHeader';
 import {
   AppBar,
   Box,
@@ -18,6 +17,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import useHeader from '../../hooks/useHeader';
 
 /**
  * Header component that renders the main title, search bar, and authentication status.
@@ -43,8 +43,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }
         backgroundColor: 'background.default',
         width: `calc(100% - ${sidebarWidth}px)`,
         transition: 'width 0.3s ease',
-      }}
-    >
+      }}>
       <Toolbar>
         <TextField
           id='searchBar'

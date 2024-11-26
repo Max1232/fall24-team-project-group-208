@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import OrderButton from './orderButton';
-import { OrderType, orderTypeDisplayName } from '../../../../types';
 import {
   Box,
   Typography,
@@ -11,6 +9,8 @@ import {
   DialogActions,
   TextField,
 } from '@mui/material';
+import OrderButton from './orderButton';
+import { OrderType, orderTypeDisplayName } from '../../../../types';
 import useNewQuestion from '../../../../hooks/useNewQuestion';
 import NewQuestionPage from '../../newQuestion';
 

@@ -50,13 +50,14 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
         flexDirection: 'column',
         alignItems: 'center',
         paddingTop: 2,
-      }}
-    >
+      }}>
       <Box sx={{ flexGrow: 1, width: '100%' }}>
         <ListItem
           component='li'
-          sx={{ justifyContent: expanded ? 'flex-start' : 'center', paddingLeft: expanded ? 2 : 0 }}
-        >
+          sx={{
+            justifyContent: expanded ? 'flex-start' : 'center',
+            paddingLeft: expanded ? 2 : 0,
+          }}>
           <ListItemIcon sx={{ minWidth: 'auto' }}>
             <img
               src='/devask-logo_pink-circle.png'
@@ -69,8 +70,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
               primary={
                 <Typography
                   variant='h2'
-                  sx={{ color: expanded ? 'secondary.light' : 'transparent' }}
-                >
+                  sx={{ color: expanded ? 'secondary.light' : 'transparent' }}>
                   DevAsk
                 </Typography>
               }
@@ -87,8 +87,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-          }}
-        >
+          }}>
           <ListItem component='li'>
             <ListItemIcon>
               <QuestionAnswer sx={{ fontSize: 30, color: '#fff' }} />
@@ -108,8 +107,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-          }}
-        >
+          }}>
           <ListItem component='li'>
             <ListItemIcon>
               <LocalOffer sx={{ fontSize: 30, color: '#fff' }} />
@@ -129,8 +127,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-          }}
-        >
+          }}>
           <ListItem component='li'>
             <ListItemIcon>
               <Quiz sx={{ fontSize: 30, color: '#fff' }} />
@@ -150,8 +147,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-          }}
-        >
+          }}>
           <ListItem component='li'>
             <ListItemIcon>
               <Settings sx={{ fontSize: 30, color: '#fff' }} />
@@ -180,8 +176,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-          }}
-        >
+          }}>
           <ListItem component='li'>
             <ListItemIcon>
               <AccountCircle sx={{ fontSize: 30, color: '#fff' }} />

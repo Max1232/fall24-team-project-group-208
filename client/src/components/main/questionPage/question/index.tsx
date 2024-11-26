@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getMetaData } from '../../../../tool';
-import { Question } from '../../../../types';
 import { Card, CardContent, Typography, Button, Box } from '@mui/material';
 import { Visibility, CheckCircle } from '@mui/icons-material';
+import { getMetaData } from '../../../../tool';
+import { Question } from '../../../../types';
 
 /**
  * Interface representing the props for the Question component.
@@ -61,8 +61,7 @@ const QuestionView = ({ q }: QuestionProps) => {
         if (q._id) {
           handleAnswer(q._id);
         }
-      }}
-    >
+      }}>
       <CardContent>
         <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
           <Box display='flex' alignItems='center'>
@@ -90,8 +89,7 @@ const QuestionView = ({ q }: QuestionProps) => {
                     onClick={e => {
                       e.stopPropagation();
                       clickTag(tag.name);
-                    }}
-                  >
+                    }}>
                     {tag.name}
                   </Button>
                 ))}
@@ -102,8 +100,7 @@ const QuestionView = ({ q }: QuestionProps) => {
             className='lastActivity'
             sx={{
               textAlign: 'right',
-            }}
-          >
+            }}>
             <Typography className='question_author'>{q.askedBy}</Typography>
             <Typography className='question_meta'>
               asked {getMetaData(new Date(q.askDateTime))}

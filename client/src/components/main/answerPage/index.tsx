@@ -14,7 +14,7 @@ import useAnswerPage from '../../../hooks/useAnswerPage';
  * It also includes the functionality to vote, ask a new question, and post a new answer.
  */
 const AnswerPage: React.FC = () => {
-  const { question, handleNewComment,  questionID } = useAnswerPage();
+  const { question, handleNewComment, questionID } = useAnswerPage();
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -32,7 +32,6 @@ const AnswerPage: React.FC = () => {
       </Box>
     );
   }
-
 
   return (
     <Box p={3}>

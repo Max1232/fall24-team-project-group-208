@@ -50,24 +50,23 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
   return (
     <Box className='comment-section'>
       <Button
-        variant="contained"
-        color="primary"
+        variant='contained'
+        color='primary'
         onClick={() => setShowComments(!showComments)}
-        className='toggle-button'
-      >
+        className='toggle-button'>
         {showComments ? 'Hide Comments' : 'Show Comments'}
       </Button>
-  
+
       {showComments && (
         <Box className='comments-container'>
           <List className='comments-list'>
             {comments.length > 0 ? (
               comments.map((comment, index) => (
-                <ListItem key={index} className='comment-item' alignItems="flex-start">
+                <ListItem key={index} className='comment-item' alignItems='flex-start'>
                   <ListItemText
                     primary={<Typography className='comment-text'>{comment.text}</Typography>}
                     secondary={
-                      <Typography className='comment-meta' variant="body2" color="textSecondary">
+                      <Typography className='comment-meta' variant='body2' color='textSecondary'>
                         {comment.commentBy}, {getMetaData(new Date(comment.commentDateTime))}
                       </Typography>
                     }
@@ -78,7 +77,7 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
               <Typography className='no-comments'>No comments yet.</Typography>
             )}
           </List>
-  
+
           <Box className='add-comment' mt={2}>
             <TextField
               placeholder='Comment'
@@ -88,15 +87,14 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
               fullWidth
               multiline
               rows={4}
-              variant="outlined"
+              variant='outlined'
             />
             <Button
-              variant="contained"
-              color="primary"
+              variant='contained'
+              color='primary'
               onClick={handleAddCommentClick}
               className='add-comment-button'
-              sx={{ mt: 1 }}
-            >
+              sx={{ mt: 1 }}>
               Add Comment
             </Button>
           </Box>

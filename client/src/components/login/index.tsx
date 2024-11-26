@@ -75,8 +75,7 @@ const Login: React.FC = () => {
             variant='contained'
             color='primary'
             disabled={loading}
-            style={{ margin: '24px 0 16px' }}
-          >
+            style={{ margin: '24px 0 16px' }}>
             {buttonText}
           </Button>
           <Button onClick={toggleMode} fullWidth>
