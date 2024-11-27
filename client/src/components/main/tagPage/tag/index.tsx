@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { Card, CardContent, Typography, Box, Modal, Button } from '@mui/material';
 import { TagData } from '../../../../types';
 import useTagSelected from '../../../../hooks/useTagSelected';
-import { Card, CardContent, Typography, Box, Modal, Button } from '@mui/material';
 
 /**
  * Props for the Tag component.
@@ -32,25 +32,24 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
   return (
     <>
       <Card
-        variant="outlined"
+        variant='outlined'
         sx={{
-          cursor: 'pointer',
-          mb: 2,
-          color: 'primary.main',
-          height: '150px',
-          borderColor: open ? 'transparent' : 'primary.main', 
-          borderWidth: '1px',
+          'cursor': 'pointer',
+          'mb': 2,
+          'color': 'primary.main',
+          'height': '150px',
+          'borderColor': open ? 'transparent' : 'primary.main',
+          'borderWidth': '1px',
           '&:hover': {
             backgroundColor: 'primary.dark',
           },
         }}
-        onClick={handleOpen}
-      >
+        onClick={handleOpen}>
         <CardContent>
-          <Typography variant="h4" component="div" gutterBottom>
+          <Typography variant='h4' component='div' gutterBottom>
             {tag.name}
           </Typography>
-          <Typography variant="body1" color="textSecondary">
+          <Typography variant='body1' color='textSecondary'>
             {tag.description}
           </Typography>
         </CardContent>
@@ -59,9 +58,8 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
       <Modal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-title"
-        aria-describedby="modal-description"
-      >
+        aria-labelledby='modal-title'
+        aria-describedby='modal-description'>
         <Box
           sx={{
             position: 'absolute',
@@ -72,23 +70,21 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
             bgcolor: 'background.paper',
             boxShadow: 24,
             p: 4,
-          }}
-        >
-          <Typography id="modal-title" variant="h6" component="h2">
+          }}>
+          <Typography id='modal-title' variant='h6' component='h2'>
             {tag.name}
           </Typography>
-          <Typography id="modal-description" sx={{ mt: 2 }}>
+          <Typography id='modal-description' sx={{ mt: 2 }}>
             {tag.description}
           </Typography>
           <Button
-            variant="contained"
-            color="primary"
+            variant='contained'
+            color='primary'
             sx={{ mt: 2 }}
             onClick={() => {
               clickTag(t.name);
               handleClose();
-            }}
-          >
+            }}>
             View all questions with this tag
           </Button>
         </Box>
