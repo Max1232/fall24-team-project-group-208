@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
 import { initializeApp } from 'firebase/app';
-import { setPersistence, browserSessionPersistence } from 'firebase/auth';
 import AuthService from '../services/authService';
 
 const firebaseConfig = {
@@ -15,16 +13,17 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Generate a unique window ID
-const WINDOW_ID = crypto.randomUUID();
+// Get or generate window ID
+export const WINDOW_ID = (() => {
+  const stored = sessionStorage.getItem('current_window_id');
+  if (stored) return stored;
 
-// Get auth instance for this specific window
+  const newId = crypto.randomUUID();
+  sessionStorage.setItem('current_window_id', newId);
+  return newId;
+})();
+
+// Get auth instance synchronously
 const auth = AuthService.getAuth(app, WINDOW_ID);
 
-// Set persistence to SESSION instead of LOCAL
-setPersistence(auth, browserSessionPersistence).catch(error => {
-  throw new Error(`Error setting persistence: ${error}`);
-});
-
-export { WINDOW_ID };
 export default auth;
