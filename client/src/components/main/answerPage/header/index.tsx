@@ -20,8 +20,7 @@ const AnswerHeader: React.FC<AnswerHeaderProps> = ({ ansCount, title }) => (
     justifyContent='space-between'
     alignItems='center'
     p={2}
-    sx={{ backgroundColor: 'primary.main' }}
-  >
+    sx={{ backgroundColor: 'primary.main' }}>
     <Typography variant='h4' className='bold_title answer_question_title'>
       {title}
     </Typography>

@@ -19,7 +19,7 @@ const NewAnswerModal: React.FC<NewAnswerModalProps> = ({ open, onClose }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose} aria-labelledby="new-answer-modal-title">
+    <Modal open={open} onClose={onClose} aria-labelledby='new-answer-modal-title'>
       <Box
         sx={{
           position: 'absolute',
@@ -31,28 +31,27 @@ const NewAnswerModal: React.FC<NewAnswerModalProps> = ({ open, onClose }) => {
           border: '2px solid #000',
           boxShadow: 24,
           p: 4,
-        }}
-      >
-        <Typography id="new-answer-modal-title" variant="h6" component="h2">
+        }}>
+        <Typography id='new-answer-modal-title' variant='h6' component='h2'>
           Submit Your Answer
         </Typography>
         <TextField
           fullWidth
           multiline
           rows={4}
-          variant="outlined"
-          label="Answer Text"
+          variant='outlined'
+          label='Answer Text'
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={e => setText(e.target.value)}
           error={!!textErr}
           helperText={textErr}
           sx={{ mt: 2 }}
         />
-        <Box mt={2} display="flex" justifyContent="space-between" alignItems="center">
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
+        <Box mt={2} display='flex' justifyContent='space-between' alignItems='center'>
+          <Button variant='contained' color='primary' onClick={handleSubmit}>
             Post Answer
           </Button>
-          <Typography variant="caption" color="textSecondary">
+          <Typography variant='caption' color='textSecondary'>
             * indicates mandatory fields
           </Typography>
         </Box>

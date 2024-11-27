@@ -22,10 +22,10 @@ const TagPage = () => {
 
   return (
     <Box p={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-        <Typography variant="h4">All Tags</Typography>
-        <Typography variant="body1">{tlist.length} Tags</Typography>
-        <Button variant="contained" color="primary" onClick={handleOpen}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' mb={3}>
+        <Typography variant='h4'>All Tags</Typography>
+        <Typography variant='body1'>{tlist.length} Tags</Typography>
+        <Button variant='contained' color='primary' onClick={handleOpen}>
           Ask a Question
         </Button>
       </Box>
@@ -36,8 +36,8 @@ const TagPage = () => {
           </Grid>
         ))}
       </Grid>
-      <Dialog open={open} fullWidth maxWidth="md">
-        <NewQuestionPage onClose={handleClose}/>
+      <Dialog open={open} fullWidth maxWidth='md'>
+        <NewQuestionPage onClose={handleClose} />
       </Dialog>
     </Box>
   );

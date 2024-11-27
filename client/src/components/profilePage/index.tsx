@@ -1,6 +1,14 @@
 import React from 'react';
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Card,
+  CardContent,
+  Avatar,
+  LinearProgress,
+} from '@mui/material';
 import useProfilePage from '../../hooks/useProfilePage';
-import { Box, CircularProgress, Typography, Card, CardContent, Avatar, LinearProgress } from '@mui/material';
 
 const ProfilePage: React.FC = () => {
   const { profileData, loading, error } = useProfilePage();
@@ -78,7 +86,11 @@ const ProfilePage: React.FC = () => {
 
       <Box sx={{ width: '100%', maxWidth: 600 }}>
         <Typography variant='h4'>Progress to Level {(profileData.level ?? 1) + 1}</Typography>
-        <LinearProgress variant='determinate' value={(profileData.reputation ?? 0) % 100} sx={{ height: 40, borderRadius: 10 }}/>
+        <LinearProgress
+          variant='determinate'
+          value={(profileData.reputation ?? 0) % 100}
+          sx={{ height: 40, borderRadius: 10 }}
+        />
       </Box>
     </Box>
   );
