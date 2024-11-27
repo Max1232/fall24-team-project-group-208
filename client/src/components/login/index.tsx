@@ -18,7 +18,14 @@ const Login: React.FC = () => {
     toggleMode,
   } = useLogin();
 
-  const buttonText = loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account';
+  let buttonText;
+  if (loading) {
+    buttonText = 'Processing...';
+  } else if (isLogin) {
+    buttonText = 'Sign In';
+  } else {
+    buttonText = 'Create Account';
+  }
 
   return (
     <Container component='main' maxWidth='xs' style={{ position: 'relative', minHeight: '100vh' }}>

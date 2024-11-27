@@ -1,38 +1,46 @@
-import React from 'react';
-import './index.css';
-import QuestionHeader from '../questionPage/header';
-import QuestionView from '../questionPage/question';
-import useQuestionPage from '../../../hooks/useQuestionPage';
+import React, { useState } from 'react';
+import { Box, Typography, Grid, Button, Dialog } from '@mui/material';
+import TagView from './tag';
+import useQuizPage from '../../../hooks/useQuizPage';
+import NewQuestionPage from '../newQuestion';
 
 /**
- * QuestionPage component renders a page displaying a list of questions
- * based on filters such as order and search terms.
- * It includes a header with order buttons and a button to ask a new question.
+ * Represents the TagPage component which displays a list of tags
+ * and provides functionality to handle tag clicks and ask a new question.
  */
-const QuestionPage = () => {
-  const { titleText, qlist, setQuestionOrder } = useQuestionPage();
+const TagPage = () => {
+  const { tlist, clickTag } = useQuizPage();
+  const [open, setOpen] = useState(false);
 
-  const filteredQlist = qlist.filter(
-    q => q.tags.filter(t => t.name === 'quizQuestion').length === 0,
-  );
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
-    <>
-      <QuestionHeader
-        titleText={titleText}
-        qcnt={filteredQlist.length}
-        setQuestionOrder={setQuestionOrder}
-      />
-      <div id='question_list' className='question_list'>
-        {filteredQlist.map((q, idx) => (
-          <QuestionView q={q} key={idx} />
+    <Box p={3}>
+      <Box display='flex' justifyContent='space-between' alignItems='center' mb={3}>
+        <Typography variant='h4'>All Tags</Typography>
+        <Typography variant='body1'>{tlist.length} Tags</Typography>
+        <Button variant='contained' color='primary' onClick={handleOpen}>
+          Ask a Question
+        </Button>
+      </Box>
+      <Grid container spacing={2}>
+        {tlist.map((t, idx) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+            <TagView t={t} clickTag={clickTag} />
+          </Grid>
         ))}
-      </div>
-      {titleText === 'Search Results' && !filteredQlist.length && (
-        <div className='bold_title right_padding'>No Questions Found</div>
-      )}
-    </>
+      </Grid>
+      <Dialog open={open} fullWidth maxWidth='md'>
+        <NewQuestionPage onClose={handleClose} />
+      </Dialog>
+    </Box>
   );
 };
 
-export default QuestionPage;
+export default TagPage;

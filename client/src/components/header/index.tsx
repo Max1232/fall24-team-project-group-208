@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+// import { useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Box,
@@ -11,7 +11,7 @@ import {
   TextField,
   InputAdornment,
   IconButton,
-  Switch,
+  // Switch,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -32,8 +32,8 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }) => {
   const { val, handleInputChange, handleKeyDown, user, handleSignOut, loading } = useHeader();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
+  // const [dropdownOpen, setDropdownOpen] = useState(false);
+  // const navigate = useNavigate();
 
   return (
     <AppBar

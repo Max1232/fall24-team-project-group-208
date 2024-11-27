@@ -268,6 +268,15 @@ export const filterQuestionsBySearch = (qlist: Question[], search: string): Ques
   });
 };
 
+export const filterQuestionsByTag = (qlist: Question[], search: string): Question[] => {
+  const searchTags = parseTags(search);
+
+  if (!qlist || qlist.length === 0) {
+    return [];
+  }
+  return qlist.filter(q => checkTagInQuestion(q, searchTags));
+};
+
 /**
  * Fetches and populates a question or answer document based on the provided ID and type.
  *

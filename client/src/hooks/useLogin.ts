@@ -61,9 +61,12 @@ const useLogin = () => {
         // Store the window ID in session storage
         sessionStorage.setItem('auth_window_id', WINDOW_ID);
 
+        // Set the username to the userCredential displayName
+        const firebaseUsername = userCredential.user.displayName || '';
+
         // Fetch user profile
         const response = await fetch(
-          `${process.env.REACT_APP_SERVER_URL}/auth/profile/${email.split('@')[0]}`,
+          `${process.env.REACT_APP_SERVER_URL}/auth/profile/${firebaseUsername}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

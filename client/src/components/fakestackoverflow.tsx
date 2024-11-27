@@ -9,8 +9,6 @@ import LoginContext from '../contexts/LoginContext';
 import UserContext, { getStoredUser } from '../contexts/UserContext';
 import QuestionPage from './main/questionPage';
 import TagPage from './main/tagPage';
-import NewQuestionPage from './main/newQuestion';
-import NewAnswerPage from './main/newAnswer';
 import AnswerPage from './main/answerPage';
 import auth, { WINDOW_ID } from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
@@ -76,12 +74,12 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
         setLoading(false);
       },
       error => {
-        console.error('Auth state change error:', error);
         setLoading(false);
         setUser(null);
       },
     );
 
+    // eslint-disable-next-line consistent-return
     return () => {
       unsubscribe();
       if (socket) {
