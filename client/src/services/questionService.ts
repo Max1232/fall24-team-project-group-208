@@ -18,6 +18,28 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
   return res.data;
 };
 
+// router.get('/getQuestion', getQuestionsByFilter);
+// router.get('/getQuestionByTag', getQuestionsByTagFilter);
+// router.get('/getQuestionById/:qid', getQuestionById);
+// router.post('/addQuestion', addQuestion);
+// router.post('/upvoteQuestion', upvoteQuestion);
+// router.post('/downvoteQuestion', downvoteQuestion);
+
+/**
+ * Function to get questions by tag filter.
+ *
+ * @param order - The order in which to fetch questions. Default is 'newest'.
+ * @param search - The search term to filter questions by tags. Default is an empty string.
+ * @throws Error if there is an issue fetching or filtering questions by tags.
+ */
+const getQuestionsByTagFilter = async (order = 'newest', search = ''): Promise<Question[]> => {
+  const res = await api.get(`${QUESTION_API_URL}/getQuestionByTag?order=${order}&search=${search}`);
+  if (res.status !== 200) {
+    throw new Error('Error when fetching or filtering questions by tags');
+  }
+  return res.data;
+};
+
 /**
  * Function to get a question by its ID.
  *
@@ -81,4 +103,11 @@ const downvoteQuestion = async (qid: string, username: string) => {
   return res.data;
 };
 
-export { getQuestionsByFilter, getQuestionById, addQuestion, upvoteQuestion, downvoteQuestion };
+export {
+  getQuestionsByFilter,
+  getQuestionsByTagFilter,
+  getQuestionById,
+  addQuestion,
+  upvoteQuestion,
+  downvoteQuestion,
+};

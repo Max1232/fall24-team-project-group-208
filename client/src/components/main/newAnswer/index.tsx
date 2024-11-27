@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Button, TextField, Typography, Modal } from '@mui/material';
 import useAnswerForm from '../../../hooks/useAnswerForm';
 

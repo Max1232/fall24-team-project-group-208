@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import AnswerHeader from './header';
 import QuestionBody from './questionBody';
 import CommentSection from '../commentSection';

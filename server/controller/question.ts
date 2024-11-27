@@ -17,6 +17,7 @@ import {
   processTags,
   populateDocument,
   saveQuestion,
+  filterQuestionsByTag,
 } from '../models/application';
 
 const questionController = (socket: FakeSOSocket) => {
@@ -43,6 +44,31 @@ const questionController = (socket: FakeSOSocket) => {
       }
       // Filter by search keyword and tags
       const resqlist: Question[] = await filterQuestionsBySearch(qlist, search);
+      res.json(resqlist);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        res.status(500).send(`Error when fetching questions by filter: ${err.message}`);
+      } else {
+        res.status(500).send(`Error when fetching questions by filter`);
+      }
+    }
+  };
+
+  const getQuestionsByTagFilter = async (
+    req: FindQuestionRequest,
+    res: Response,
+  ): Promise<void> => {
+    const { order } = req.query;
+    const { search } = req.query;
+    const { askedBy } = req.query;
+    try {
+      let qlist: Question[] = await getQuestionsByOrder(order);
+      // Filter by askedBy if provided
+      if (askedBy) {
+        qlist = filterQuestionsByAskedBy(qlist, askedBy);
+      }
+      // Filter by tags
+      const resqlist: Question[] = await filterQuestionsByTag(qlist, search);
       res.json(resqlist);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -229,6 +255,7 @@ const questionController = (socket: FakeSOSocket) => {
 
   // add appropriate HTTP verbs and their endpoints to the router
   router.get('/getQuestion', getQuestionsByFilter);
+  router.get('/getQuestionByTag', getQuestionsByTagFilter);
   router.get('/getQuestionById/:qid', getQuestionById);
   router.post('/addQuestion', addQuestion);
   router.post('/upvoteQuestion', upvoteQuestion);

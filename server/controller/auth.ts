@@ -14,7 +14,7 @@ const SERVICE_ACCOUNT_PATH = process.env.KEY_PATH;
 if (!SERVICE_ACCOUNT_PATH) {
   throw new Error('KEY_PATH is not defined in the environment variables');
 }
-const serviceAccount = require(serviceAccountPath);
+const serviceAccount = require(SERVICE_ACCOUNT_PATH);
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -87,6 +87,7 @@ const authController = (socket: FakeSOSocket) => {
         comments: 0,
         badges: [],
         joinedDate: new Date(),
+        role: 1,
       });
 
       const profilePayload: ProfileCreatedPayload = {
@@ -101,6 +102,7 @@ const authController = (socket: FakeSOSocket) => {
         comments: user.comments,
         badges: user.badges,
         joinedDate: user.joinedDate,
+        role: user.role,
       };
 
       socket.emit('profileCreated', profilePayload);
