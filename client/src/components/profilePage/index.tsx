@@ -8,6 +8,7 @@ import {
   Avatar,
   LinearProgress,
 } from '@mui/material';
+// eslint-disable-next-line import/no-named-as-default
 import useProfilePage from '../../hooks/useProfilePage';
 
 const ProfilePage: React.FC = () => {

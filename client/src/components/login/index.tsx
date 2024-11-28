@@ -18,6 +18,7 @@ const Login: React.FC = () => {
     toggleMode,
   } = useLogin();
 
+  // eslint-disable-next-line no-nested-ternary
   const buttonText = loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account';
 
   return (
