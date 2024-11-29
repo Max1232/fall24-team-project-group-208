@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
 import useUserContext from '../../../../hooks/useUserContext';
+import useQuizTag from '../../../../hooks/useQuizTag';
 
 /**
  * Interface representing the props for the QuestionBody component.
@@ -17,6 +18,7 @@ interface QuestionBodyProps {
   askby: string;
   meta: string;
   answerCount: number;
+  questionID: string;
 }
 
 /**
@@ -29,8 +31,16 @@ interface QuestionBodyProps {
  * @param askby The username of the question's author.
  * @param meta Additional metadata related to the question.
  */
-const QuestionBody: React.FC<QuestionBodyProps> = ({ views, text, askby, meta, answerCount }) => {
+const QuestionBody: React.FC<QuestionBodyProps> = ({
+  views,
+  text,
+  askby,
+  meta,
+  answerCount,
+  questionID,
+}) => {
   const { user } = useUserContext();
+  const { addQuizTag, isLoading, error } = useQuizTag(questionID);
 
   // Determine if the button should be displayed
   const shouldShowButton = user && (user.username === askby || user.role === 0) && answerCount >= 3;
@@ -60,10 +70,16 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({ views, text, askby, meta, a
           asked {meta}
         </Typography>
       </Box>
+
       {shouldShowButton && (
-        <Button variant='contained' color='primary'>
-          MAKE QUIZ
+        <Button variant='contained' color='primary' onClick={addQuizTag} disabled={isLoading}>
+          {isLoading ? 'Adding...' : 'MAKE QUIZ'}
         </Button>
+      )}
+      {error && (
+        <Typography color='error' sx={{ mt: 1 }}>
+          {error}
+        </Typography>
       )}
     </Box>
   );
