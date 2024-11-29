@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Typography, Box, Modal, Button } from '@mui/material';
-import { Question, QuestionsWithTag } from '../../../../types';
-import useQuizSelected from '../../../../hooks/useQuizSelected';
+import { Question } from '../../../../types';
 
 /**
  * Props for the Question component.
@@ -23,7 +22,6 @@ interface QuestionProps {
  * @param clickTag - Function to handle tag clicks.
  */
 const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
-  const { questionsWithTag } = useQuizSelected(q.tags[0]);
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -50,7 +48,7 @@ const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
             {q.title}
           </Typography>
           <Typography variant='body1' color='textSecondary'>
-            {q.tags.length} Tags
+            Question: {q.text}
           </Typography>
         </CardContent>
       </Card>
@@ -72,10 +70,13 @@ const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
             p: 4,
           }}>
           <Typography id='modal-title' variant='h6' component='h2'>
-            {questionsWithTag.name}
+            {q.title}
           </Typography>
           <Typography id='modal-description' sx={{ mt: 2 }}>
-            {questionsWithTag.description}
+            Multiple choice question with {q.answers.length} answers
+          </Typography>
+          <Typography id='modal-description' sx={{ mt: 2 }}>
+            Tags: {q.tags.map(tag => tag.name).join(', ')}
           </Typography>
           <Button
             variant='contained'

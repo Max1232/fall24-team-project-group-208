@@ -3,7 +3,6 @@ import { Box, Typography, Grid, Button, Dialog } from '@mui/material';
 import QuestionView from './question';
 import useQuizPage from '../../../hooks/useQuizPage';
 import NewQuestionPage from '../newQuestion';
-import { QuestionsWithTag } from '../../../types';
 
 /**
  * Represents the QuizPage component which displays a list of questions

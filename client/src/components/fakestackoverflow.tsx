@@ -10,6 +10,7 @@ import UserContext, { getStoredUser } from '../contexts/UserContext';
 import QuestionPage from './main/questionPage';
 import TagPage from './main/tagPage';
 import AnswerPage from './main/answerPage';
+import QuizQuestionPage from './main/quizQuestionPage';
 import auth, { WINDOW_ID } from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
 import ProfilePage from './profilePage';
@@ -141,6 +142,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/home' element={<QuestionPage />} />
             <Route path='tags' element={<TagPage />} />
             <Route path='/question/:qid' element={<AnswerPage />} />
+            <Route path='/quiz/:qid' element={<QuizQuestionPage />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/quizzes' element={<QuizPage />} />
           </Route>

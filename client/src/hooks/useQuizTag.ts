@@ -11,7 +11,7 @@ const useQuizTag = (questionId: string) => {
   const [error, setError] = useState<string | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);
 
-  // Fetch question data 
+  // Fetch question data
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
@@ -54,7 +54,6 @@ const useQuizTag = (questionId: string) => {
       // Update the question with new tags
       const updatedQuestion = await updateQuestionTags(questionId, newTags);
       setQuestion(updatedQuestion);
-
     } catch (err) {
       setError('Failed to add QUIZ tag');
       console.error('Error adding QUIZ tag:', err);
@@ -67,7 +66,7 @@ const useQuizTag = (questionId: string) => {
     addQuizTag,
     isLoading,
     error,
-    question
+    question,
   };
 };
 

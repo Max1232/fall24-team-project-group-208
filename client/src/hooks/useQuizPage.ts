@@ -20,7 +20,7 @@ const useQuizPage = () => {
    * @param question_id - The id of the question to navigate to.
    */
   const clickQuestion = (question_id: string) => {
-    navigate(`/question/${question_id}`);
+    navigate(`/quiz/${question_id}`);
   };
 
   useEffect(() => {
