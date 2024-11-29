@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -57,13 +58,13 @@ const useLogin = () => {
         // Handle login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const token = await userCredential.user.getIdToken();
-
+        console.log('userCredential', userCredential);
         // Store the window ID in session storage
         sessionStorage.setItem('auth_window_id', WINDOW_ID);
 
         // Set the username to the userCredential displayName
         const firebaseUsername = userCredential.user.displayName || '';
-
+        console.log('firebaseUsername', firebaseUsername);
         // Fetch user profile
         const response = await fetch(
           `${process.env.REACT_APP_SERVER_URL}/auth/profile/${firebaseUsername}`,

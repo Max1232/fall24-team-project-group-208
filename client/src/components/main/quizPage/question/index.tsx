@@ -47,10 +47,10 @@ const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
         onClick={handleOpen}>
         <CardContent>
           <Typography variant='h4' component='div' gutterBottom>
-            {questionsWithTag.name}
+            {q.title}
           </Typography>
           <Typography variant='body1' color='textSecondary'>
-            {questionsWithTag.description}
+            {q.tags.length} Tags
           </Typography>
         </CardContent>
       </Card>
@@ -90,7 +90,7 @@ const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
               }
               handleClose();
             }}>
-            View all questions with this tag
+            View this quiz question
           </Button>
         </Box>
       </Modal>

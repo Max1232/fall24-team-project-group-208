@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Question } from '../types';
 import api from './config';
 
@@ -19,14 +20,15 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
 };
 
 /**
- * Function to get questions by tag filter.
+ * Function to get questions by tag.
  *
  * @param order - The order in which to fetch questions. Default is 'newest'.
  * @param search - The search term to filter questions by tags. Default is an empty string.
  * @throws Error if there is an issue fetching or filtering questions by tags.
  */
-const getQuestionsByTagFilter = async (order = 'newest', search = ''): Promise<Question[]> => {
+const getQuestionsByTag = async (order = 'newest', search = ''): Promise<Question[]> => {
   const res = await api.get(`${QUESTION_API_URL}/getQuestionByTag?order=${order}&search=${search}`);
+  console.log('res', res);
   if (res.status !== 200) {
     throw new Error('Error when fetching or filtering questions by tags');
   }
@@ -98,7 +100,7 @@ const downvoteQuestion = async (qid: string, username: string) => {
 
 export {
   getQuestionsByFilter,
-  getQuestionsByTagFilter,
+  getQuestionsByTag,
   getQuestionById,
   addQuestion,
   upvoteQuestion,

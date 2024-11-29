@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getQuestionsByTagFilter } from '../services/questionService';
+import { getQuestionsByTag } from '../services/questionService';
 import { Question } from '../types';
 
 /**
@@ -15,22 +15,18 @@ const useQuizPage = () => {
   const [qlist, setQlist] = useState<Question[]>([]);
 
   /**
-   * Function to navigate to the home page with the specified tag as a search parameter.
+   * Function to navigate to the question page with the id of the selected question.
    *
-   * @param tagName - The name of the tag to be added to the search parameters.
+   * @param question_id - The id of the question to navigate to.
    */
-  const clickQuestion = (tagName: string) => {
-    const searchParams = new URLSearchParams();
-    searchParams.set('tag', tagName);
-
-    navigate(`/home?${searchParams.toString()}`);
+  const clickQuestion = (question_id: string) => {
+    navigate(`/question/${question_id}`);
   };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getQuestionsByTagFilter('newest', 'quizQuestions');
-        console.log(res);
+        const res = await getQuestionsByTag('newest', 'quizQuestions');
         setQlist(res || []);
       } catch (e) {
         // eslint-disable-next-line no-console
