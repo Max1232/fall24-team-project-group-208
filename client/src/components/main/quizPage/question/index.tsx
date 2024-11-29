@@ -1,29 +1,29 @@
 import React, { useState } from 'react';
 import { Card, CardContent, Typography, Box, Modal, Button } from '@mui/material';
-import { TagData } from '../../../../types';
-import useTagSelected from '../../../../hooks/useQuizSelected';
+import { Question, QuestionsWithTag } from '../../../../types';
+import useQuizSelected from '../../../../hooks/useQuizSelected';
 
 /**
- * Props for the Tag component.
+ * Props for the Question component.
  *
- * t - The tag object.
+ * q - The question object.
  * clickTag - Function to handle the tag click event.
  */
-interface TagProps {
-  t: TagData;
-  clickTag: (tagName: string) => void;
+interface QuestionProps {
+  q: Question;
+  clickQuestion: (questionName: string) => void;
 }
 
 /**
- * Tag component that displays information about a specific tag.
- * The component displays the tag's name, description, and the number of associated questions.
+ * Question component that displays information about a specific question.
+ * The component displays the question's title, description, and the number of associated tags.
  * It also triggers a click event to handle tag selection.
  *
- * @param t - The tag object .
+ * @param q - The question object.
  * @param clickTag - Function to handle tag clicks.
  */
-const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
-  const { tag } = useTagSelected(t);
+const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
+  const { questionsWithTag } = useQuizSelected(q.tags[0]);
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -47,10 +47,10 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
         onClick={handleOpen}>
         <CardContent>
           <Typography variant='h4' component='div' gutterBottom>
-            {tag.name}
+            {questionsWithTag.name}
           </Typography>
           <Typography variant='body1' color='textSecondary'>
-            {tag.description}
+            {questionsWithTag.description}
           </Typography>
         </CardContent>
       </Card>
@@ -72,17 +72,22 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
             p: 4,
           }}>
           <Typography id='modal-title' variant='h6' component='h2'>
-            {tag.name}
+            {questionsWithTag.name}
           </Typography>
           <Typography id='modal-description' sx={{ mt: 2 }}>
-            {tag.description}
+            {questionsWithTag.description}
           </Typography>
           <Button
             variant='contained'
             color='primary'
             sx={{ mt: 2 }}
             onClick={() => {
-              clickTag(t.name);
+              if (q._id) {
+                clickQuestion(q._id);
+              } else {
+                // eslint-disable-next-line no-console
+                console.error('Question ID not found');
+              }
               handleClose();
             }}>
             View all questions with this tag
@@ -93,4 +98,4 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
   );
 };
 
-export default TagView;
+export default QuestionView;
