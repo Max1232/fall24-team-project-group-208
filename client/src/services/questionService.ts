@@ -18,13 +18,6 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
   return res.data;
 };
 
-// router.get('/getQuestion', getQuestionsByFilter);
-// router.get('/getQuestionByTag', getQuestionsByTagFilter);
-// router.get('/getQuestionById/:qid', getQuestionById);
-// router.post('/addQuestion', addQuestion);
-// router.post('/upvoteQuestion', upvoteQuestion);
-// router.post('/downvoteQuestion', downvoteQuestion);
-
 /**
  * Function to get questions by tag filter.
  *

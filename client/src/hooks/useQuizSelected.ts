@@ -1,38 +1,43 @@
 import { useEffect, useState } from 'react';
-import { getTagByName } from '../services/tagService';
-import { Tag, TagData } from '../types';
+import { getQuestionsByTagFilter } from '../services/questionService';
+import { Question, QuestionsWithTag, Tag } from '../types';
 
 /**
- * Custom hook to handle fetching tag details by tag name.
+ * Custom hook to handle fetching questions by tag name.
  *
  * @param t - The tag object to fetch data for
  *
- * @returns tag - The current tag details (name and description).
- * @returns setTag - Setter to manually update the tag state if needed.
+ * @returns questionsWithTag - The current tag details with associated questions.
+ * @returns setQuestionsWithTag - Setter to manually update the state if needed.
  */
-const useTagSelected = (t: TagData) => {
-  const [tag, setTag] = useState<Tag>({
+const useQuizSelected = (t: Tag) => {
+  const [questionsWithTag, setQuestionsWithTag] = useState<QuestionsWithTag>({
     name: '',
     description: '',
+    questions: [],
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getTagByName(t.name);
-        setTag(res || { name: 'Error', description: 'Error' });
+        const res = await getQuestionsByTagFilter('newest', t.name);
+        setQuestionsWithTag({
+          name: t.name,
+          description: t.description,
+          questions: res || [],
+        });
       } catch (e) {
         // eslint-disable-next-line no-console
         console.log(e);
       }
     };
     fetchData();
-  }, [t.name]);
+  }, [t.name, t.description]);
 
   return {
-    tag,
-    setTag,
+    questionsWithTag,
+    setQuestionsWithTag,
   };
 };
 
-export default useTagSelected;
+export default useQuizSelected;
