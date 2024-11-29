@@ -16,6 +16,7 @@ interface QuestionBodyProps {
   text: string;
   askby: string;
   meta: string;
+  answerCount: number;
 }
 
 /**
@@ -28,11 +29,11 @@ interface QuestionBodyProps {
  * @param askby The username of the question's author.
  * @param meta Additional metadata related to the question.
  */
-const QuestionBody: React.FC<QuestionBodyProps> = ({ views, text, askby, meta }) => {
+const QuestionBody: React.FC<QuestionBodyProps> = ({ views, text, askby, meta, answerCount }) => {
   const { user } = useUserContext();
 
   // Determine if the button should be displayed
-  const shouldShowButton = user && (user.username === askby || user.role === 0);
+  const shouldShowButton = user && (user.username === askby || user.role === 0) && answerCount >= 3;
   return (
     <Box
       id='questionBody'
@@ -61,7 +62,7 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({ views, text, askby, meta })
       </Box>
       {shouldShowButton && (
         <Button variant='contained' color='primary'>
-          Mark as Resolved
+          MAKE QUIZ
         </Button>
       )}
     </Box>
