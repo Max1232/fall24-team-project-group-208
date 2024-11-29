@@ -7,6 +7,10 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.2"
   },
+  "scripts": {
+    "build": "cd server && npm install && npm run build",
+    "start": "cd server && npm run start:prod"
+  },
   "jest": {
     "verbose": false
   }
