@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Question } from '../types';
+import { Question, Tag, } from '../types';
 import api from './config';
 
 const QUESTION_API_URL = `${process.env.REACT_APP_SERVER_URL}/question`;
@@ -15,6 +15,29 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
   const res = await api.get(`${QUESTION_API_URL}/getQuestion?order=${order}&search=${search}`);
   if (res.status !== 200) {
     throw new Error('Error when fetching or filtering questions');
+  }
+  return res.data;
+};
+
+// router.get('/getQuestion', getQuestionsByFilter);
+// router.get('/getQuestionByTag', getQuestionsByTagFilter);
+// router.get('/getQuestionById/:qid', getQuestionById);
+// router.post('/addQuestion', addQuestion);
+// router.post('/upvoteQuestion', upvoteQuestion);
+// router.post('/downvoteQuestion', downvoteQuestion);
+// router.post('/updateTags', updateQuestionTags);
+
+/**
+ * Function to update a question's tags.
+ *
+ * @param qid - The ID of the question to update
+ * @param tags - The array of tags to set for the question
+ * @throws Error if there is an issue updating the question's tags
+ */
+const updateQuestionTags = async (qid: string, tags: Tag[]): Promise<Question> => {
+  const res = await api.post(`${QUESTION_API_URL}/updateTags`, { qid, tags });
+  if (res.status !== 200) {
+    throw new Error('Error while updating question tags');
   }
   return res.data;
 };
@@ -105,4 +128,5 @@ export {
   addQuestion,
   upvoteQuestion,
   downvoteQuestion,
+  updateQuestionTags,
 };
