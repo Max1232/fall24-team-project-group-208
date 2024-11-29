@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import {
@@ -54,21 +55,16 @@ const questionController = (socket: FakeSOSocket) => {
     }
   };
 
-  const getQuestionsByTagFilter = async (
-    req: FindQuestionRequest,
-    res: Response,
-  ): Promise<void> => {
+  const getQuestionsByTag = async (req: FindQuestionRequest, res: Response): Promise<void> => {
     const { order } = req.query;
     const { search } = req.query;
-    const { askedBy } = req.query;
     try {
-      let qlist: Question[] = await getQuestionsByOrder(order);
-      // Filter by askedBy if provided
-      if (askedBy) {
-        qlist = filterQuestionsByAskedBy(qlist, askedBy);
-      }
+      const qlist: Question[] = await getQuestionsByOrder(order);
+
       // Filter by tags
+      console.log('Search:', search);
       const resqlist: Question[] = await filterQuestionsByTag(qlist, search);
+
       res.json(resqlist);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -255,7 +251,7 @@ const questionController = (socket: FakeSOSocket) => {
 
   // add appropriate HTTP verbs and their endpoints to the router
   router.get('/getQuestion', getQuestionsByFilter);
-  router.get('/getQuestionByTag', getQuestionsByTagFilter);
+  router.get('/getQuestionByTag', getQuestionsByTag);
   router.get('/getQuestionById/:qid', getQuestionById);
   router.post('/addQuestion', addQuestion);
   router.post('/upvoteQuestion', upvoteQuestion);

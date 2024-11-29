@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getQuestionsByTagFilter } from '../services/questionService';
+import { getQuestionsByTag } from '../services/questionService';
 import { Question, QuestionsWithTag, Tag } from '../types';
 
 /**
@@ -20,7 +20,7 @@ const useQuizSelected = (t: Tag) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await getQuestionsByTagFilter('newest', t.name);
+        const res = await getQuestionsByTag('newest', t.name);
         setQuestionsWithTag({
           name: t.name,
           description: t.description,

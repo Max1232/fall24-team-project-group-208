@@ -46,12 +46,10 @@ const parseKeyword = (search: string): string[] =>
  *
  * @returns {boolean} - `true` if any tag is present in the question, `false` otherwise
  */
-const checkTagInQuestion = (q: Question, taglist: string[]): boolean => {
-  for (const tagname of taglist) {
-    for (const tag of q.tags) {
-      if (tagname === tag.name) {
-        return true;
-      }
+const checkTagInQuestion = (q: Question, tagName: string): boolean => {
+  for (const tag of q.tags) {
+    if (tagName === tag.name) {
+      return true;
     }
   }
 
@@ -257,24 +255,28 @@ export const filterQuestionsBySearch = (qlist: Question[], search: string): Ques
     }
 
     if (searchKeyword.length === 0) {
-      return checkTagInQuestion(q, searchTags);
+      for (const tag of searchTags) {
+        if (checkTagInQuestion(q, tag)) {
+          return true;
+        }
+      }
     }
 
     if (searchTags.length === 0) {
       return checkKeywordInQuestion(q, searchKeyword);
     }
 
-    return checkKeywordInQuestion(q, searchKeyword) || checkTagInQuestion(q, searchTags);
+    return checkKeywordInQuestion(q, searchKeyword);
   });
 };
 
 export const filterQuestionsByTag = (qlist: Question[], search: string): Question[] => {
-  const searchTags = parseTags(search);
-
   if (!qlist || qlist.length === 0) {
+    console.log('No questions found');
     return [];
   }
-  return qlist.filter(q => checkTagInQuestion(q, searchTags));
+  // Takes the list of questions qlist and filters them by the searchTag
+  return qlist.filter(q => checkTagInQuestion(q, search));
 };
 
 /**
