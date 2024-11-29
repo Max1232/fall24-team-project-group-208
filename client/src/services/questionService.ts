@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { Question, Tag, } from '../types';
+import { Question, Tag } from '../types';
 import api from './config';
 
 const QUESTION_API_URL = `${process.env.REACT_APP_SERVER_URL}/question`;

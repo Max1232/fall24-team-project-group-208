@@ -64,7 +64,7 @@ const useLogin = () => {
 
         // Set the username to the userCredential displayName
         const firebaseUsername = userCredential.user.displayName || '';
-        console.log('firebaseUsername', firebaseUsername);
+        console.log('userCredential', userCredential.user);
         // Fetch user profile
         const response = await fetch(
           `${process.env.REACT_APP_SERVER_URL}/auth/profile/${firebaseUsername}`,
@@ -80,6 +80,10 @@ const useLogin = () => {
         }
 
         const userData = await response.json();
+        console.log('Getting user data...');
+        console.log('userData', userData);
+        console.log('userData.name', userData.name);
+        console.log('userData.email', userData.email);
         setUser(userData);
 
         // Store user data with window ID
@@ -110,6 +114,10 @@ const useLogin = () => {
         }
 
         const userData = await response.json();
+        console.log('Saving user data...');
+        console.log('userData', userData);
+        console.log('userData.name', userData.name);
+        console.log('userData.email', userData.email);
         setUser(userData);
 
         // Store user data with window ID
