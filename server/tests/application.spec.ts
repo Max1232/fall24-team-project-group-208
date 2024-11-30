@@ -58,6 +58,7 @@ const com1MockUser: User = {
   acceptedAnswers: 0,
   comments: 0,
   badges: [],
+  role: 1,
 };
 
 const com1: Comment = {
@@ -451,6 +452,7 @@ describe('application module', () => {
           acceptedAnswers: 0,
           comments: 0,
           badges: [],
+          role: 1,
         };
 
         const mockQn = {
@@ -668,6 +670,7 @@ describe('application module', () => {
           acceptedAnswers: 0,
           comments: 0,
           badges: [],
+          role: 1,
         };
         const mockAnswer = {
           text: 'This is a test answer',

@@ -37,6 +37,7 @@ describe('User Attribute Modification Tests', () => {
       acceptedAnswers: 0,
       comments: 0,
       badges: [],
+      role: 1,
     };
     // Save the initial user to the database
     const savedUser = await UserModel.create(initialUser);
@@ -87,6 +88,7 @@ describe('User Attribute Modification Tests', () => {
       acceptedAnswers: 0,
       comments: 0,
       badges: [],
+      role: 1,
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -127,6 +129,7 @@ describe('User Attribute Modification Tests', () => {
       acceptedAnswers: 0,
       comments: 0,
       badges: [],
+      role: 1,
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -160,6 +163,7 @@ describe('User Attribute Modification Tests', () => {
       acceptedAnswers: 0,
       comments: 0,
       badges: [],
+      role: 1,
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -197,6 +201,7 @@ describe('User Attribute Modification Tests', () => {
       acceptedAnswers: 0,
       comments: 0,
       badges: [],
+      role: 1,
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
@@ -234,6 +239,7 @@ describe('User Attribute Modification Tests', () => {
       acceptedAnswers: 0,
       comments: 0,
       badges: [],
+      role: 1,
     };
     const savedUser = await UserModel.create(initialUser);
     expect(savedUser).toBeDefined();
