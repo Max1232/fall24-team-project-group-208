@@ -278,3 +278,14 @@ export interface AuthRequest extends Request {
     username?: string;
   };
 }
+
+/**
+ * Interface for the request body when updating a question's tags and correct answer.
+ */
+export interface UpdateTagsRequest extends Request {
+  body: {
+    qid: string;
+    tags: Tag[];
+    correctAnswerIndex?: number;
+  };
+}
