@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -18,6 +18,7 @@ interface SelectCorrectAnswerModalProps {
   onClose: () => void;
   answers: Answer[];
   onSelect: (index: number) => void;
+  selectedAnswerIndex?: number | null;
 }
 
 const SelectCorrectAnswerModal: React.FC<SelectCorrectAnswerModalProps> = ({
@@ -25,24 +26,45 @@ const SelectCorrectAnswerModal: React.FC<SelectCorrectAnswerModalProps> = ({
   onClose,
   answers,
   onSelect,
+  selectedAnswerIndex,
 }) => {
-  const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
+  const [localSelectedIndex, setLocalSelectedIndex] = React.useState<number | null>(null);
+
+  // reset local state when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      setLocalSelectedIndex(null);
+    }
+  }, [open]);
+
+  // update local state when selectedAnswerIndex changes
+  useEffect(() => {
+    if (selectedAnswerIndex !== undefined) {
+      setLocalSelectedIndex(selectedAnswerIndex);
+    }
+  }, [selectedAnswerIndex]);
 
   const handleSubmit = () => {
-    if (selectedIndex !== null) {
-      onSelect(selectedIndex);
-      onClose();
+    if (localSelectedIndex !== null) {
+      onSelect(localSelectedIndex);
     }
   };
 
+  const handleClose = () => {
+    setLocalSelectedIndex(null);
+    onClose();
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='md' fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth='md' fullWidth>
       <DialogTitle>Select Correct Answer</DialogTitle>
       <DialogContent>
         <Typography variant='body1' sx={{ mb: 2 }}>
           Please select which answer should be marked as correct for this quiz question:
         </Typography>
-        <RadioGroup value={selectedIndex} onChange={e => setSelectedIndex(Number(e.target.value))}>
+        <RadioGroup
+          value={localSelectedIndex}
+          onChange={e => setLocalSelectedIndex(Number(e.target.value))}>
           {answers.map((answer, index) => (
             <Box
               key={index}
@@ -70,8 +92,8 @@ const SelectCorrectAnswerModal: React.FC<SelectCorrectAnswerModalProps> = ({
         </RadioGroup>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit} disabled={selectedIndex === null}>
+        <Button onClick={handleClose}>Cancel</Button>
+        <Button onClick={handleSubmit} disabled={localSelectedIndex === null}>
           Confirm Selection
         </Button>
       </DialogActions>

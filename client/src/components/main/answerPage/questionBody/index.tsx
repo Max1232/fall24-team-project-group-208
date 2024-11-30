@@ -4,6 +4,7 @@ import { handleHyperlink } from '../../../../tool';
 import useUserContext from '../../../../hooks/useUserContext';
 import useQuizTag from '../../../../hooks/useQuizTag';
 import SelectCorrectAnswerModal from '../answer/selectCorrectAnswer';
+import { Question } from '../../../../types';
 
 /**
  * Interface representing the props for the QuestionBody component.
@@ -20,6 +21,7 @@ interface QuestionBodyProps {
   meta: string;
   answerCount: number;
   questionID: string;
+  question: Question;
 }
 
 /**
@@ -39,17 +41,18 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
   meta,
   answerCount,
   questionID,
+  question,
 }) => {
   const { user } = useUserContext();
   const {
     addQuizTag,
     isLoading,
     error,
-    question,
     selectAnswerModalOpen,
     setSelectAnswerModalOpen,
     handleCorrectAnswerSelect,
-  } = useQuizTag(questionID);
+    selectedAnswerIndex,
+  } = useQuizTag(questionID, question);
 
   // Determine if the button should be displayed
   const shouldShowButton = user && (user.username === askby || user.role === 0) && answerCount >= 3;
@@ -97,6 +100,7 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
           onClose={() => setSelectAnswerModalOpen(false)}
           answers={question.answers}
           onSelect={handleCorrectAnswerSelect}
+          selectedAnswerIndex={selectedAnswerIndex}
         />
       )}
     </Box>
