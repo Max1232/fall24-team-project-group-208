@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import AnswerHeader from './header';
 import QuestionBody from './questionBody';
 import CommentSection from '../commentSection';
@@ -41,6 +41,8 @@ const AnswerPage: React.FC = () => {
         text={question.text}
         askby={question.askedBy}
         meta={getMetaData(new Date(question.askDateTime))}
+        answerCount={question.answers.length}
+        questionID={question._id || ''}
       />
       <Box pt={2}>
         <CommentSection

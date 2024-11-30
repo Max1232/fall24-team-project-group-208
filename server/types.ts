@@ -228,6 +228,7 @@ export interface ProfileCreatedPayload {
   comments: number;
   badges: string[];
   joinedDate: Date;
+  role: number;
 }
 
 /**
@@ -266,6 +267,7 @@ export interface User {
   comments: number;
   joinedDate: Date;
   badges: string[];
+  role: number;
 }
 
 export interface AuthRequest extends Request {
@@ -274,5 +276,16 @@ export interface AuthRequest extends Request {
   };
   body: {
     username?: string;
+  };
+}
+
+/**
+ * Interface for the request body when updating a question's tags and correct answer.
+ */
+export interface UpdateTagsRequest extends Request {
+  body: {
+    qid: string;
+    tags: Tag[];
+    correctAnswerIndex?: number;
   };
 }

@@ -55,6 +55,7 @@ export const useProfilePage = () => {
           comments: 0,
           badges: [],
           joinedDate: new Date(),
+          role: 1,
         };
       } else if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

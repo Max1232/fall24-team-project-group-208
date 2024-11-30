@@ -56,6 +56,10 @@ const userSchema: Schema = new Schema(
       type: [String],
       default: [],
     },
+    role: {
+      type: Number,
+      default: 1,
+    },
   },
   {
     collection: 'users',

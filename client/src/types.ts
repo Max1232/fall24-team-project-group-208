@@ -19,6 +19,7 @@ export interface User {
   comments?: number;
   joinedDate?: Date;
   badges?: string[];
+  role: number;
 }
 
 /**
@@ -72,6 +73,17 @@ export interface Tag {
 export interface TagData {
   name: string;
   qcnt: number;
+}
+
+/**
+ * Interface representing a list of questions with the related tag.
+ *
+ * name - The name of the tag.
+ * description - The description of the tag.
+ * questions - An array of questions associated with the tag.
+ */
+export interface QuestionsWithTag extends Tag {
+  questions: Question[];
 }
 
 /**
@@ -129,6 +141,7 @@ export interface Question {
   upVotes: string[];
   downVotes: string[];
   comments: Comment[];
+  correctAnswerIndex?: number;
 }
 
 /**
