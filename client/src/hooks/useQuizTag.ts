@@ -10,6 +10,7 @@ const useQuizTag = (questionId: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [question, setQuestion] = useState<Question | null>(null);
+  const [selectAnswerModalOpen, setSelectAnswerModalOpen] = useState(false);
 
   // Fetch question data
   useEffect(() => {
@@ -42,21 +43,35 @@ const useQuizTag = (questionId: string) => {
         return;
       }
 
-      // Create new tags with QUIZ tag
-      const newTags: Tag[] = [
-        ...question.tags,
-        {
-          name: 'QUIZ',
-          description: 'Question marked as quiz material.',
-        },
-      ];
-
-      // Update the question with new tags
-      const updatedQuestion = await updateQuestionTags(questionId, newTags);
-      setQuestion(updatedQuestion);
+      setSelectAnswerModalOpen(true);
     } catch (err) {
       setError('Failed to add QUIZ tag');
       console.error('Error adding QUIZ tag:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCorrectAnswerSelect = async (index: number) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // Add QUIZ tag and update correct answer index
+      const newTags: Tag[] = [
+        ...question!.tags,
+        {
+          name: 'QUIZ',
+          description: 'Question marked as quiz material',
+        },
+      ];
+
+      const updatedQuestion = await updateQuestionTags(questionId, newTags, index);
+      setQuestion(updatedQuestion);
+      setSelectAnswerModalOpen(false);
+    } catch (err) {
+      setError('Failed to update question');
+      console.error('Error updating question:', err);
     } finally {
       setIsLoading(false);
     }
@@ -67,6 +82,9 @@ const useQuizTag = (questionId: string) => {
     isLoading,
     error,
     question,
+    selectAnswerModalOpen,
+    setSelectAnswerModalOpen,
+    handleCorrectAnswerSelect,
   };
 };
 

@@ -3,6 +3,7 @@ import { Box, Typography, Button } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
 import useUserContext from '../../../../hooks/useUserContext';
 import useQuizTag from '../../../../hooks/useQuizTag';
+import SelectCorrectAnswerModal from '../answer/selectCorrectAnswer';
 
 /**
  * Interface representing the props for the QuestionBody component.
@@ -40,7 +41,15 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
   questionID,
 }) => {
   const { user } = useUserContext();
-  const { addQuizTag, isLoading, error } = useQuizTag(questionID);
+  const {
+    addQuizTag,
+    isLoading,
+    error,
+    question,
+    selectAnswerModalOpen,
+    setSelectAnswerModalOpen,
+    handleCorrectAnswerSelect,
+  } = useQuizTag(questionID);
 
   // Determine if the button should be displayed
   const shouldShowButton = user && (user.username === askby || user.role === 0) && answerCount >= 3;
@@ -80,6 +89,15 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
         <Typography color='error' sx={{ mt: 1 }}>
           {error}
         </Typography>
+      )}
+
+      {question && (
+        <SelectCorrectAnswerModal
+          open={selectAnswerModalOpen}
+          onClose={() => setSelectAnswerModalOpen(false)}
+          answers={question.answers}
+          onSelect={handleCorrectAnswerSelect}
+        />
       )}
     </Box>
   );
