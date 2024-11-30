@@ -34,8 +34,12 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
  * @param tags - The array of tags to set for the question
  * @throws Error if there is an issue updating the question's tags
  */
-const updateQuestionTags = async (qid: string, tags: Tag[]): Promise<Question> => {
-  const res = await api.post(`${QUESTION_API_URL}/updateTags`, { qid, tags });
+const updateQuestionTags = async (
+  qid: string,
+  tags: Tag[],
+  correctAnswerIndex?: number,
+): Promise<Question> => {
+  const res = await api.post(`${QUESTION_API_URL}/updateTags`, { qid, tags, correctAnswerIndex });
   if (res.status !== 200) {
     throw new Error('Error while updating question tags');
   }
