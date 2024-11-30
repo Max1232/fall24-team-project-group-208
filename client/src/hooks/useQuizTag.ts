@@ -38,7 +38,7 @@ const useQuizTag = (questionId: string) => {
       setError(null);
 
       // Check if QUIZ tag already applied
-      const hasQuizTag = question.tags.some(tag => tag.name === 'QUIZ');
+      const hasQuizTag = question.tags.some(tag => tag.name === 'quizQuestions');
       if (hasQuizTag) {
         return;
       }
