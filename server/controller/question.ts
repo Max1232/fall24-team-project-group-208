@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import {
@@ -7,6 +8,7 @@ import {
   AddQuestionRequest,
   VoteRequest,
   FakeSOSocket,
+  UpdateTagsRequest,
 } from '../types';
 import {
   addVoteToQuestion,
@@ -17,6 +19,8 @@ import {
   processTags,
   populateDocument,
   saveQuestion,
+  filterQuestionsByTag,
+  updateQuestionTagsAndIndex,
 } from '../models/application';
 
 const questionController = (socket: FakeSOSocket) => {
@@ -43,6 +47,26 @@ const questionController = (socket: FakeSOSocket) => {
       }
       // Filter by search keyword and tags
       const resqlist: Question[] = await filterQuestionsBySearch(qlist, search);
+      res.json(resqlist);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        res.status(500).send(`Error when fetching questions by filter: ${err.message}`);
+      } else {
+        res.status(500).send(`Error when fetching questions by filter`);
+      }
+    }
+  };
+
+  const getQuestionsByTag = async (req: FindQuestionRequest, res: Response): Promise<void> => {
+    const { order } = req.query;
+    const { search } = req.query;
+    try {
+      const qlist: Question[] = await getQuestionsByOrder(order);
+
+      // Filter by tags
+      console.log('Search:', search);
+      const resqlist: Question[] = await filterQuestionsByTag(qlist, search);
+
       res.json(resqlist);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -227,12 +251,50 @@ const questionController = (socket: FakeSOSocket) => {
     voteQuestion(req, res, 'downvote');
   };
 
+  /**
+   * Updates a question's tags and correct answer index in the database.
+   *
+   * @param req The Request object containing:
+   *   - qid: The unique identifier of the question to update
+   *   - tags: Array of Tag objects to set for the question
+   *   - correctAnswerIndex: Optional index indicating which answer is correct (for quiz questions)
+   * @param res The HTTP response object used to send back the result of the operation
+   *
+   * @returns A Promise that resolves to void
+   */
+  const updateQuestionTags = async (req: UpdateTagsRequest, res: Response): Promise<void> => {
+    // Validate request body
+    const { qid, tags, correctAnswerIndex } = req.body;
+
+    if (!qid || !ObjectId.isValid(qid) || !tags) {
+      res.status(400).send('Invalid request parameters');
+      return;
+    }
+
+    try {
+      const result = await updateQuestionTagsAndIndex(qid, tags, correctAnswerIndex);
+
+      if ('error' in result) {
+        throw new Error(result.error);
+      }
+
+      // Emit the update to all connected clients
+      socket.emit('questionUpdate', result);
+      res.json(result);
+    } catch (err) {
+      console.error('Error updating question tags:', err);
+      res.status(500).send(`Error updating question tags: ${(err as Error).message}`);
+    }
+  };
+
   // add appropriate HTTP verbs and their endpoints to the router
   router.get('/getQuestion', getQuestionsByFilter);
+  router.get('/getQuestionByTag', getQuestionsByTag);
   router.get('/getQuestionById/:qid', getQuestionById);
   router.post('/addQuestion', addQuestion);
   router.post('/upvoteQuestion', upvoteQuestion);
   router.post('/downvoteQuestion', downvoteQuestion);
+  router.post('/updateTags', updateQuestionTags);
 
   return router;
 };

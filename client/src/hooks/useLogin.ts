@@ -9,10 +9,10 @@ import {
 import auth, { WINDOW_ID } from '../config/firebase';
 import useLoginContext from './useLoginContext';
 import AuthService from '../services/authService';
-
+ 
 /**
- * Custom hook to handle login and registration with Firebase Authentication.
- */
+* Custom hook to handle login and registration with Firebase Authentication.
+*/
 const useLogin = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -20,47 +20,47 @@ const useLogin = () => {
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-
+ 
   const { setUser } = useLoginContext();
   const navigate = useNavigate();
-
+ 
   const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     setError('');
   };
-
+ 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     setError('');
   };
-
+ 
   const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setUsername(e.target.value);
     setError('');
   };
-
+ 
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setError('');
   };
-
+ 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     setError('');
-
+ 
     try {
       // Set session persistence before authentication
       await setPersistence(auth, browserSessionPersistence);
-
+ 
       if (isLogin) {
         // Handle login
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const token = await userCredential.user.getIdToken();
-
+ 
         // Store the window ID in session storage
         sessionStorage.setItem('auth_window_id', WINDOW_ID);
-
+ 
         // Fetch user profile
         const response = await fetch(
           `${process.env.REACT_APP_SERVER_URL}/auth/profile/${email.split('@')[0]}`,
@@ -70,26 +70,26 @@ const useLogin = () => {
             },
           },
         );
-
+ 
         if (!response.ok) {
           throw new Error('Failed to fetch user profile');
         }
-
+ 
         const userData = await response.json();
         setUser(userData);
-
+ 
         // Store user data with window ID
         sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(userData));
-
+ 
         navigate('/home');
       } else {
         // Handle registration
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const token = await userCredential.user.getIdToken();
-
+ 
         // Store the window ID in session storage
         sessionStorage.setItem('auth_window_id', WINDOW_ID);
-
+ 
         // Create user profile
         const response = await fetch(`${process.env.REACT_APP_SERVER_URL}/auth/profile`, {
           method: 'POST',
@@ -99,18 +99,18 @@ const useLogin = () => {
           },
           body: JSON.stringify({ username }),
         });
-
+ 
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(errorText);
         }
-
+ 
         const userData = await response.json();
         setUser(userData);
-
+ 
         // Store user data with window ID
         sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(userData));
-
+ 
         navigate('/home');
       }
     } catch (err) {
@@ -118,7 +118,7 @@ const useLogin = () => {
       AuthService.clearAuth(WINDOW_ID);
       sessionStorage.removeItem('auth_window_id');
       sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
-
+ 
       let errorMessage = 'An error occurred';
       if (err instanceof Error) {
         errorMessage = err.message;
@@ -128,7 +128,7 @@ const useLogin = () => {
       setLoading(false);
     }
   };
-
+ 
   return {
     email,
     password,
@@ -143,5 +143,5 @@ const useLogin = () => {
     toggleMode,
   };
 };
-
+ 
 export default useLogin;

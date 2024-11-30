@@ -10,6 +10,7 @@ import UserContext, { getStoredUser } from '../contexts/UserContext';
 import QuestionPage from './main/questionPage';
 import TagPage from './main/tagPage';
 import AnswerPage from './main/answerPage';
+import QuizQuestionPage from './main/quizQuestionPage';
 import auth, { WINDOW_ID } from '../config/firebase';
 import ProtectedRoute from './auth/ProtectedRoute';
 import ProfilePage from './profilePage';
@@ -71,12 +72,12 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
         setLoading(false);
       },
       error => {
-        console.error('Auth state change error:', error);
         setLoading(false);
         setUser(null);
       },
     );
 
+    // eslint-disable-next-line consistent-return
     return () => {
       unsubscribe();
       if (socket) {
@@ -116,7 +117,11 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
       <CssBaseline />
       <LoginContext.Provider value={{ setUser: handleSetUser }}>
         <Routes>
+
+          {/* Public Route with redirect logic */}
           <Route path='/' element={user ? <Navigate to='/home' replace /> : <Login />} />
+
+          {/* Protected Routes with proper user context */}
           <Route
             element={
               user && socket ? (
@@ -133,9 +138,13 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/home' element={<QuestionPage />} />
             <Route path='tags' element={<TagPage />} />
             <Route path='/question/:qid' element={<AnswerPage />} />
+
+            <Route path='/quiz/:qid' element={<QuizQuestionPage />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/quizzes' element={<QuizPage />} />
           </Route>
+
+          {/* Catch-all route */}
           <Route path='*' element={<Navigate to='/' replace />} />
         </Routes>
       </LoginContext.Provider>

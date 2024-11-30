@@ -1,4 +1,5 @@
-import { Question } from '../types';
+/* eslint-disable no-console */
+import { Question, Tag } from '../types';
 import api from './config';
 
 const QUESTION_API_URL = `${process.env.REACT_APP_SERVER_URL}/question`;
@@ -14,6 +15,41 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
   const res = await api.get(`${QUESTION_API_URL}/getQuestion?order=${order}&search=${search}`);
   if (res.status !== 200) {
     throw new Error('Error when fetching or filtering questions');
+  }
+  return res.data;
+};
+
+/**
+ * Function to update a question's tags.
+ *
+ * @param qid - The ID of the question to update
+ * @param tags - The array of tags to set for the question
+ * @throws Error if there is an issue updating the question's tags
+ */
+const updateQuestionTags = async (
+  qid: string,
+  tags: Tag[],
+  correctAnswerIndex?: number,
+): Promise<Question> => {
+  const res = await api.post(`${QUESTION_API_URL}/updateTags`, { qid, tags, correctAnswerIndex });
+  if (res.status !== 200) {
+    throw new Error('Error while updating question tags');
+  }
+  return res.data;
+};
+
+/**
+ * Function to get questions by tag.
+ *
+ * @param order - The order in which to fetch questions. Default is 'newest'.
+ * @param search - The search term to filter questions by tags. Default is an empty string.
+ * @throws Error if there is an issue fetching or filtering questions by tags.
+ */
+const getQuestionsByTag = async (order = 'newest', search = ''): Promise<Question[]> => {
+  const res = await api.get(`${QUESTION_API_URL}/getQuestionByTag?order=${order}&search=${search}`);
+  console.log('res', res);
+  if (res.status !== 200) {
+    throw new Error('Error when fetching or filtering questions by tags');
   }
   return res.data;
 };
@@ -81,4 +117,12 @@ const downvoteQuestion = async (qid: string, username: string) => {
   return res.data;
 };
 
-export { getQuestionsByFilter, getQuestionById, addQuestion, upvoteQuestion, downvoteQuestion };
+export {
+  getQuestionsByFilter,
+  getQuestionsByTag,
+  getQuestionById,
+  addQuestion,
+  upvoteQuestion,
+  downvoteQuestion,
+  updateQuestionTags,
+};

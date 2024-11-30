@@ -20,23 +20,23 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import useHeader from '../../hooks/useHeader';
 
 /**
- * Header component that renders the main title, search bar, and authentication status.
- * The search bar allows the user to input a query and navigate to the search results page
- * when they press Enter.
- */
+* Header component that renders the main title, search bar, and authentication status.
+* The search bar allows the user to input a query and navigate to the search results page
+* when they press Enter.
+*/
 interface HeaderProps {
   toggleTheme: () => void;
   isDarkMode: boolean;
   sidebarWidth: number;
 }
-
+ 
 const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }) => {
   const { val, handleInputChange, handleKeyDown, user, handleSignOut, loading } = useHeader();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
-
+ 
   return (
-    <AppBar
+<AppBar
       position='fixed'
       elevation={0}
       sx={{
@@ -71,34 +71,34 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }
           }}
           InputProps={{
             startAdornment: (
-              <InputAdornment position='start'>
-                <IconButton>
-                  <SearchIcon color='primary' />
-                </IconButton>
-              </InputAdornment>
+<InputAdornment position='start'>
+<IconButton>
+<SearchIcon color='primary' />
+</IconButton>
+</InputAdornment>
             ),
           }}
         />
-        <Typography variant='h6' sx={{ flexGrow: 1, textAlign: 'center' }}></Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton onClick={toggleTheme} color='primary'>
+<Typography variant='h6' sx={{ flexGrow: 1, textAlign: 'center' }}></Typography>
+<Box sx={{ display: 'flex', alignItems: 'center' }}>
+<IconButton onClick={toggleTheme} color='primary'>
             {isDarkMode ? (
-              <Brightness7Icon sx={{ fontSize: 30 }} />
+<Brightness7Icon sx={{ fontSize: 30 }} />
             ) : (
-              <Brightness4Icon sx={{ fontSize: 30 }} />
+<Brightness4Icon sx={{ fontSize: 30 }} />
             )}
-          </IconButton>{' '}
+</IconButton>{' '}
           {loading && <CircularProgress size={24} sx={{ ml: 2 }} />}
           {!loading && user && (
-            <Button onClick={handleSignOut} variant='contained' color='primary' sx={{ ml: 2 }}>
-              <LogoutIcon />
+<Button onClick={handleSignOut} variant='contained' color='primary' sx={{ ml: 2 }}>
+<LogoutIcon />
               Logout
-            </Button>
+</Button>
           )}
-        </Box>
-      </Toolbar>
-    </AppBar>
+</Box>
+</Toolbar>
+</AppBar>
   );
 };
-
+ 
 export default Header;

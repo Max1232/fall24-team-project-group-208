@@ -1,6 +1,9 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
+import useUserContext from '../../../../hooks/useUserContext';
+import useQuizTag from '../../../../hooks/useQuizTag';
+import SelectCorrectAnswerModal from '../answer/selectCorrectAnswer';
 
 /**
  * Interface representing the props for the QuestionBody component.
@@ -15,6 +18,8 @@ interface QuestionBodyProps {
   text: string;
   askby: string;
   meta: string;
+  answerCount: number;
+  questionID: string;
 }
 
 /**
@@ -27,33 +32,75 @@ interface QuestionBodyProps {
  * @param askby The username of the question's author.
  * @param meta Additional metadata related to the question.
  */
-const QuestionBody: React.FC<QuestionBodyProps> = ({ views, text, askby, meta }) => (
-  <Box
-    id='questionBody'
-    className='questionBody right_padding'
-    p={2}
-    sx={{
-      border: '1px solid',
-      borderColor: 'primary.main',
-      borderRadius: 1,
-    }}>
-    <Box display='flex' alignItems='center' justifyContent='space-between'>
-      <Typography variant='h5' sx={{ ml: 2 }}>
-        {handleHyperlink(text)}
-      </Typography>
-      <Typography variant='h6' sx={{ ml: 1 }}>
-        {views} views
-      </Typography>
+const QuestionBody: React.FC<QuestionBodyProps> = ({
+  views,
+  text,
+  askby,
+  meta,
+  answerCount,
+  questionID,
+}) => {
+  const { user } = useUserContext();
+  const {
+    addQuizTag,
+    isLoading,
+    error,
+    question,
+    selectAnswerModalOpen,
+    setSelectAnswerModalOpen,
+    handleCorrectAnswerSelect,
+  } = useQuizTag(questionID);
+
+  // Determine if the button should be displayed
+  const shouldShowButton = user && (user.username === askby || user.role === 0) && answerCount >= 3;
+  return (
+    <Box
+      id='questionBody'
+      className='questionBody right_padding'
+      p={2}
+      sx={{
+        border: '1px solid',
+        borderColor: 'primary.main',
+        borderRadius: 1,
+      }}>
+      <Box display='flex' alignItems='center' justifyContent='space-between'>
+        <Typography variant='h5' sx={{ ml: 2 }}>
+          {handleHyperlink(text)}
+        </Typography>
+        <Typography variant='h6' sx={{ ml: 1 }}>
+          {views} views
+        </Typography>
+      </Box>
+      <Box className='answer_question_right' mt={2} display='flex' alignItems='center'>
+        <Typography variant='body2' className='question_author'>
+          {askby}
+        </Typography>
+        <Typography variant='body2' className='answer_question_meta' sx={{ ml: 1 }}>
+          asked {meta}
+        </Typography>
+      </Box>
+
+      {shouldShowButton && (
+        <Button variant='contained' color='primary' onClick={addQuizTag} disabled={isLoading}>
+          {isLoading ? 'Adding...' : 'MAKE QUIZ'}
+        </Button>
+      )}
+      {error && (
+        <Typography color='error' sx={{ mt: 1 }}>
+          {error}
+        </Typography>
+      )}
+
+      {question && (
+        <SelectCorrectAnswerModal
+          open={selectAnswerModalOpen}
+          onClose={() => setSelectAnswerModalOpen(false)}
+          answers={question.answers}
+          onSelect={handleCorrectAnswerSelect}
+        />
+      )}
     </Box>
-    <Box className='answer_question_right' mt={2} display='flex' alignItems='center'>
-      <Typography variant='body2' className='question_author'>
-        {askby}
-      </Typography>
-      <Typography variant='body2' className='answer_question_meta' sx={{ ml: 1 }}>
-        asked {meta}
-      </Typography>
-    </Box>
-  </Box>
-);
+  );
+};
 
 export default QuestionBody;

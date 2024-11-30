@@ -24,6 +24,7 @@ interface CommentSectionProps {
 const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => {
   const { user } = useUserContext();
   const [text, setText] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [textErr, setTextErr] = useState<string>('');
   const [showComments, setShowComments] = useState<boolean>(false);
 

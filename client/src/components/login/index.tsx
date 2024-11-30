@@ -18,8 +18,14 @@ const Login: React.FC = () => {
     toggleMode,
   } = useLogin();
 
-  // eslint-disable-next-line no-nested-ternary
-  const buttonText = loading ? 'Processing...' : isLogin ? 'Sign In' : 'Create Account';
+  let buttonText;
+  if (loading) {
+    buttonText = 'Processing...';
+  } else if (isLogin) {
+    buttonText = 'Sign In';
+  } else {
+    buttonText = 'Create Account';
+  }
 
   return (
     <Container component='main' maxWidth='xs' style={{ position: 'relative', minHeight: '100vh' }}>
