@@ -33,6 +33,7 @@ const mockUser: User = {
   acceptedAnswers: 0,
   comments: 0,
   badges: [],
+  role: 1,
 };
 
 const mockQuestion: Question = {
