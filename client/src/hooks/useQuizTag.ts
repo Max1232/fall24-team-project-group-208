@@ -61,7 +61,7 @@ const useQuizTag = (questionId: string) => {
       const newTags: Tag[] = [
         ...question!.tags,
         {
-          name: 'QUIZ',
+          name: 'quizQuestions',
           description: 'Question marked as quiz material',
         },
       ];
