@@ -12,6 +12,7 @@ import commentController from './controller/comment';
 import authController from './controller/auth';
 import userController from './controller/user';
 import { FakeSOSocket } from './types';
+import path from 'path';
 
 dotenv.config();
 
@@ -51,6 +52,8 @@ const authenticateRequest = (req: Request, res: Response, next: Function) => {
   next();
 };
 
+app.use(express.static(path.join(__dirname, '../client/build')));
+
 // CORS configuration
 app.use(
   cors({
@@ -64,9 +67,9 @@ app.use(
 app.use(express.json());
 app.use(authenticateRequest); // Add authentication middleware
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('hello world');
-});
+// app.get('/', (req: Request, res: Response) => {
+//   res.send('hello world');
+// });
 
 app.use('/auth', authController(socket));
 
@@ -76,6 +79,10 @@ app.use('/tag', tagController());
 app.use('/answer', answerController(socket));
 app.use('/comment', commentController(socket));
 //app.use('/auth', authController);
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: Function) => {
