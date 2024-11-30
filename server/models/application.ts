@@ -828,3 +828,53 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
     return { error: 'Error when construction tag map' };
   }
 };
+
+/**
+ * Updates a question's tags and correct answer index in the database.
+ *
+ * @param qid The unique identifier of the question to update
+ * @param tags The new array of tags to set for the question
+ * @param correctAnswerIndex Optional index indicating the correct answer for quiz questions
+ * 
+ * @returns The updated question with populated data, or an error object if the operation fails
+ */
+export const updateQuestionTagsAndIndex = async (
+  qid: string,
+  tags: Tag[],
+  correctAnswerIndex?: number
+): Promise<QuestionResponse> => {
+  try {
+    // ensure tags exist in the database
+    const processedTags = await processTags(tags);
+    
+    if (processedTags.length === 0) {
+      throw new Error('Invalid tags');
+    }
+
+    // update question with new tags and correct answer index
+    const result = await QuestionModel.findByIdAndUpdate(
+      qid,
+      { 
+        $set: { 
+          tags: processedTags,
+          correctAnswerIndex 
+        } 
+      },
+      { new: true }
+    );
+
+    if (!result) {
+      throw new Error('Question not found');
+    }
+
+    const populatedQuestion = await populateDocument(qid, 'question');
+    
+    if (!populatedQuestion || 'error' in populatedQuestion) {
+      throw new Error('Error populating updated question');
+    }
+
+    return populatedQuestion as Question;
+  } catch (error) {
+    return { error: `Error updating question: ${(error as Error).message}` };
+  }
+};

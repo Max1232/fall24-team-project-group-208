@@ -25,7 +25,6 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
 // router.post('/addQuestion', addQuestion);
 // router.post('/upvoteQuestion', upvoteQuestion);
 // router.post('/downvoteQuestion', downvoteQuestion);
-// router.post('/updateTags', updateQuestionTags);
 
 /**
  * Function to update a question's tags.
