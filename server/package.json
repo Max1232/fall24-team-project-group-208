@@ -45,7 +45,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest -w=1 --coverage --detectOpenHandles",
-    "build": "tsc",
+    "build": "tsc && cd ../client && npm install && npm run build",
     "start:prod": "node ./dist/server.js",
     "stryker": "stryker run"
   }

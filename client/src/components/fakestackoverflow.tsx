@@ -19,30 +19,30 @@ import QuizPage from './main/quizPage';
 import AuthService from '../services/authService';
 
 const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
-  const [user, setUser] = useState<User | null>(null);
+  // Initialize from session storage immediately
+  const [user, setUser] = useState<User | null>(() => {
+    const storedData = sessionStorage.getItem(`user_data_${WINDOW_ID}`);
+    try {
+      return storedData ? JSON.parse(storedData) : null;
+    } catch {
+      return null;
+    }
+  });
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check if this window should have an active session
+    // Quick check for active session
     const storedWindowId = sessionStorage.getItem('auth_window_id');
-
-    if (storedWindowId && storedWindowId !== WINDOW_ID) {
-      // This is a different window, clear the auth state
-      AuthService.clearAuth(WINDOW_ID);
-      setUser(null);
-      setLoading(false);
-      return;
-    }
+    const storedData = sessionStorage.getItem(`user_data_${WINDOW_ID}`);
 
     const unsubscribe = onAuthStateChanged(
       auth,
       firebaseUser => {
         if (firebaseUser) {
-          // Only set user if this window owns the session
           if (!storedWindowId || storedWindowId === WINDOW_ID) {
-            const storedData = sessionStorage.getItem(`user_data_${WINDOW_ID}`);
-            const existingData = storedData ? JSON.parse(storedData) : getStoredUser();
+            // Use existing data or create new user data
+            const existingData = storedData ? JSON.parse(storedData) : null;
 
             const userData: User = {
               username: firebaseUser.email || 'Anonymous',
@@ -61,16 +61,13 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             };
 
             setUser(userData);
-            // Store data in session storage with window ID
             sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(userData));
             sessionStorage.setItem('auth_window_id', WINDOW_ID);
           }
         } else {
           setUser(null);
-          // Clean up session data
           sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
           sessionStorage.removeItem('auth_window_id');
-          AuthService.clearAuth(WINDOW_ID);
         }
         setLoading(false);
       },
@@ -92,11 +89,9 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
   const handleSetUser = (newUser: User | null) => {
     setUser(newUser);
     if (newUser) {
-      // Store in session storage with window ID
       sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(newUser));
       sessionStorage.setItem('auth_window_id', WINDOW_ID);
     } else {
-      // Clean up session data
       sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
       sessionStorage.removeItem('auth_window_id');
       AuthService.clearAuth(WINDOW_ID);
@@ -122,6 +117,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
       <CssBaseline />
       <LoginContext.Provider value={{ setUser: handleSetUser }}>
         <Routes>
+
           {/* Public Route with redirect logic */}
           <Route path='/' element={user ? <Navigate to='/home' replace /> : <Login />} />
 
@@ -142,6 +138,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/home' element={<QuestionPage />} />
             <Route path='tags' element={<TagPage />} />
             <Route path='/question/:qid' element={<AnswerPage />} />
+
             <Route path='/quiz/:qid' element={<QuizQuestionPage />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/quizzes' element={<QuizPage />} />

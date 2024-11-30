@@ -18,7 +18,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import useHeader from '../../hooks/useHeader';
- 
+
 /**
 * Header component that renders the main title, search bar, and authentication status.
 * The search bar allows the user to input a query and navigate to the search results page
@@ -44,8 +44,8 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }
         width: `calc(100% - ${sidebarWidth}px)`,
         transition: 'width 0.3s ease',
       }}>
-<Toolbar>
-<TextField
+      <Toolbar>
+        <TextField
           id='searchBar'
           placeholder='Search ...'
           type='text'
