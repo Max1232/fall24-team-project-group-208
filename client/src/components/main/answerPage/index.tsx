@@ -43,6 +43,7 @@ const AnswerPage: React.FC = () => {
         meta={getMetaData(new Date(question.askDateTime))}
         answerCount={question.answers.length}
         questionID={question._id || ''}
+        question={question}
       />
       <Box pt={2}>
         <CommentSection

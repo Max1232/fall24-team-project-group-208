@@ -1,44 +1,22 @@
 /* eslint-disable no-console */
 // REMOVE LATER - console for debug
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Question, Tag } from '../types';
-import { getQuestionById, updateQuestionTags } from '../services/questionService';
-import useUserContext from './useUserContext';
+import { updateQuestionTags } from '../services/questionService';
 
-const useQuizTag = (questionId: string) => {
-  const { user } = useUserContext();
+const useQuizTag = (questionId: string, currentQuestion: Question) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [question, setQuestion] = useState<Question | null>(null);
   const [selectAnswerModalOpen, setSelectAnswerModalOpen] = useState(false);
-
-  // Fetch question data
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const questionData = await getQuestionById(questionId, user.username);
-        setQuestion(questionData);
-      } catch (err) {
-        setError('Failed to load question data');
-        console.error('Error loading question:', err);
-      }
-    };
-
-    fetchQuestion();
-  }, [questionId, user.username]);
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
 
   const addQuizTag = async () => {
-    if (!question) {
-      setError('Question data not available');
-      return;
-    }
-
     try {
       setIsLoading(true);
       setError(null);
 
       // Check if QUIZ tag already applied
-      const hasQuizTag = question.tags.some(tag => tag.name === 'quizQuestions');
+      const hasQuizTag = currentQuestion.tags.some(tag => tag.name === 'quizQuestions');
       if (hasQuizTag) {
         return;
       }
@@ -51,24 +29,24 @@ const useQuizTag = (questionId: string) => {
       setIsLoading(false);
     }
   };
-
   const handleCorrectAnswerSelect = async (index: number) => {
     try {
       setIsLoading(true);
       setError(null);
+      setSelectedAnswerIndex(index);
 
       // Add QUIZ tag and update correct answer index
       const newTags: Tag[] = [
-        ...question!.tags,
+        ...currentQuestion.tags,
         {
           name: 'quizQuestions',
           description: 'Question marked as quiz material',
         },
       ];
 
-      const updatedQuestion = await updateQuestionTags(questionId, newTags, index);
-      setQuestion(updatedQuestion);
+      await updateQuestionTags(questionId, newTags, index);
       setSelectAnswerModalOpen(false);
+      setSelectedAnswerIndex(null);
     } catch (err) {
       setError('Failed to update question');
       console.error('Error updating question:', err);
@@ -81,10 +59,10 @@ const useQuizTag = (questionId: string) => {
     addQuizTag,
     isLoading,
     error,
-    question,
     selectAnswerModalOpen,
     setSelectAnswerModalOpen,
     handleCorrectAnswerSelect,
+    selectedAnswerIndex,
   };
 };
 
