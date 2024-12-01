@@ -29,7 +29,7 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
 const updateQuestionTags = async (
   qid: string,
   tags: Tag[],
-  correctAnswerIndex?: number,
+  correctAnswerIndex?: string,
 ): Promise<Question> => {
   const res = await api.post(`${QUESTION_API_URL}/updateTags`, { qid, tags, correctAnswerIndex });
   if (res.status !== 200) {

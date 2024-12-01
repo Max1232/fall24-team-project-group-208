@@ -8,7 +8,7 @@ const useQuizTag = (questionId: string, currentQuestion: Question) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectAnswerModalOpen, setSelectAnswerModalOpen] = useState(false);
-  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<number | null>(null);
+  const [selectedAnswerIndex, setSelectedAnswerIndex] = useState<string | null>(null);
 
   const addQuizTag = async () => {
     try {
@@ -29,7 +29,7 @@ const useQuizTag = (questionId: string, currentQuestion: Question) => {
       setIsLoading(false);
     }
   };
-  const handleCorrectAnswerSelect = async (index: number) => {
+  const handleCorrectAnswerSelect = async (index: string) => {
     try {
       setIsLoading(true);
       setError(null);
