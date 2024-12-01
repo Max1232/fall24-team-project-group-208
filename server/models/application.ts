@@ -841,7 +841,7 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
 export const updateQuestionTagsAndIndex = async (
   qid: string,
   tags: Tag[],
-  correctAnswerIndex?: number,
+  correctAnswerIndex?: string,
 ): Promise<QuestionResponse> => {
   try {
     // ensure tags exist in the database
@@ -851,13 +851,18 @@ export const updateQuestionTagsAndIndex = async (
       throw new Error('Invalid tags');
     }
 
+    if (correctAnswerIndex === undefined) {
+      throw new Error('Correct answer index is required');
+    }
+    const question = await QuestionModel.findById(qid);
+    const correctAnswerId = question?.answers[Number(correctAnswerIndex)];
     // update question with new tags and correct answer index
     const result = await QuestionModel.findByIdAndUpdate(
       qid,
       {
         $set: {
           tags: processedTags,
-          correctAnswerIndex,
+          correctAnswerIndex: correctAnswerId,
         },
       },
       { new: true },

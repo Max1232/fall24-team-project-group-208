@@ -14,14 +14,16 @@ import useAnswerPage from '../../../hooks/useAnswerPage';
 const AnswerPage: React.FC = () => {
   const { question } = useAnswerPage();
   const [checkboxLocked, setCheckboxLocked] = React.useState(false);
+  const [selectedAnswerId, setSelectedAnswerId] = React.useState<string | null>(null);
 
   const handleSubmitClick = () => {
-    // If the user has selected an answer, submit the answer
-    if (checkboxLocked) {
-      const userAnswer = question?.correctAnswerIndex;
+    console.log('Submit clicked');
+    if (checkboxLocked && selectedAnswerId) {
+      const userAnswer = selectedAnswerId;
       // Check if the answer is correct
+      console.log('User answer:', userAnswer);
+      console.log('Correct answer:', question?.correctAnswerIndex);
       if (userAnswer === question?.correctAnswerIndex) {
-        // placeholder variables
         console.log('Correct');
       } else {
         console.log('Wrong');
@@ -29,8 +31,10 @@ const AnswerPage: React.FC = () => {
     }
   };
 
-  const handleCheckboxChange = () => {
+  const handleCheckboxChange = (answerId: string) => {
+    console.log('Checkbox selected for answer with id of:', answerId);
     setCheckboxLocked(true);
+    setSelectedAnswerId(answerId);
   };
 
   if (!question) {
@@ -51,15 +55,17 @@ const AnswerPage: React.FC = () => {
         meta={getMetaData(new Date(question.askDateTime))}
         answerCount={question.answers.length}
         questionID={question._id || ''}
+        question={question}
       />
       {question.answers.map((a, idx) => (
         <AnswerView
           key={idx}
           text={a.text}
           ansBy={a.ansBy}
+          id={a._id || ''}
           meta={getMetaData(new Date(a.ansDateTime))}
           checkboxLocked={checkboxLocked}
-          onCheckboxChange={handleCheckboxChange}
+          onCheckboxChange={() => handleCheckboxChange(a._id || '')}
         />
       ))}
       <Box mt={3} display='flex' justifyContent='center'>

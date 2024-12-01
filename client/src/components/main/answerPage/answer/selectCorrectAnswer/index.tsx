@@ -17,8 +17,8 @@ interface SelectCorrectAnswerModalProps {
   open: boolean;
   onClose: () => void;
   answers: Answer[];
-  onSelect: (index: number) => void;
-  selectedAnswerIndex?: number | null;
+  onSelect: (index: string) => void;
+  selectedAnswerIndex?: string | null;
 }
 
 const SelectCorrectAnswerModal: React.FC<SelectCorrectAnswerModalProps> = ({
@@ -28,7 +28,7 @@ const SelectCorrectAnswerModal: React.FC<SelectCorrectAnswerModalProps> = ({
   onSelect,
   selectedAnswerIndex,
 }) => {
-  const [localSelectedIndex, setLocalSelectedIndex] = React.useState<number | null>(null);
+  const [localSelectedIndex, setLocalSelectedIndex] = React.useState<string | null>(null);
 
   // reset local state when modal opens/closes
   useEffect(() => {
@@ -64,7 +64,7 @@ const SelectCorrectAnswerModal: React.FC<SelectCorrectAnswerModalProps> = ({
         </Typography>
         <RadioGroup
           value={localSelectedIndex}
-          onChange={e => setLocalSelectedIndex(Number(e.target.value))}>
+          onChange={e => setLocalSelectedIndex(e.target.value)}>
           {answers.map((answer, index) => (
             <Box
               key={index}
