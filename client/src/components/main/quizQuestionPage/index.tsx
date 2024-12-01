@@ -1,10 +1,10 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { Box, Button, CircularProgress } from '@mui/material';
 import AnswerHeader from './header';
 import QuestionBody from './questionBody';
 import AnswerView from './answer';
 import { getMetaData } from '../../../tool';
-import NewAnswerModal from '../newAnswer';
 import useAnswerPage from '../../../hooks/useAnswerPage';
 
 /**
@@ -13,15 +13,20 @@ import useAnswerPage from '../../../hooks/useAnswerPage';
  */
 const AnswerPage: React.FC = () => {
   const { question } = useAnswerPage();
-  const [open, setOpen] = React.useState(false);
   const [checkboxLocked, setCheckboxLocked] = React.useState(false);
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
+  const handleSubmitClick = () => {
+    // If the user has selected an answer, submit the answer
+    if (checkboxLocked) {
+      const userAnswer = question?.correctAnswerIndex;
+      // Check if the answer is correct
+      if (userAnswer === question?.correctAnswerIndex) {
+        // placeholder variables
+        console.log('Correct');
+      } else {
+        console.log('Wrong');
+      }
+    }
   };
 
   const handleCheckboxChange = () => {
@@ -58,10 +63,10 @@ const AnswerPage: React.FC = () => {
         />
       ))}
       <Box mt={3} display='flex' justifyContent='center'>
-        <Button variant='contained' color='primary' onClick={handleClickOpen}>
+        <Button variant='contained' color='primary' onClick={handleSubmitClick}>
           Answer Question
         </Button>
-        <NewAnswerModal open={open} onClose={handleClose} />
+        {/* <NewAnswerModal open={open} onClose={handleClose} /> */}
       </Box>
     </Box>
   );
