@@ -286,6 +286,6 @@ export interface UpdateTagsRequest extends Request {
   body: {
     qid: string;
     tags: Tag[];
-    correctAnswerIndex?: number;
+    correctAnswerIndex?: string;
   };
 }

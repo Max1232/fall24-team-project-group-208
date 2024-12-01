@@ -15,9 +15,10 @@ import { handleHyperlink } from '../../../../tool';
 interface AnswerProps {
   text: string;
   ansBy: string;
+  id: string;
   meta: string;
   checkboxLocked: boolean;
-  onCheckboxChange: () => void;
+  onCheckboxChange: (answerId: string) => void;
 }
 
 /**
@@ -33,6 +34,7 @@ interface AnswerProps {
 const AnswerView: React.FC<AnswerProps> = ({
   text,
   ansBy,
+  id,
   meta,
   checkboxLocked,
   onCheckboxChange,
@@ -40,8 +42,8 @@ const AnswerView: React.FC<AnswerProps> = ({
   const [checked, setChecked] = useState(false);
 
   const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onCheckboxChange(id);
     setChecked(event.target.checked);
-    onCheckboxChange();
   };
 
   return (
@@ -49,7 +51,9 @@ const AnswerView: React.FC<AnswerProps> = ({
       <CardContent>
         <Box className='answerText' mb={2} display='flex' alignItems='center'>
           <Checkbox checked={checked} onChange={handleCheckboxChange} disabled={checkboxLocked} />
-          <Typography variant='body1'>{handleHyperlink(text)}</Typography>
+          <Box component='span' sx={{ display: 'inline' }}>
+            {handleHyperlink(text)}
+          </Box>
         </Box>
         <Box
           className='answerAuthor'
