@@ -1,3 +1,4 @@
+// TODO: Remove unused code and fix lint issues
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
@@ -42,11 +43,9 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
   questionID,
   question,
 }) => {
+  // TODO: Remove this stuff if it is still unused
   const { user } = useUserContext();
   const { addQuizTag, isLoading, error } = useQuizTag(questionID, question);
-
-  // Determine if the button should be displayed
-  const shouldShowButton = user && (user.username === askby || user.role === 0) && answerCount >= 3;
   return (
     <Box
       id='questionBody'
@@ -73,12 +72,6 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
           asked {meta}
         </Typography>
       </Box>
-
-      {shouldShowButton && (
-        <Button variant='contained' color='primary' onClick={addQuizTag} disabled={isLoading}>
-          {isLoading ? 'Adding...' : 'MAKE QUIZ'}
-        </Button>
-      )}
       {error && (
         <Typography color='error' sx={{ mt: 1 }}>
           {error}
