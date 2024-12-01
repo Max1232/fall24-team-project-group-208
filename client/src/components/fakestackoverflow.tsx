@@ -117,7 +117,6 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
       <CssBaseline />
       <LoginContext.Provider value={{ setUser: handleSetUser }}>
         <Routes>
-
           {/* Public Route with redirect logic */}
           <Route path='/' element={user ? <Navigate to='/home' replace /> : <Login />} />
 
