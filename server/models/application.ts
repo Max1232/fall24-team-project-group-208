@@ -855,12 +855,19 @@ export const updateQuestionTagsAndIndex = async (
       throw new Error('Correct answer index is required');
     }
     // update question with new tags and correct answer index
+    const question = await QuestionModel.findById(qid);
+    if (!question) {
+      throw new Error('Question not found');
+    }
+    const correctAnswerId = question.answers[parseInt(correctAnswerIndex, 10)]._id;
+    console.log('Updating question tags and correct answer index...');
+    console.log('Correct answer id:', correctAnswerId);
     const result = await QuestionModel.findByIdAndUpdate(
       qid,
       {
         $set: {
           tags: processedTags,
-          correctAnswerIndex,
+          correctAnswerIndex: correctAnswerId,
         },
       },
       { new: true },

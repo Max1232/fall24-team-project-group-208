@@ -18,13 +18,21 @@ const AnswerPage: React.FC = () => {
 
   const handleSubmitClick = () => {
     console.log('Submit clicked');
+    // TODO: Fix question?.correctAnswerIndex set, it is returning undefined
     if (checkboxLocked && selectedAnswerId) {
-      const userAnswer = selectedAnswerId;
       // Check if the answer is correct
+
+      const userAnswer = selectedAnswerId;
       console.log('User answer:', userAnswer);
       console.log('Correct answer:', question?.correctAnswerIndex);
       if (userAnswer === question?.correctAnswerIndex) {
         console.log('Correct');
+        /** TODO: Handle correct answer
+         * - Update user reputation (Required)
+         * - Display success message (desireable)
+         * - Redirect to home page? (optional)
+         * - Lock the quiz? (optional)
+         */
       } else {
         console.log('Wrong');
       }
