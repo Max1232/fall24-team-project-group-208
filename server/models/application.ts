@@ -841,7 +841,7 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
 export const updateQuestionTagsAndIndex = async (
   qid: string,
   tags: Tag[],
-  correctAnswerIndex?: string,
+  correctAnsIndex?: string,
 ): Promise<QuestionResponse> => {
   try {
     // ensure tags exist in the database
@@ -851,7 +851,7 @@ export const updateQuestionTagsAndIndex = async (
       throw new Error('Invalid tags');
     }
 
-    if (correctAnswerIndex === undefined) {
+    if (correctAnsIndex === undefined) {
       throw new Error('Correct answer index is required');
     }
     // update question with new tags and correct answer index
@@ -859,9 +859,10 @@ export const updateQuestionTagsAndIndex = async (
     if (!question) {
       throw new Error('Question not found');
     }
-    const correctAnswerId = question.answers[parseInt(correctAnswerIndex, 10)]._id;
+    const correctAnswerId = question.answers[parseInt(correctAnsIndex, 10)]._id?.toString();
     console.log('Updating question tags and correct answer index...');
     console.log('Correct answer id:', correctAnswerId);
+    // TODO: Result is not updated correctly
     const result = await QuestionModel.findByIdAndUpdate(
       qid,
       {
@@ -871,8 +872,11 @@ export const updateQuestionTagsAndIndex = async (
         },
       },
       { new: true },
-    );
-
+    ).populate([
+      { path: 'tags', model: TagModel },
+      { path: 'answers', model: AnswerModel },
+    ]);
+    console.log('Updated question:', result?.correctAnswerIndex); // TODO: This is returning undefined, which should not be the case
     if (!result) {
       throw new Error('Question not found');
     }
