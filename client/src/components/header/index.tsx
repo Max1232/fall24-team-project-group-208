@@ -7,6 +7,7 @@ import {
   Button,
   CircularProgress,
   TextField,
+  InputAdornment,
   IconButton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -66,11 +67,13 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }
               },
             },
           }}
-          slots={{
+          InputProps={{
             startAdornment: (
-              <IconButton>
-                <SearchIcon color='primary' />
-              </IconButton>
+              <InputAdornment position='start'>
+                <IconButton>
+                  <SearchIcon color='primary' />
+                </IconButton>
+              </InputAdornment>
             ),
           }}
         />
