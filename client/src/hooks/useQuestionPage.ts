@@ -1,104 +1,80 @@
 import { useSearchParams } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import useUserContext from './useUserContext';
 import { Answer, OrderType, Question } from '../types';
 import { getQuestionsByFilter } from '../services/questionService';
 
-/**
- * Custom hook for managing the question page state, filtering, and real-time updates.
- *
- * @returns titleText - The current title of the question page
- * @returns qlist - The list of questions to display
- * @returns setQuestionOrder - Function to set the sorting order of questions (e.g., newest, oldest).
- */
 const useQuestionPage = () => {
   const { socket } = useUserContext();
-
   const [searchParams] = useSearchParams();
-  const [titleText, setTitleText] = useState<string>('All Questions');
-  const [search, setSearch] = useState<string>('');
-  const [questionOrder, setQuestionOrder] = useState<OrderType>('newest');
-  const [qlist, setQlist] = useState<Question[]>([]);
 
+  // Combine state updates into a single state object
+  const [state, setState] = useState({
+    titleText: 'All Questions',
+    search: '',
+    questionOrder: 'newest' as OrderType,
+    qlist: [] as Question[],
+  });
+
+  // Memoize the fetch function
+  const fetchQuestions = useCallback(async (order: OrderType, searchTerm: string) => {
+    try {
+      const res = await getQuestionsByFilter(order, searchTerm || '');
+      setState(prev => ({ ...prev, qlist: res || [] }));
+    } catch (error) {
+      console.error('Error fetching questions:', error);
+      setState(prev => ({ ...prev, qlist: [] }));
+    }
+  }, []);
+
+  // Single effect to handle URL params and trigger fetch
   useEffect(() => {
-    let pageTitle = 'All Questions';
-    let searchString = '';
-
     const searchQuery = searchParams.get('search');
     const tagQuery = searchParams.get('tag');
 
-    console.log('Query params:', { searchQuery, tagQuery }); // Debug log
+    let newTitle = 'All Questions';
+    let newSearch = '';
 
-    if (searchQuery && searchQuery !== 'undefined' && searchQuery.trim()) {
-      pageTitle = 'Search Results';
-      searchString = searchQuery.trim();
-    } else if (tagQuery && tagQuery !== 'undefined' && tagQuery.trim()) {
-      pageTitle = tagQuery.trim();
-      searchString = `[${tagQuery.trim()}]`;
+    if (searchQuery?.trim()) {
+      newTitle = 'Search Results';
+      newSearch = searchQuery.trim();
+    } else if (tagQuery?.trim()) {
+      newTitle = tagQuery.trim();
+      newSearch = `[${tagQuery.trim()}]`;
     }
 
-    console.log('Search Query:', searchQuery);
-    setTitleText(pageTitle);
-    setSearch(searchString);
-  }, [searchParams]);
+    setState(prev => ({
+      ...prev,
+      titleText: newTitle,
+      search: newSearch,
+    }));
 
+    fetchQuestions(state.questionOrder, newSearch);
+  }, [searchParams, state.questionOrder, fetchQuestions]);
+
+  // Socket event handlers
   useEffect(() => {
-    /**
-     * Function to fetch questions based on the filter and update the question list.
-     */
-    const fetchData = async () => {
-      try {
-        // Only pass search if it exists and isn't 'undefined'
-        const searchTerm = search || '';
-        console.log('Fetching with search:', search);
-        const res = await getQuestionsByFilter(questionOrder, searchTerm);
-        console.log('Received questions:', res?.length); // Debug log
-        setQlist(res || []);
-      } catch (error) {
-        console.error('Error fetching questions:', error);
-        setQlist([]);
-      }
-    };
-
-    fetchData();
-
-    /**
-     * Function to handle question updates from the socket.
-     *
-     * @param question - the updated question object.
-     */
     const handleQuestionUpdate = (question: Question) => {
-      setQlist(prevQlist => {
-        const questionExists = prevQlist.some(q => q._id === question._id);
-
-        if (questionExists) {
-          // Update the existing question
-          return prevQlist.map(q => (q._id === question._id ? question : q));
-        }
-
-        return [question, ...prevQlist];
-      });
+      setState(prev => ({
+        ...prev,
+        qlist: prev.qlist.some(q => q._id === question._id)
+          ? prev.qlist.map(q => (q._id === question._id ? question : q))
+          : [question, ...prev.qlist],
+      }));
     };
 
-    /**
-     * Function to handle answer updates from the socket.
-     *
-     * @param qid - The question ID.
-     * @param answer - The answer object.
-     */
     const handleAnswerUpdate = ({ qid, answer }: { qid: string; answer: Answer }) => {
-      setQlist(prevQlist =>
-        prevQlist.map(q => (q._id === qid ? { ...q, answers: [...q.answers, answer] } : q)),
-      );
+      setState(prev => ({
+        ...prev,
+        qlist: prev.qlist.map(q => (q._id === qid ? { ...q, answers: [...q.answers, answer] } : q)),
+      }));
     };
 
-    /**
-     * Function to handle views updates from the socket.
-     *
-     * @param question - The updated question object.
-     */
     const handleViewsUpdate = (question: Question) => {
-      setQlist(prevQlist => prevQlist.map(q => (q._id === question._id ? question : q)));
+      setState(prev => ({
+        ...prev,
+        qlist: prev.qlist.map(q => (q._id === question._id ? question : q)),
+      }));
     };
 
     socket.on('questionUpdate', handleQuestionUpdate);
@@ -110,9 +86,17 @@ const useQuestionPage = () => {
       socket.off('answerUpdate', handleAnswerUpdate);
       socket.off('viewsUpdate', handleViewsUpdate);
     };
-  }, [questionOrder, search, socket]);
+  }, [socket]);
 
-  return { titleText, qlist, setQuestionOrder };
+  const setQuestionOrder = useCallback((order: OrderType) => {
+    setState(prev => ({ ...prev, questionOrder: order }));
+  }, []);
+
+  return {
+    titleText: state.titleText,
+    qlist: state.qlist,
+    setQuestionOrder,
+  };
 };
 
 export default useQuestionPage;
