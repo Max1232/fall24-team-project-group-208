@@ -79,7 +79,7 @@ export interface Question {
   upVotes: string[];
   downVotes: string[];
   comments: Comment[] | ObjectId[];
-  correctAnswerIndex?: string;
+  correctAnswerId?: string;
 }
 
 /**

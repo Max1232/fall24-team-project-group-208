@@ -844,7 +844,6 @@ export const updateQuestionTagsAndIndex = async (
   correctAnsIndex?: string,
 ): Promise<QuestionResponse> => {
   try {
-    // ensure tags exist in the database
     const processedTags = await processTags(tags);
 
     if (processedTags.length === 0) {
@@ -854,29 +853,47 @@ export const updateQuestionTagsAndIndex = async (
     if (correctAnsIndex === undefined) {
       throw new Error('Correct answer index is required');
     }
-    // update question with new tags and correct answer index
+
     const question = await QuestionModel.findById(qid);
     if (!question) {
       throw new Error('Question not found');
     }
-    const correctAnswerId = question.answers[parseInt(correctAnsIndex, 10)]._id?.toString();
-    console.log('Updating question tags and correct answer index...');
-    console.log('Correct answer id:', correctAnswerId);
-    // TODO: Result is not updated correctly
+
+    // Convert string index to number and validate it
+    const numericIndex = parseInt(correctAnsIndex, 10);
+    if (isNaN(numericIndex) || numericIndex < 0 || numericIndex >= question.answers.length) {
+      throw new Error('Invalid answer index');
+    }
+
+    // Get the answer ID at the specified index
+    const correctAnswerId = question.answers[numericIndex]._id?.toString();
+
+    console.log('--------- Update Operation Debug ---------');
+    console.log('Question ID:', qid);
+    console.log('Selected answer ID:', correctAnswerId);
+
     const result = await QuestionModel.findByIdAndUpdate(
       qid,
       {
         $set: {
           tags: processedTags,
-          correctAnswerIndex: correctAnswerId,
+          correctAnswerId, // Store the actual answer ID
         },
       },
-      { new: true },
+      {
+        new: true,
+        runValidators: true,
+      },
     ).populate([
       { path: 'tags', model: TagModel },
       { path: 'answers', model: AnswerModel },
     ]);
-    console.log('Updated question:', result?.correctAnswerIndex); // TODO: This is returning undefined, which should not be the case
+
+    console.log('Updated question result:', {
+      id: result?._id,
+      correctAnswerId: result?.correctAnswerId,
+    });
+
     if (!result) {
       throw new Error('Question not found');
     }
@@ -889,6 +906,7 @@ export const updateQuestionTagsAndIndex = async (
 
     return populatedQuestion as Question;
   } catch (error) {
+    console.error('Error updating question:', error);
     return { error: `Error updating question: ${(error as Error).message}` };
   }
 };

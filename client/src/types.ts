@@ -141,7 +141,7 @@ export interface Question {
   upVotes: string[];
   downVotes: string[];
   comments: Comment[];
-  correctAnswerIndex?: string;
+  correctAnswerId?: string;
 }
 
 /**
