@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useEffect, useState, useContext } from 'react';
+import { Box, CircularProgress } from '@mui/material';
 import auth from '../../config/firebase';
 import UserContext from '../../contexts/UserContext';
 
@@ -25,11 +26,9 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   // Show loading state while checking auth
   if (loading) {
     return (
-      <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-center'>
-          <h2>Loading...</h2>
-        </div>
-      </div>
+      <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh'>
+        <CircularProgress />
+      </Box>
     );
   }
 

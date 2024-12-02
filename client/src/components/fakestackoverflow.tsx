@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { ThemeProvider, CssBaseline } from '@mui/material';
+import { ThemeProvider, CssBaseline, Box, CircularProgress } from '@mui/material';
 import Layout from './layout';
 import Login from './login';
 import { FakeSOSocket, User } from '../types';
@@ -100,11 +100,9 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
 
   if (loading) {
     return (
-      <div className='flex items-center justify-center min-h-screen'>
-        <div className='text-center'>
-          <h2>Loading...</h2>
-        </div>
-      </div>
+      <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh'>
+        <CircularProgress />
+      </Box>
     );
   }
 
