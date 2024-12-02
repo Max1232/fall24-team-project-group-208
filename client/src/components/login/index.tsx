@@ -1,5 +1,5 @@
-import React from 'react';
-import { TextField, Button, Typography, Container, Paper } from '@mui/material';
+import React, { useEffect } from 'react';
+import { TextField, Button, Typography, Container, Paper, Box } from '@mui/material';
 import useLogin from '../../hooks/useLogin';
 import Blobs from './blobs';
 
@@ -27,10 +27,40 @@ const Login: React.FC = () => {
     buttonText = 'Create Account';
   }
 
+  useEffect(() => {
+    // Disable scrolling
+    document.body.style.overflow = 'hidden';
+
+    // Re-enable scrolling when the component is unmounted
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
     <Container component='main' maxWidth='xs' style={{ position: 'relative', minHeight: '100vh' }}>
       <Blobs />
       <Paper elevation={3} style={{ padding: '20px', marginTop: '20px' }}>
+        <Box display='flex' flexDirection='column' alignItems='center' mb={2}>
+          <Box display='flex' alignItems='center' mb={0}>
+            <img
+              src='/devask-logo_pink-circle.png'
+              alt='DevAsk Logo'
+              style={{ marginRight: '10px', height: '100px' }}
+            />
+            <Typography component='h1' variant='h1' color='primary.main'>
+              DevAsk
+            </Typography>
+          </Box>
+          <Typography
+            component='h2'
+            variant='body1'
+            color='primary.main'
+            sx={{ fontSize: '1.5rem' }}>
+            Community by devs for devs.
+          </Typography>
+        </Box>
+
         <Typography component='h1' variant='h5'>
           {isLogin ? 'Sign In' : 'Create Account'}
         </Typography>
