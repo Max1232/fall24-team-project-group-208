@@ -64,7 +64,8 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
       sx={{
         border: '1px solid',
         borderColor: 'primary.main',
-        borderRadius: 1,
+        borderBottomRightRadius: 5,
+        borderBottomLeftRadius: 5,
       }}>
       <Box display='flex' alignItems='center' justifyContent='space-between'>
         <Typography variant='h5' sx={{ ml: 2 }}>
@@ -75,7 +76,10 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
         </Typography>
       </Box>
       <Box className='answer_question_right' mt={2} display='flex' alignItems='center'>
-        <Typography variant='body2' className='question_author'>
+        <Typography
+          variant='body2'
+          className='question_author'
+          sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           {askby}
         </Typography>
         <Typography variant='body2' className='answer_question_meta' sx={{ ml: 1 }}>
