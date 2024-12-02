@@ -1,5 +1,8 @@
+import React from 'react';
+import { Box, IconButton, Typography } from '@mui/material';
+import ArrowCircleUpTwoToneIcon from '@mui/icons-material/ArrowCircleUpTwoTone';
 import { downvoteQuestion, upvoteQuestion } from '../../../services/questionService';
-import './index.css';
+import ArrowCircleDownTwoToneIcon from '@mui/icons-material/ArrowCircleDownTwoTone';
 import useUserContext from '../../../hooks/useUserContext';
 import { Question } from '../../../types';
 import useVoteStatus from '../../../hooks/useVoteStatus';
@@ -18,7 +21,7 @@ interface VoteComponentProps {
  *
  * @param question - The question object containing voting information.
  */
-const VoteComponent = ({ question }: VoteComponentProps) => {
+const VoteComponent: React.FC<VoteComponentProps> = ({ question }) => {
   const { user } = useUserContext();
   const { count, voted } = useVoteStatus({ question });
 
@@ -27,7 +30,7 @@ const VoteComponent = ({ question }: VoteComponentProps) => {
    *
    * @param type - The type of vote, either 'upvote' or 'downvote'.
    */
-  const handleVote = async (type: string) => {
+  const handleVote = async (event: React.MouseEvent<HTMLButtonElement>, type: string) => {
     try {
       if (question._id) {
         if (type === 'upvote') {
@@ -37,24 +40,24 @@ const VoteComponent = ({ question }: VoteComponentProps) => {
         }
       }
     } catch (error) {
-      // Handle error
+      console.error('Error voting:', error);
     }
   };
 
   return (
-    <div className='vote-container'>
-      <button
-        className={`vote-button ${voted === 1 ? 'vote-button-upvoted' : ''}`}
-        onClick={() => handleVote('upvote')}>
-        Upvote
-      </button>
-      <button
-        className={`vote-button ${voted === -1 ? 'vote-button-downvoted' : ''}`}
-        onClick={() => handleVote('downvote')}>
-        Downvote
-      </button>
-      <span className='vote-count'>{count}</span>
-    </div>
+    <Box display='flex' flexDirection='column' alignItems='center'>
+      <IconButton
+        onClick={event => handleVote(event, 'upvote')}
+        color={voted === 1 ? 'success' : 'default'}>
+        <ArrowCircleUpTwoToneIcon sx={{ fontSize: 30 }} />
+      </IconButton>
+      <Typography>{count}</Typography>
+      <IconButton
+        onClick={event => handleVote(event, 'downvote')}
+        color={voted === -1 ? 'error' : 'default'}>
+        <ArrowCircleDownTwoToneIcon sx={{ fontSize: 30 }} />
+      </IconButton>
+    </Box>
   );
 };
 
