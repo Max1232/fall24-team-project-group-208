@@ -39,10 +39,10 @@ const authController = (socket: FakeSOSocket): express.Router => {
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
       req.user = { uid: decodedToken.uid };
-      next();
+      return next();
     } catch (error) {
       socket.emit('authError', { message: 'Invalid token' });
-      next(error);
+      return next(error);
     }
   };
 

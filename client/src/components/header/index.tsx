@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -11,7 +10,6 @@ import {
   TextField,
   InputAdornment,
   IconButton,
-  Switch,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import LogoutIcon from '@mui/icons-material/Logout';

@@ -7,6 +7,13 @@ import UserContext, {
 import { WINDOW_ID } from '../config/firebase';
 import AuthService from '../services/authService';
 
+/**
+ * Custom hook to manage the user context.
+ * It restores the user from session storage if missing and ensures the correct window session.
+ *
+ * @returns {UserContextType} The user context.
+ * @throws {Error} If the user context is null.
+ */
 const useUserContext = (): UserContextType => {
   const context = useContext(UserContext);
 
