@@ -29,13 +29,13 @@ const QuizPage = () => {
           Ask a Question
         </Button>
       </Box>
-      <Grid container spacing={2}>
+      <Box display='flex' flexDirection='column' width='100%'>
         {qlist.map((q, idx) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+          <Box key={idx} mb={2}>
             <QuestionView q={q} clickQuestion={clickQuestion} />
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
       <Dialog open={open} fullWidth maxWidth='md'>
         <NewQuestionPage onClose={handleClose} />
       </Dialog>

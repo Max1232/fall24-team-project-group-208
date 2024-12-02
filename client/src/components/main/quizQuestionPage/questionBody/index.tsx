@@ -54,7 +54,9 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
       sx={{
         border: '1px solid',
         borderColor: 'primary.main',
-        borderRadius: 1,
+        borderBottomRightRadius: 5,
+        borderBottomLeftRadius: 5,
+        mb: 2,
       }}>
       <Box display='flex' alignItems='center' justifyContent='space-between'>
         <Typography variant='h5' sx={{ ml: 2 }}>

@@ -55,19 +55,6 @@ const AnswerView: React.FC<AnswerProps> = ({
             {handleHyperlink(text)}
           </Box>
         </Box>
-        <Box
-          className='answerAuthor'
-          display='flex'
-          justifyContent='space-between'
-          alignItems='center'
-          mb={2}>
-          <Typography variant='body2' className='answer_author'>
-            {ansBy}
-          </Typography>
-          <Typography variant='body2' className='answer_question_meta' sx={{ ml: 1 }}>
-            {meta}
-          </Typography>
-        </Box>
       </CardContent>
     </Card>
   );
