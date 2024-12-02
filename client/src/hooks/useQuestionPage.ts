@@ -27,14 +27,17 @@ const useQuestionPage = () => {
     const searchQuery = searchParams.get('search');
     const tagQuery = searchParams.get('tag');
 
-    if (searchQuery) {
+    console.log('Query params:', { searchQuery, tagQuery }); // Debug log
+
+    if (searchQuery && searchQuery !== 'undefined' && searchQuery.trim()) {
       pageTitle = 'Search Results';
-      searchString = searchQuery;
-    } else if (tagQuery) {
-      pageTitle = tagQuery;
-      searchString = `[${tagQuery}]`;
+      searchString = searchQuery.trim();
+    } else if (tagQuery && tagQuery !== 'undefined' && tagQuery.trim()) {
+      pageTitle = tagQuery.trim();
+      searchString = `[${tagQuery.trim()}]`;
     }
 
+    console.log('Search Query:', searchQuery);
     setTitleText(pageTitle);
     setSearch(searchString);
   }, [searchParams]);
@@ -45,13 +48,19 @@ const useQuestionPage = () => {
      */
     const fetchData = async () => {
       try {
-        const res = await getQuestionsByFilter(questionOrder, search);
+        // Only pass search if it exists and isn't 'undefined'
+        const searchTerm = search || '';
+        console.log('Fetching with search:', search);
+        const res = await getQuestionsByFilter(questionOrder, searchTerm);
+        console.log('Received questions:', res?.length); // Debug log
         setQlist(res || []);
       } catch (error) {
-        // eslint-disable-next-line no-console
-        console.log(error);
+        console.error('Error fetching questions:', error);
+        setQlist([]);
       }
     };
+
+    fetchData();
 
     /**
      * Function to handle question updates from the socket.
@@ -92,7 +101,7 @@ const useQuestionPage = () => {
       setQlist(prevQlist => prevQlist.map(q => (q._id === question._id ? question : q)));
     };
 
-    fetchData();
+
 
     socket.on('questionUpdate', handleQuestionUpdate);
     socket.on('answerUpdate', handleAnswerUpdate);
