@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }
       sx={{
         backgroundColor: 'background.default',
         width: `calc(100% - ${sidebarWidth}px)`,
-        transition: 'width 0.3s ease',
+        transition: 'width 0.5s ease',
       }}>
       <Toolbar>
         <TextField

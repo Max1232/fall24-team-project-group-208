@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
+import { Outlet } from 'react-router-dom';
 import SideBarNav from '../sideBarNav';
 import Header from '../header';
 
@@ -14,15 +14,34 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ toggleTheme, isDarkMode }) => {
   const [sidebarWidth, setSidebarWidth] = useState(250);
+  const [prevSidebarWidth, setPrevSidebarWidth] = useState(250);
+  const [transitionTime, setTransitionTime] = useState('0.8s');
 
   const handleSidebarToggle = () => {
-    setSidebarWidth(sidebarWidth === 250 ? 90 : 250);
+    const newWidth = sidebarWidth === 250 ? 90 : 250;
+    setPrevSidebarWidth(sidebarWidth);
+    setSidebarWidth(newWidth);
   };
+
+  useEffect(() => {
+    if (sidebarWidth < prevSidebarWidth) {
+      setTransitionTime('0.5s');
+    } else {
+      setTransitionTime('0.8s');
+    }
+  }, [sidebarWidth, prevSidebarWidth]);
 
   return (
     <Box display='flex'>
-      <SideBarNav onToggle={handleSidebarToggle} />
-      <Box flexGrow={1} ml={`${sidebarWidth}px`} sx={{ transition: 'margin-left 0.6s ease' }}>
+      <Box
+        sx={{
+          transition: `width ${transitionTime} ease`,
+          backgroundColor: 'primary.light',
+        }}
+      >
+        <SideBarNav onToggle={handleSidebarToggle} />
+      </Box>
+      <Box flexGrow={1} ml={`${sidebarWidth}px`} sx={{ transition: `margin-left ${transitionTime} ease` }}>
         <Box id='main' className='main' mt={8}>
           <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} sidebarWidth={sidebarWidth} />
           <Box id='right_main' className='right_main'>
