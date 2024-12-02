@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import express, { Response } from 'express';
 import admin from 'firebase-admin';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 import { AuthRequest, FakeSOSocket, ProfileCreatedPayload } from '../types';
 import UserModel from '../models/users';
-
-// Initialize Firebase Admin SDK
 
 dotenv.config();
 
@@ -15,8 +11,6 @@ const SERVICE_ACCOUNT_PATH = process.env.AUTH_KEY;
 if (!SERVICE_ACCOUNT_PATH) {
   throw new Error('AUTH_KEY is not defined in the environment variables');
 }
-
-// eslint-disable-next-line import/no-dynamic-require
 const serviceAccount = require(path.resolve(SERVICE_ACCOUNT_PATH));
 
 if (!admin.apps.length) {
@@ -31,7 +25,7 @@ if (!admin.apps.length) {
  * @param socket - The WebSocket server instance for real-time updates
  * @returns Express router configured with auth routes
  */
-const authController = (socket: FakeSOSocket) => {
+const authController = (socket: FakeSOSocket): express.Router => {
   const router = express.Router();
 
   /**
@@ -39,19 +33,16 @@ const authController = (socket: FakeSOSocket) => {
    */
   const verifyToken = async (req: AuthRequest, res: Response, next: express.NextFunction) => {
     const token = req.headers.authorization?.split('Bearer ')[1];
-
     if (!token) {
-      res.status(401).send('No token provided');
-      return;
+      return res.status(401).send('No token provided');
     }
-
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
       req.user = { uid: decodedToken.uid };
       next();
     } catch (error) {
       socket.emit('authError', { message: 'Invalid token' });
-      res.status(401).send('Invalid token');
+      next(error);
     }
   };
 

@@ -4,6 +4,11 @@ import useUserContext from './useUserContext';
 import { Answer, OrderType, Question } from '../types';
 import { getQuestionsByFilter } from '../services/questionService';
 
+/**
+ * Custom hook to manage the state and logic for the question page.
+ * It handles fetching questions based on search parameters and updates the state accordingly.
+ * It also sets up socket event listeners to handle real-time updates to questions and answers.
+ */
 const useQuestionPage = () => {
   const { socket } = useUserContext();
   const [searchParams] = useSearchParams();

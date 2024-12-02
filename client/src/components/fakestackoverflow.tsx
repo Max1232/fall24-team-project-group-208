@@ -18,8 +18,16 @@ import { lightTheme, darkTheme } from '../theme';
 import QuizPage from './main/quizPage';
 import AuthService from '../services/authService';
 
+/**
+ * Main component for the FakeStackOverflow application.
+ * It handles user authentication, theme switching, and routing.
+ *
+ * @param {Object} props - The component props.
+ * @param {FakeSOSocket | null} props.socket - The socket instance for real-time communication.
+ * @returns {JSX.Element} The rendered component.
+ */
 const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
-  // Initialize from session storage immediately
+  // Initialize user state from session storage
   const [user, setUser] = useState<User | null>(() => {
     const storedData = sessionStorage.getItem(`user_data_${WINDOW_ID}`);
     try {
@@ -77,7 +85,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
       },
     );
 
-    // eslint-disable-next-line consistent-return
+    // Cleanup function to unsubscribe from auth state changes and disconnect socket
     return () => {
       unsubscribe();
       if (socket) {
@@ -86,11 +94,15 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
     };
   }, [socket]);
 
+  /**
+   * Handle setting the user state and updating session storage.
+   *
+   * @param {User | null} newUser - The new user data.
+   */
   const handleSetUser = (newUser: User | null) => {
     setUser(newUser);
     if (newUser) {
       sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(newUser));
-      sessionStorage.setItem('auth_window_id', WINDOW_ID);
     } else {
       sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
       sessionStorage.removeItem('auth_window_id');
@@ -106,6 +118,9 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
     );
   }
 
+  /**
+   * Toggle the theme between light and dark mode.
+   */
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
@@ -135,7 +150,6 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
             <Route path='/home' element={<QuestionPage />} />
             <Route path='tags' element={<TagPage />} />
             <Route path='/question/:qid' element={<AnswerPage />} />
-
             <Route path='/quiz/:qid' element={<QuizQuestionPage />} />
             <Route path='/profile' element={<ProfilePage />} />
             <Route path='/quizzes' element={<QuizPage />} />

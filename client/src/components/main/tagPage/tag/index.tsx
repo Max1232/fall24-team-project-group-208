@@ -8,19 +8,40 @@ interface TagProps {
   clickTag: (tagName: string) => void;
 }
 
+/**
+ * Component to display a tag with its name and description.
+ * It also provides a modal to view more details about the tag.
+ *
+ * @param {TagProps} props - The properties for the TagView component.
+ * @param {TagData} props.t - The tag data containing the name and description.
+ * @param {function} props.clickTag - Function to handle the click event on the tag.
+ * @returns {JSX.Element} The rendered TagView component.
+ */
 const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
   const { tag } = useTagSelected(t);
   const [open, setOpen] = React.useState(false);
 
+  /**
+   * Handle the event to open the modal.
+   *
+   * @param {React.MouseEvent} e - The mouse event.
+   */
   const handleOpen = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setOpen(true);
   }, []);
 
+  /**
+   * Handle the event to close the modal.
+   */
   const handleClose = useCallback(() => {
     setOpen(false);
   }, []);
 
+  /**
+   * Handle the event to click on the tag.
+   * It triggers the clickTag function and closes the modal.
+   */
   const handleTagClick = useCallback(() => {
     clickTag(t.name);
     handleClose();
