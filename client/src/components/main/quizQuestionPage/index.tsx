@@ -14,33 +14,27 @@ import useAnswerPage from '../../../hooks/useAnswerPage';
  */
 const AnswerPage: React.FC = () => {
   const { question } = useAnswerPage();
-  const [checkboxLocked, setCheckboxLocked] = React.useState(false);
   const [selectedAnswerId, setSelectedAnswerId] = React.useState<string | null>(null);
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [isCorrect, setIsCorrect] = React.useState(false);
 
   const handleSubmitClick = () => {
-    if (!question || !selectedAnswerId) {
+    if (!question || !selectedAnswerId || !question.correctAnswerId) {
       setShowFeedback(true);
       setIsCorrect(false);
       return;
     }
 
+    const correct = selectedAnswerId === question.correctAnswerId;
+    setIsCorrect(correct);
     setShowFeedback(true);
 
-    if (question.correctAnswerId) {
-      const correct = selectedAnswerId === question.correctAnswerId;
-      console.log('Answer check:', {
-        selected: selectedAnswerId,
-        correct: question.correctAnswerId,
-        isMatch: correct,
-      });
-      setIsCorrect(correct);
+    if (!correct) {
+      setSelectedAnswerId(null);
     }
   };
 
-  const handleCheckboxChange = (answerId: string) => {
-    setCheckboxLocked(true);
+  const handleAnswerSelect = (answerId: string) => {
     setSelectedAnswerId(answerId);
   };
 
@@ -49,18 +43,21 @@ const AnswerPage: React.FC = () => {
   };
 
   const getFeedbackMessage = () => {
-    if (!selectedAnswerId) return 'Please select an answer first';
-    if (!question?.correctAnswerId) return 'No correct answer set for this question';
+    if (!selectedAnswerId) {
+      return 'Incorrect, try again';
+    }
+    if (!question || !question.correctAnswerId) {
+      return 'No correct answer set';
+    }
     return isCorrect ? '🎉 Correct!' : 'Incorrect, try again';
   };
 
-  if (!question) {
+  if (!question)
     return (
       <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh'>
         <CircularProgress color='primary' />
       </Box>
     );
-  }
 
   return (
     <Box p={3}>
@@ -81,12 +78,16 @@ const AnswerPage: React.FC = () => {
           ansBy={a.ansBy}
           id={a._id || ''}
           meta={getMetaData(new Date(a.ansDateTime))}
-          checkboxLocked={checkboxLocked}
-          onCheckboxChange={() => handleCheckboxChange(a._id || '')}
+          selected={a._id?.toString() === selectedAnswerId}
+          onSelect={handleAnswerSelect}
         />
       ))}
       <Box mt={3} display='flex' justifyContent='center'>
-        <Button variant='contained' color='primary' onClick={handleSubmitClick}>
+        <Button
+          variant='contained'
+          color='primary'
+          onClick={handleSubmitClick}
+          disabled={!selectedAnswerId}>
           Submit Answer
         </Button>
       </Box>
