@@ -37,11 +37,13 @@ const Layout: React.FC<LayoutProps> = ({ toggleTheme, isDarkMode }) => {
         sx={{
           transition: `width ${transitionTime} ease`,
           backgroundColor: 'primary.light',
-        }}
-      >
+        }}>
         <SideBarNav onToggle={handleSidebarToggle} />
       </Box>
-      <Box flexGrow={1} ml={`${sidebarWidth}px`} sx={{ transition: `margin-left ${transitionTime} ease` }}>
+      <Box
+        flexGrow={1}
+        ml={`${sidebarWidth}px`}
+        sx={{ transition: `margin-left ${transitionTime} ease` }}>
         <Box id='main' className='main' mt={8}>
           <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} sidebarWidth={sidebarWidth} />
           <Box id='right_main' className='right_main'>

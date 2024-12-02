@@ -13,7 +13,7 @@ dotenv.config();
 
 const SERVICE_ACCOUNT_PATH = process.env.AUTH_KEY;
 if (!SERVICE_ACCOUNT_PATH) {
-  throw new Error('KEY_PATH is not defined in the environment variables');
+  throw new Error('AUTH_KEY is not defined in the environment variables');
 }
 
 // eslint-disable-next-line import/no-dynamic-require

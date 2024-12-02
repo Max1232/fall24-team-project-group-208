@@ -66,7 +66,7 @@ const QuestionView = ({ q }: QuestionProps) => {
       <CardContent>
         <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
           <Box display='flex' alignItems='center'>
-            <Box sx={{pr: 4}}>
+            <Box sx={{ pr: 4 }}>
               <VoteComponent question={q} />
             </Box>
             <Box className='postStats' mr={2} mt={1} alignContent='center'>
