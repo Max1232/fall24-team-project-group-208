@@ -51,11 +51,11 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
   return (
     <Box className='comment-section'>
       <Button
-        variant='contained'
+        variant='outlined'
         color='primary'
         onClick={() => setShowComments(!showComments)}
         className='toggle-button'>
-        {showComments ? 'Hide Comments' : 'Show Comments'}
+        {showComments ? 'Hide Replies' : 'Show Replies'}
       </Button>
 
       {showComments && (
@@ -75,7 +75,7 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
                 </ListItem>
               ))
             ) : (
-              <Typography className='no-comments'>No comments yet.</Typography>
+              <Typography className='no-comments'>No replies yet.</Typography>
             )}
           </List>
 
@@ -96,7 +96,7 @@ const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => 
               onClick={handleAddCommentClick}
               className='add-comment-button'
               sx={{ mt: 1 }}>
-              Add Comment
+              Add Reply
             </Button>
           </Box>
         </Box>

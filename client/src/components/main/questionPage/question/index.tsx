@@ -4,6 +4,7 @@ import { Card, CardContent, Typography, Button, Box } from '@mui/material';
 import { Visibility, CheckCircle } from '@mui/icons-material';
 import { getMetaData } from '../../../../tool';
 import { Question } from '../../../../types';
+import VoteComponent from '../../voteComponent';
 
 /**
  * Interface representing the props for the Question component.
@@ -65,6 +66,9 @@ const QuestionView = ({ q }: QuestionProps) => {
       <CardContent>
         <Box display='flex' justifyContent='space-between' alignItems='center' mb={2}>
           <Box display='flex' alignItems='center'>
+            <Box sx={{pr: 4}}>
+              <VoteComponent question={q} />
+            </Box>
             <Box className='postStats' mr={2} mt={1} alignContent='center'>
               <Typography fontWeight={600}>{q.upVotes.length} votes</Typography>
               <Typography>
