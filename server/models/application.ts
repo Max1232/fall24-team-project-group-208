@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { ObjectId } from 'mongodb';
 import { QueryOptions } from 'mongoose';
 import {
@@ -272,7 +271,6 @@ export const filterQuestionsBySearch = (qlist: Question[], search: string): Ques
 
 export const filterQuestionsByTag = (qlist: Question[], search: string): Question[] => {
   if (!qlist || qlist.length === 0) {
-    console.log('No questions found');
     return [];
   }
   // Takes the list of questions qlist and filters them by the searchTag
@@ -434,8 +432,6 @@ const updateUser = async (
   amount: number,
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    console.log('Attempting to update user attributes...');
-
     if (attribute === 'reputation') {
       // Update both reputation and levelProgress together
       await UserModel.updateOne(
@@ -460,7 +456,6 @@ const updateUser = async (
 
     return { success: true };
   } catch (error) {
-    console.error('Error when updating user attributes:', error);
     return { success: false, error: 'Error when updating user attributes' };
   }
 };
@@ -473,26 +468,20 @@ const updateUser = async (
  * @returns {Promise<QuestionResponse>} - The saved question, or error message
  */
 export const saveQuestion = async (question: Question): Promise<QuestionResponse> => {
-  console.log('Attempting to save a question...');
   try {
     const result = await QuestionModel.create(question);
-    console.log('Question saved successfully, trying to update user reputation...');
     if (result) {
       const reputationResult = await updateUser(question.askedBy, 'reputation', 2);
       if (!reputationResult.success) {
-        console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
       }
       const saveQuestionResult = await updateUser(question.askedBy, 'questions', 1);
       if (!saveQuestionResult.success) {
-        console.log(saveQuestionResult.error);
         return { error: saveQuestionResult.error || 'Unknown error' };
       }
-      console.log('User attributes reputation & questions updated successfully');
     }
     return result;
   } catch (error) {
-    console.log('Error when saving a question:', error);
     return { error: 'Error when saving a question' };
   }
 };
@@ -510,15 +499,12 @@ export const saveAnswer = async (answer: Answer): Promise<AnswerResponse> => {
     if (result) {
       const reputationResult = await updateUser(answer.ansBy, 'reputation', 5);
       if (!reputationResult.success) {
-        console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
       }
       const saveAnswerResult = await updateUser(answer.ansBy, 'answers', 1);
       if (!saveAnswerResult.success) {
-        console.log(saveAnswerResult.error);
         return { error: saveAnswerResult.error || 'Unknown error' };
       }
-      console.log('User attributes reputation & answers updated successfully');
     }
     return result;
   } catch (error) {
@@ -539,15 +525,12 @@ export const saveComment = async (comment: Comment): Promise<CommentResponse> =>
     if (result) {
       const reputationResult = await updateUser(comment.commentBy, 'reputation', 1);
       if (!reputationResult.success) {
-        console.log(reputationResult.error);
         return { error: reputationResult.error || 'Unknown error' };
       }
       const saveCommentResult = await updateUser(comment.commentBy, 'comments', 1);
       if (!saveCommentResult.success) {
-        console.log(saveCommentResult.error);
         return { error: saveCommentResult.error || 'Unknown error' };
       }
-      console.log('User attributes reputation & comments updated successfully');
     }
     return result;
   } catch (error) {
@@ -595,10 +578,6 @@ export const processTags = async (tags: Tag[]): Promise<Tag[]> => {
 
     return processedTags;
   } catch (error: unknown) {
-    // Log the error for debugging purposes
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    // eslint-disable-next-line no-console
-    console.log('An error occurred while adding tags:', errorMessage);
     return [];
   }
 };
@@ -790,7 +769,6 @@ export const getUserData = async (username: string): Promise<User | null> => {
       .populate('comments');
     return user;
   } catch (error) {
-    console.error('Error fetching user data:', error);
     return null;
   }
 };
@@ -868,10 +846,6 @@ export const updateQuestionTagsAndIndex = async (
     // Get the answer ID at the specified index
     const correctAnswerId = question.answers[numericIndex]._id?.toString();
 
-    console.log('--------- Update Operation Debug ---------');
-    console.log('Question ID:', qid);
-    console.log('Selected answer ID:', correctAnswerId);
-
     const result = await QuestionModel.findByIdAndUpdate(
       qid,
       {
@@ -889,11 +863,6 @@ export const updateQuestionTagsAndIndex = async (
       { path: 'answers', model: AnswerModel },
     ]);
 
-    console.log('Updated question result:', {
-      id: result?._id,
-      correctAnswerId: result?.correctAnswerId,
-    });
-
     if (!result) {
       throw new Error('Question not found');
     }
@@ -906,7 +875,6 @@ export const updateQuestionTagsAndIndex = async (
 
     return populatedQuestion as Question;
   } catch (error) {
-    console.error('Error updating question:', error);
     return { error: `Error updating question: ${(error as Error).message}` };
   }
 };
