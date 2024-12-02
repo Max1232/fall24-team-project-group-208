@@ -137,26 +137,6 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
             </Collapse>
           </ListItem>
         </NavLink>
-        <NavLink
-          to='/settings'
-          id='menu_settings'
-          className={({ isActive }) => `menu_button ${isActive ? 'menu_selected' : ''}`}
-          style={{
-            textDecoration: 'none',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}>
-          <ListItem component='li'>
-            <ListItemIcon>
-              <Settings sx={{ fontSize: 30, color: '#fff' }} />
-            </ListItemIcon>
-            <Collapse in={expanded} orientation='horizontal'>
-              <ListItemText primary='Settings' sx={{ color: expanded ? '#fff' : 'transparent' }} />
-            </Collapse>
-          </ListItem>
-        </NavLink>
       </Box>
       <Box
         display='flex'
