@@ -13,6 +13,7 @@ import authController from './controller/auth';
 import userController from './controller/user';
 import { FakeSOSocket } from './types';
 import path from 'path';
+import quizController from "./controller/quiz";
 
 dotenv.config();
 
@@ -78,7 +79,7 @@ app.use('/question', questionController(socket));
 app.use('/tag', tagController());
 app.use('/answer', answerController(socket));
 app.use('/comment', commentController(socket));
-//app.use('/auth', authController);
+app.use('/quiz', quizController(socket));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build', 'index.html'));

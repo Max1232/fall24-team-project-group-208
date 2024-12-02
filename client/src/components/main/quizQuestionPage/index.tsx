@@ -18,7 +18,7 @@ const AnswerPage: React.FC = () => {
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [isCorrect, setIsCorrect] = React.useState(false);
 
-  const handleSubmitClick = () => {
+  const handleSubmitClick = async () => {
     if (!question || !selectedAnswerId || !question.correctAnswerId) {
       setShowFeedback(true);
       setIsCorrect(false);
@@ -26,6 +26,31 @@ const AnswerPage: React.FC = () => {
     }
 
     const correct = selectedAnswerId === question.correctAnswerId;
+    console.log('Answer check:', {
+      selected: selectedAnswerId,
+      correct: question.correctAnswerId,
+      isMatch: correct,
+      username: question.askedBy,
+    });
+
+    if (correct) {
+      try {
+        const response = await fetch('http://localhost:8000/quiz/reputation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: question.askedBy,
+            isCorrect: true,
+          }),
+        });
+        console.log('Reputation update response:', await response.json());
+      } catch (error) {
+        console.error('Failed to update reputation:', error);
+      }
+    }
+
     setIsCorrect(correct);
     setShowFeedback(true);
 

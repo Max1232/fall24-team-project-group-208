@@ -231,12 +231,6 @@ export interface ProfileCreatedPayload {
   joinedDate: Date;
   role: number;
 }
-
-/**
- * Type representing the possible responses for an Auth-related operation.
- */
-export type AuthResponse = User | { error: string };
-
 /**
  * Interface representing the possible events that the server can emit to the client.
  */
@@ -249,6 +243,7 @@ export interface ServerToClientEvents {
   authUpdate: (auth: AuthUpdatePayload) => void;
   profileCreated: (profile: ProfileCreatedPayload) => void;
   authError: (error: { message: string }) => void;
+  reputationUpdate: (data: { username: string }) => void;
 }
 
 /**

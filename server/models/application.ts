@@ -868,3 +868,17 @@ export const updateQuestionTagsAndIndex = async (
     return { error: `Error updating question: ${(error as Error).message}` };
   }
 };
+
+export const updateQuizReputation = async (
+  username: string,
+  isCorrect: boolean,
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    if (isCorrect) {
+      return await updateUser(username, 'reputation', 10); // Award 5 points for correct answer
+    }
+    return { success: true }; // No points for incorrect answers
+  } catch (error) {
+    return { success: false, error: 'Failed to update quiz reputation' };
+  }
+};
