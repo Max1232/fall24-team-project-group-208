@@ -48,13 +48,13 @@ const VoteComponent: React.FC<VoteComponentProps> = ({ question }) => {
     <Box display='flex' flexDirection='column' alignItems='center'>
       <IconButton
         onClick={event => handleVote(event, 'upvote')}
-        color={voted === 1 ? 'success' : 'default'}>
+        sx={{ color: voted === 1 ? 'success.main' : 'primary.light' }}>
         <ArrowCircleUpTwoToneIcon sx={{ fontSize: 30 }} />
       </IconButton>
       <Typography>{count}</Typography>
       <IconButton
         onClick={event => handleVote(event, 'downvote')}
-        color={voted === -1 ? 'error' : 'default'}>
+        sx={{ color: voted === -1 ? 'error.main' : 'primary.light' }}>
         <ArrowCircleDownTwoToneIcon sx={{ fontSize: 30 }} />
       </IconButton>
     </Box>
