@@ -1,15 +1,19 @@
 import React from 'react';
-import { DialogContent, DialogTitle, TextField, DialogActions, Button } from '@mui/material';
+import {
+  DialogContent,
+  DialogTitle,
+  TextField,
+  DialogActions,
+  Button,
+  Alert,
+  Snackbar,
+} from '@mui/material';
 import useNewQuestion from '../../../hooks/useNewQuestion';
 
 interface NewQuestionPageProps {
   onClose: () => void;
 }
 
-/**
- * NewQuestionPage component allows users to submit a new question with a title,
- * description, tags, and username.
- */
 const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
   const {
     title,
@@ -22,11 +26,16 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
     textErr,
     tagErr,
     postQuestion,
+    showAlert,
+    alertMessage,
+    setShowAlert,
   } = useNewQuestion();
 
-  const handleSubmit = () => {
-    postQuestion();
-    onClose();
+  const handleSubmit = async () => {
+    const success = await postQuestion();
+    if (success) {
+      onClose(); // Only close the dialog if the question was successfully posted
+    }
   };
 
   return (
@@ -75,6 +84,11 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
           Post Question
         </Button>
       </DialogActions>
+      <Snackbar open={showAlert} autoHideDuration={3000} onClose={() => setShowAlert(false)}>
+        <Alert severity='error' onClose={() => setShowAlert(false)}>
+          {alertMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };

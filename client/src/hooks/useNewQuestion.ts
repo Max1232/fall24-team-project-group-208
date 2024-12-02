@@ -5,51 +5,47 @@ import { addQuestion } from '../services/questionService';
 import useUserContext from './useUserContext';
 import { Question } from '../types';
 
-/**
- * Custom hook to handle question submission and form validation
- *
- * @returns title - The current value of the title input.
- * @returns text - The current value of the text input.
- * @returns tagNames - The current value of the tags input.
- * @returns titleErr - Error message for the title field, if any.
- * @returns textErr - Error message for the text field, if any.
- * @returns tagErr - Error message for the tag field, if any.
- * @returns postQuestion - Function to validate the form and submit a new question.
- */
 const useNewQuestion = () => {
   const navigate = useNavigate();
   const { user } = useUserContext();
-  const [title, setTitle] = useState<string>('');
-  const [text, setText] = useState<string>('');
-  const [tagNames, setTagNames] = useState<string>('');
+  const [title, setTitle] = useState('');
+  const [text, setText] = useState('');
+  const [tagNames, setTagNames] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
-  const [titleErr, setTitleErr] = useState<string>('');
-  const [textErr, setTextErr] = useState<string>('');
-  const [tagErr, setTagErr] = useState<string>('');
+  const [titleErr, setTitleErr] = useState('');
+  const [textErr, setTextErr] = useState('');
+  const [tagErr, setTagErr] = useState('');
 
-  /**
-   * Function to validate the form before submitting the question.
-   *
-   * @returns boolean - True if the form is valid, false otherwise.
-   */
+  const displayError = (message: string) => {
+    setAlertMessage(message);
+    setShowAlert(true);
+  };
+
   const validateForm = (): boolean => {
     let isValid = true;
+    let errorMessage = '';
 
     if (!title) {
-      setTitleErr('Title cannot be empty');
+      errorMessage = 'Title cannot be empty';
+      setTitleErr(errorMessage);
       isValid = false;
     } else if (title.length > 100) {
-      setTitleErr('Title cannot be more than 100 characters');
+      errorMessage = 'Title cannot be more than 100 characters';
+      setTitleErr(errorMessage);
       isValid = false;
     } else {
       setTitleErr('');
     }
 
     if (!text) {
-      setTextErr('Question text cannot be empty');
+      errorMessage = 'Question text cannot be empty';
+      setTextErr(errorMessage);
       isValid = false;
     } else if (!validateHyperlink(text)) {
-      setTextErr('Invalid hyperlink format.');
+      errorMessage = 'Invalid hyperlink format';
+      setTextErr(errorMessage);
       isValid = false;
     } else {
       setTextErr('');
@@ -57,33 +53,34 @@ const useNewQuestion = () => {
 
     const tagnames = tagNames.split(' ').filter(tagName => tagName.trim() !== '');
     if (tagnames.length === 0) {
-      setTagErr('Should have at least 1 tag');
+      errorMessage = 'Should have at least 1 tag';
+      setTagErr(errorMessage);
       isValid = false;
     } else if (tagnames.length > 5) {
-      setTagErr('Cannot have more than 5 tags');
+      errorMessage = 'Cannot have more than 5 tags';
+      setTagErr(errorMessage);
       isValid = false;
     } else {
-      setTagErr('');
+      for (const tagName of tagnames) {
+        if (tagName.length > 20) {
+          errorMessage = 'New tag length cannot be more than 20';
+          setTagErr(errorMessage);
+          isValid = false;
+          break;
+        }
+      }
+      if (isValid) setTagErr('');
     }
 
-    for (const tagName of tagnames) {
-      if (tagName.length > 20) {
-        setTagErr('New tag length cannot be more than 20');
-        isValid = false;
-        break;
-      }
+    if (!isValid) {
+      displayError(errorMessage);
     }
 
     return isValid;
   };
 
-  /**
-   * Function to post a question to the server.
-   *
-   * @returns title - The current value of the title input.
-   */
-  const postQuestion = async () => {
-    if (!validateForm()) return;
+  const postQuestion = async (): Promise<boolean> => {
+    if (!validateForm()) return false;
 
     const tagnames = tagNames.split(' ').filter(tagName => tagName.trim() !== '');
     const tags = tagnames.map(tagName => ({
@@ -104,10 +101,17 @@ const useNewQuestion = () => {
       comments: [],
     };
 
-    const res = await addQuestion(question);
-
-    if (res && res._id) {
-      navigate('/home');
+    try {
+      const res = await addQuestion(question);
+      if (res && res._id) {
+        navigate('/home');
+        return true; // Indicate success
+      }
+      displayError('Failed to post question. Please try again.');
+      return false;
+    } catch (error) {
+      displayError('An error occurred while posting the question.');
+      return false;
     }
   };
 
@@ -122,6 +126,9 @@ const useNewQuestion = () => {
     textErr,
     tagErr,
     postQuestion,
+    showAlert,
+    setShowAlert,
+    alertMessage,
   };
 };
 

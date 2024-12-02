@@ -39,17 +39,6 @@ const authenticateRequest = (req: Request, res: Response, next: Function) => {
     return next(); // Allow requests without auth header for now
   }
 
-  // If you want to verify Firebase tokens on the server side:
-  // const token = authHeader.split('Bearer ')[1];
-  // admin.auth().verifyIdToken(token)
-  //   .then(decodedToken => {
-  //     req.user = decodedToken;
-  //     next();
-  //   })
-  //   .catch(error => {
-  //     res.status(401).json({ error: 'Unauthorized' });
-  //   });
-
   next();
 };
 
