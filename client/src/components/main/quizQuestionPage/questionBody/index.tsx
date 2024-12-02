@@ -31,6 +31,8 @@ interface QuestionBodyProps {
  * @param text The content of the question.
  * @param askby The username of the question's author.
  * @param meta Additional metadata related to the question.
+ * @param questionID The ID of the question.
+ * @param question The question object containing details about the question.
  */
 const QuestionBody: React.FC<QuestionBodyProps> = ({
   views,

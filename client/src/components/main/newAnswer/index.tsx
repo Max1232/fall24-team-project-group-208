@@ -4,6 +4,8 @@ import useAnswerForm from '../../../hooks/useAnswerForm';
 
 /**
  * NewAnswerModal component allows users to submit an answer to a specific question.
+ * The modal contains a text field for the answer text and a button to submit the answer.
+ * Throws an error if the text field is empty.
  */
 interface NewAnswerModalProps {
   open: boolean;
@@ -14,7 +16,7 @@ const NewAnswerModal: React.FC<NewAnswerModalProps> = ({ open, onClose }) => {
   const { text, textErr, setText, postAnswer } = useAnswerForm();
 
   const handleSubmit = () => {
-    postAnswer();
+    postAnswer().then(() => {});
     onClose();
   };
 

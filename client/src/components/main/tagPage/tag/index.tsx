@@ -17,7 +17,7 @@ interface TagProps {
  * @param {function} props.clickTag - Function to handle the click event on the tag.
  * @returns {JSX.Element} The rendered TagView component.
  */
-const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
+const TagView: React.FC<TagProps> = ({ t, clickTag }: TagProps): React.JSX.Element => {
   const { tag } = useTagSelected(t);
   const [open, setOpen] = React.useState(false);
 

@@ -1,17 +1,7 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Button,
-  Dialog,
-  // DialogTitle,
-  // DialogContent,
-  // DialogActions,
-  // TextField,
-} from '@mui/material';
+import { Box, Typography, Button, Dialog } from '@mui/material';
 import OrderButton from './orderButton';
 import { OrderType, orderTypeDisplayName } from '../../../../types';
-// import useNewQuestion from '../../../../hooks/useNewQuestion';
 import NewQuestionPage from '../../newQuestion';
 
 /**

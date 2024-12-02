@@ -7,7 +7,6 @@ import {
   Button,
   CircularProgress,
   TextField,
-  InputAdornment,
   IconButton,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
@@ -20,6 +19,9 @@ import useHeader from '../../hooks/useHeader';
  * Header component that renders the main title, search bar, and authentication status.
  * The search bar allows the user to input a query and navigate to the search results page
  * when they press Enter.
+ * @param {Function} toggleTheme - Function to toggle the theme between light and dark mode.
+ * @param {Boolean} isDarkMode - Boolean value to determine if the theme is in dark mode.
+ * @param {Number} sidebarWidth - Number value to determine the width of the sidebar.
  */
 interface HeaderProps {
   toggleTheme: () => void;
@@ -64,13 +66,11 @@ const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }
               },
             },
           }}
-          InputProps={{
+          slots={{
             startAdornment: (
-              <InputAdornment position='start'>
-                <IconButton>
-                  <SearchIcon color='primary' />
-                </IconButton>
-              </InputAdornment>
+              <IconButton>
+                <SearchIcon color='primary' />
+              </IconButton>
             ),
           }}
         />

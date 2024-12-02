@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Button, Dialog } from '@mui/material';
+import { Box, Typography, Button, Dialog } from '@mui/material';
 import TagView from './tag';
 import useTagPage from '../../../hooks/useTagPage';
 import NewQuestionPage from '../newQuestion';
@@ -29,13 +29,13 @@ const TagPage = () => {
           Ask a Question
         </Button>
       </Box>
-      <Grid container spacing={2}>
+      <Box display='grid' gridTemplateColumns='repeat(auto-fill, minmax(300px, 1fr))' gap={2}>
         {tlist.map((t, idx) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={idx}>
+          <Box key={idx}>
             <TagView t={t} clickTag={clickTag} />
-          </Grid>
+          </Box>
         ))}
-      </Grid>
+      </Box>
       <Dialog open={open} fullWidth maxWidth='md'>
         <NewQuestionPage onClose={handleClose} />
       </Dialog>

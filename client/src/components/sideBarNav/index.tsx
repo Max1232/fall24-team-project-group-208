@@ -22,6 +22,7 @@ import {
  * The SideBarNav component has five menu items: "Questions", "Tags", "Quizzes", "Settings", and "Profile".
  * It highlights the currently selected item based on the active page and
  * triggers corresponding functions when the menu items are clicked.
+ * The component also has a toggle button to expand or collapse the sidebar.
  */
 interface SideBarNavProps {
   onToggle: () => void;

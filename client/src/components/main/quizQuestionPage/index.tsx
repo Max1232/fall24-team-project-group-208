@@ -26,16 +26,10 @@ const AnswerPage: React.FC = () => {
     }
 
     const correct = selectedAnswerId === question.correctAnswerId;
-    console.log('Answer check:', {
-      selected: selectedAnswerId,
-      correct: question.correctAnswerId,
-      isMatch: correct,
-      username: question.askedBy,
-    });
 
     if (correct) {
       try {
-        const response = await fetch('http://localhost:8000/quiz/reputation', {
+        await fetch('http://localhost:8000/quiz/reputation', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -45,9 +39,8 @@ const AnswerPage: React.FC = () => {
             isCorrect: true,
           }),
         });
-        console.log('Reputation update response:', await response.json());
       } catch (error) {
-        console.error('Failed to update reputation:', error);
+        throw new Error('Error updating reputation');
       }
     }
 

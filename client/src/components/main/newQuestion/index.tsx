@@ -14,7 +14,16 @@ interface NewQuestionPageProps {
   onClose: () => void;
 }
 
-const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
+/**
+ * NewQuestionPage component
+ *
+ * This component renders a dialog for asking a new question. It includes fields for the question title,
+ * text, and tags, and provides validation feedback. It also handles the submission of the new question.
+ *
+ * @param {NewQuestionPageProps} props - The props for the component
+ * @param {() => void} props.onClose - Function to call when the dialog is closed
+ */
+const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestionPageProps) => {
   const {
     title,
     setTitle,
@@ -31,6 +40,10 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }) => {
     setShowAlert,
   } = useNewQuestion();
 
+  /**
+   * Handles the submission of the new question.
+   * If the question is successfully posted, the dialog is closed.
+   */
   const handleSubmit = async () => {
     const success = await postQuestion();
     if (success) {

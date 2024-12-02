@@ -6,6 +6,8 @@ import Header from '../header';
 
 /**
  * Main component represents the layout of the main page, including a sidebar and the main content area.
+ * @param {Function} toggleTheme - Function to toggle the theme of the application.
+ * @param {Boolean} isDarkMode - Boolean value to determine if the application is in dark mode.
  */
 interface LayoutProps {
   toggleTheme: () => void;

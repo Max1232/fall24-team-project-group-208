@@ -4,9 +4,9 @@ import './index.css';
 /**
  * Blobs component to render a lava lamp-like animation using CSS and SVG filters.
  *
- * @returns {JSX.Element} The rendered Blobs component.
+ * @returns {React.JSX.Element} The rendered Blobs component.
  */
-const Blobs: React.FC = () => (
+const Blobs: React.FC = (): React.JSX.Element => (
   <div className='blobs-container'>
     <div className='lamp'>
       <div className='lava'>

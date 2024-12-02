@@ -26,7 +26,7 @@ import AuthService from '../services/authService';
  * @param {FakeSOSocket | null} props.socket - The socket instance for real-time communication.
  * @returns {JSX.Element} The rendered component.
  */
-const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
+const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }): React.JSX.Element => {
   // Initialize user state from session storage
   const [user, setUser] = useState<User | null>(() => {
     const storedData = sessionStorage.getItem(`user_data_${WINDOW_ID}`);
@@ -79,7 +79,7 @@ const FakeStackOverflow = ({ socket }: { socket: FakeSOSocket | null }) => {
         }
         setLoading(false);
       },
-      error => {
+      () => {
         setLoading(false);
         setUser(null);
       },

@@ -28,9 +28,10 @@ const VoteComponent: React.FC<VoteComponentProps> = ({ question }) => {
   /**
    * Function to handle upvoting or downvoting a question.
    *
+   * @param _event
    * @param type - The type of vote, either 'upvote' or 'downvote'.
    */
-  const handleVote = async (event: React.MouseEvent<HTMLButtonElement>, type: string) => {
+  const handleVote = async (_event: React.MouseEvent<HTMLButtonElement>, type: string) => {
     try {
       if (question._id) {
         if (type === 'upvote') {

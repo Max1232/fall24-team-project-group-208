@@ -19,13 +19,11 @@ interface CommentSectionProps {
  * CommentSection component shows the users all the comments and allows the users add more comments.
  *
  * @param comments: an array of Comment objects
- * @param handleAddComment: function to handle the addition of a new comment
  */
 const CommentSection = ({ comments, handleAddComment }: CommentSectionProps) => {
   const { user } = useUserContext();
   const [text, setText] = useState<string>('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [textErr, setTextErr] = useState<string>('');
+  const [, setTextErr] = useState<string>('');
   const [showComments, setShowComments] = useState<boolean>(false);
 
   /**
