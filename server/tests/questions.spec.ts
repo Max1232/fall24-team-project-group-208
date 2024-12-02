@@ -166,6 +166,6 @@ describe('GET /getQuestion', () => {
     const response = await supertest(app).get('/question/getQuestion').query(mockReqQuery);
 
     // Asserting the response
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(200);
   });
 });

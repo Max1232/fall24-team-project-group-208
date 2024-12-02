@@ -3,6 +3,12 @@ import { TextField, Button, Typography, Container, Paper, Box } from '@mui/mater
 import useLogin from '../../hooks/useLogin';
 import Blobs from './blobs';
 
+/**
+ * Login component for the DevAsk application.
+ * It handles user authentication, including sign-in and account creation.
+ *
+ * @returns {JSX.Element} The rendered Login component.
+ */
 const Login: React.FC = () => {
   const {
     email,

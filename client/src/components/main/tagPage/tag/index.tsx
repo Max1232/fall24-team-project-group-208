@@ -1,33 +1,51 @@
-import React, { useState } from 'react';
+import React, { useCallback, memo } from 'react';
 import { Card, CardContent, Typography, Box, Modal, Button } from '@mui/material';
 import { TagData } from '../../../../types';
 import useTagSelected from '../../../../hooks/useTagSelected';
 
-/**
- * Props for the Tag component.
- *
- * t - The tag object.
- * clickTag - Function to handle the tag click event.
- */
 interface TagProps {
   t: TagData;
   clickTag: (tagName: string) => void;
 }
 
 /**
- * Tag component that displays information about a specific tag.
- * The component displays the tag's name, description, and the number of associated questions.
- * It also triggers a click event to handle tag selection.
+ * Component to display a tag with its name and description.
+ * It also provides a modal to view more details about the tag.
  *
- * @param t - The tag object .
- * @param clickTag - Function to handle tag clicks.
+ * @param {TagProps} props - The properties for the TagView component.
+ * @param {TagData} props.t - The tag data containing the name and description.
+ * @param {function} props.clickTag - Function to handle the click event on the tag.
+ * @returns {JSX.Element} The rendered TagView component.
  */
 const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
   const { tag } = useTagSelected(t);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = React.useState(false);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  /**
+   * Handle the event to open the modal.
+   *
+   * @param {React.MouseEvent} e - The mouse event.
+   */
+  const handleOpen = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setOpen(true);
+  }, []);
+
+  /**
+   * Handle the event to close the modal.
+   */
+  const handleClose = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  /**
+   * Handle the event to click on the tag.
+   * It triggers the clickTag function and closes the modal.
+   */
+  const handleTagClick = useCallback(() => {
+    clickTag(t.name);
+    handleClose();
+  }, [clickTag, t.name, handleClose]);
 
   return (
     <>
@@ -70,21 +88,15 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
             bgcolor: 'background.paper',
             boxShadow: 24,
             p: 4,
-          }}>
+          }}
+          onClick={e => e.stopPropagation()}>
           <Typography id='modal-title' variant='h6' component='h2'>
             {tag.name}
           </Typography>
           <Typography id='modal-description' sx={{ mt: 2 }}>
             {tag.description}
           </Typography>
-          <Button
-            variant='contained'
-            color='primary'
-            sx={{ mt: 2 }}
-            onClick={() => {
-              clickTag(t.name);
-              handleClose();
-            }}>
+          <Button variant='contained' color='primary' sx={{ mt: 2 }} onClick={handleTagClick}>
             View all questions with this tag
           </Button>
         </Box>
@@ -93,4 +105,4 @@ const TagView: React.FC<TagProps> = ({ t, clickTag }) => {
   );
 };
 
-export default TagView;
+export default memo(TagView);

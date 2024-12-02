@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import express, { Response } from 'express';
 import { ObjectId } from 'mongodb';
 import {
@@ -23,41 +22,37 @@ import {
   updateQuestionTagsAndIndex,
 } from '../models/application';
 
+/**
+ * Controller for handling question-related routes.
+ *
+ * @param socket - The WebSocket server instance for real-time updates
+ * @returns Express router configured with question routes
+ */
 const questionController = (socket: FakeSOSocket) => {
   const router = express.Router();
 
   /**
-   * Retrieves a list of questions filtered by a search term and ordered by a specified criterion.
-   * If there is an error, the HTTP response's status is updated.
+   * Retrieves questions based on filter criteria.
    *
-   * @param req The FindQuestionRequest object containing the query parameters `order` and `search`.
-   * @param res The HTTP response object used to send back the filtered list of questions.
-   *
-   * @returns A Promise that resolves to void.
+   * @param req - The request object containing filter criteria
+   * @param res - The response object to send the filtered questions
    */
   const getQuestionsByFilter = async (req: FindQuestionRequest, res: Response): Promise<void> => {
     try {
       const { order, search, askedBy } = req.query;
-      console.log('Controller received request:', { order, search, askedBy });
 
-      // First get base list of questions
       let qlist: Question[] = await getQuestionsByOrder(order);
 
-      // Only apply search filter if search term exists and is valid
       if (typeof search === 'string' && search !== 'undefined' && search.trim()) {
-        console.log('Applying search filter:', search);
         qlist = await filterQuestionsBySearch(qlist, search);
       }
 
-      // Apply askedBy filter if provided
       if (typeof askedBy === 'string' && askedBy.trim()) {
         qlist = filterQuestionsByAskedBy(qlist, askedBy);
       }
 
-      console.log('Sending response with', qlist.length, 'questions');
       res.json(qlist);
     } catch (err: unknown) {
-      console.error('Error in getQuestionsByFilter:', err);
       if (err instanceof Error) {
         res.status(500).send(`Error when fetching questions by filter: ${err.message}`);
       } else {
@@ -66,14 +61,18 @@ const questionController = (socket: FakeSOSocket) => {
     }
   };
 
+  /**
+   * Retrieves questions based on a specific tag.
+   *
+   * @param req - The request object containing the tag
+   * @param res - The response object to send the filtered questions
+   */
   const getQuestionsByTag = async (req: FindQuestionRequest, res: Response): Promise<void> => {
     const { order } = req.query;
     const { search } = req.query;
     try {
       const qlist: Question[] = await getQuestionsByOrder(order);
 
-      // Filter by tags
-      console.log('Search:', search);
       const resqlist: Question[] = await filterQuestionsByTag(qlist, search);
 
       res.json(resqlist);
@@ -87,13 +86,10 @@ const questionController = (socket: FakeSOSocket) => {
   };
 
   /**
-   * Retrieves a question by its unique ID, and increments the view count for that question.
-   * If there is an error, the HTTP response's status is updated.
+   * Retrieves a question by its ID.
    *
-   * @param req The FindQuestionByIdRequest object containing the question ID as a parameter.
-   * @param res The HTTP response object used to send back the question details.
-   *
-   * @returns A Promise that resolves to void.
+   * @param req - The request object containing the question ID
+   * @param res - The response object to send the question
    */
   const getQuestionById = async (req: FindQuestionByIdRequest, res: Response): Promise<void> => {
     const { qid } = req.params;
@@ -129,11 +125,10 @@ const questionController = (socket: FakeSOSocket) => {
   };
 
   /**
-   * Validates the question object to ensure it contains all the necessary fields.
+   * Validates the question body.
    *
-   * @param question The question object to validate.
-   *
-   * @returns `true` if the question is valid, otherwise `false`.
+   * @param question - The question object to validate
+   * @returns True if the question body is valid, false otherwise
    */
   const isQuestionBodyValid = (question: Question): boolean =>
     question.title !== undefined &&
@@ -148,13 +143,10 @@ const questionController = (socket: FakeSOSocket) => {
     question.askDateTime !== null;
 
   /**
-   * Adds a new question to the database. The question is first validated and then saved.
-   * If the tags are invalid or saving the question fails, the HTTP response status is updated.
+   * Adds a new question.
    *
-   * @param req The AddQuestionRequest object containing the question data.
-   * @param res The HTTP response object used to send back the result of the operation.
-   *
-   * @returns A Promise that resolves to void.
+   * @param req - The request object containing the question data
+   * @param res - The response object to send the added question
    */
   const addQuestion = async (req: AddQuestionRequest, res: Response): Promise<void> => {
     if (!isQuestionBodyValid(req.body)) {
@@ -175,7 +167,6 @@ const questionController = (socket: FakeSOSocket) => {
         throw new Error(result.error);
       }
 
-      // Populates the fields of the question that was added, and emits the new object
       const populatedQuestion = await populateDocument(result._id?.toString(), 'question');
 
       if (populatedQuestion && 'error' in populatedQuestion) {
@@ -194,13 +185,11 @@ const questionController = (socket: FakeSOSocket) => {
   };
 
   /**
-   * Helper function to handle upvoting or downvoting a question.
+   * Handles voting on a question.
    *
-   * @param req The VoteRequest object containing the question ID and the username.
-   * @param res The HTTP response object used to send back the result of the operation.
-   * @param type The type of vote to perform (upvote or downvote).
-   *
-   * @returns A Promise that resolves to void.
+   * @param req - The request object containing the vote data
+   * @param res - The response object to send the vote result
+   * @param type - The type of vote ('upvote' or 'downvote')
    */
   const voteQuestion = async (
     req: VoteRequest,
@@ -226,7 +215,6 @@ const questionController = (socket: FakeSOSocket) => {
         throw new Error(status.error as string);
       }
 
-      // Emit the updated vote counts to all connected clients
       socket.emit('voteUpdate', { qid, upVotes: status.upVotes, downVotes: status.downVotes });
       res.json({ msg: status.msg, upVotes: status.upVotes, downVotes: status.downVotes });
     } catch (err) {
@@ -235,44 +223,32 @@ const questionController = (socket: FakeSOSocket) => {
   };
 
   /**
-   * Handles upvoting a question. The request must contain the question ID (qid) and the username.
-   * If the request is invalid or an error occurs, the appropriate HTTP response status and message are returned.
+   * Upvotes a question.
    *
-   * @param req The VoteRequest object containing the question ID and the username.
-   * @param res The HTTP response object used to send back the result of the operation.
-   *
-   * @returns A Promise that resolves to void.
+   * @param req - The request object containing the vote data
+   * @param res - The response object to send the vote result
    */
   const upvoteQuestion = async (req: VoteRequest, res: Response): Promise<void> => {
     voteQuestion(req, res, 'upvote');
   };
 
   /**
-   * Handles downvoting a question. The request must contain the question ID (qid) and the username.
-   * If the request is invalid or an error occurs, the appropriate HTTP response status and message are returned.
+   * Downvotes a question.
    *
-   * @param req The VoteRequest object containing the question ID and the username.
-   * @param res The HTTP response object used to send back the result of the operation.
-   *
-   * @returns A Promise that resolves to void.
+   * @param req - The request object containing the vote data
+   * @param res - The response object to send the vote result
    */
   const downvoteQuestion = async (req: VoteRequest, res: Response): Promise<void> => {
     voteQuestion(req, res, 'downvote');
   };
 
   /**
-   * Updates a question's tags and correct answer index in the database.
+   * Updates the tags of a question.
    *
-   * @param req The Request object containing:
-   *   - qid: The unique identifier of the question to update
-   *   - tags: Array of Tag objects to set for the question
-   *   - correctAnswerIndex: Optional index indicating which answer is correct (for quiz questions)
-   * @param res The HTTP response object used to send back the result of the operation
-   *
-   * @returns A Promise that resolves to void
+   * @param req - The request object containing the updated tags
+   * @param res - The response object to send the updated question
    */
   const updateQuestionTags = async (req: UpdateTagsRequest, res: Response): Promise<void> => {
-    // Validate request body
     const { qid, tags, correctAnswerIndex } = req.body;
 
     if (!qid || !ObjectId.isValid(qid) || !tags) {
@@ -287,16 +263,14 @@ const questionController = (socket: FakeSOSocket) => {
         throw new Error(result.error);
       }
 
-      // Emit the update to all connected clients
       socket.emit('questionUpdate', result);
       res.json(result);
     } catch (err) {
-      console.error('Error updating question tags:', err);
       res.status(500).send(`Error updating question tags: ${(err as Error).message}`);
     }
   };
 
-  // add appropriate HTTP verbs and their endpoints to the router
+  // Define routes
   router.get('/getQuestion', getQuestionsByFilter);
   router.get('/getQuestionByTag', getQuestionsByTag);
   router.get('/getQuestionById/:qid', getQuestionById);
