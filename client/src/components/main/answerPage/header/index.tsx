@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
+import VoteComponent from '../../voteComponent';
 
 interface AnswerHeaderProps {
   ansCount: number;
@@ -20,14 +21,13 @@ const AnswerHeader: React.FC<AnswerHeaderProps> = ({ ansCount, title }) => (
     justifyContent='space-between'
     alignItems='center'
     p={2}
-    sx={{ backgroundColor: 'primary.main' }}>
+    sx={{ backgroundColor: 'primary.main', borderTopLeftRadius: 5, borderTopRightRadius: 5 }}>
     <Typography variant='h4' className='bold_title answer_question_title'>
       {title}
     </Typography>
     <Typography variant='h6' className='bold_title' sx={{ ml: 'auto' }}>
       {ansCount} answers
     </Typography>
-    {/* Add "ask question button" */}
   </Box>
 );
 

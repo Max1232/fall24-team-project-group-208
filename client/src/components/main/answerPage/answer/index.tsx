@@ -43,7 +43,10 @@ const AnswerView: React.FC<AnswerProps> = ({ text, ansBy, meta, comments, handle
         justifyContent='space-between'
         alignItems='center'
         mb={2}>
-        <Typography variant='body2' className='answer_author'>
+        <Typography
+          variant='body2'
+          className='question_author'
+          sx={{ fontWeight: 'bold', color: 'primary.main' }}>
           {ansBy}
         </Typography>
         <Typography variant='body2' className='answer_question_meta' sx={{ ml: 1 }}>

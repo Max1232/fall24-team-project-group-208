@@ -44,7 +44,7 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
         position: 'fixed',
         height: '100vh',
         width: expanded ? 240 : 80,
-        transition: 'width 0.3s',
+        transition: 'width 0.5s',
         backgroundColor: 'primary.light',
         display: 'flex',
         flexDirection: 'column',
@@ -158,14 +158,13 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
           </ListItem>
         </NavLink>
       </Box>
-      <Box sx={{ width: '100%', textAlign: 'center' }}>
-        <IconButton onClick={handleToggle} sx={{ mb: 1 }}>
-          {expanded ? (
-            <ArrowBackIos sx={{ color: '#fff' }} />
-          ) : (
-            <ArrowForwardIos sx={{ color: '#fff' }} />
-          )}
-        </IconButton>
+      <Box
+        display='flex'
+        flexDirection={expanded ? 'row' : 'column'}
+        alignItems='center'
+        justifyContent='space-between'
+        p={2}
+        sx={{ width: '100%', textAlign: 'center' }}>
         <NavLink
           to='/profile'
           id='menu_profile'
@@ -186,6 +185,13 @@ const SideBarNav: React.FC<SideBarNavProps> = ({ onToggle }) => {
             </Collapse>
           </ListItem>
         </NavLink>
+        <IconButton onClick={handleToggle} sx={{ mb: expanded ? 0 : 1 }}>
+          {expanded ? (
+            <ArrowBackIos sx={{ color: '#fff' }} />
+          ) : (
+            <ArrowForwardIos sx={{ color: '#fff' }} />
+          )}
+        </IconButton>
       </Box>
     </Box>
   );
