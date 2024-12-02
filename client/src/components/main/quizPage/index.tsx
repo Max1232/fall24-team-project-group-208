@@ -23,7 +23,9 @@ const QuizPage = () => {
   return (
     <Box p={3}>
       <Box display='flex' justifyContent='space-between' alignItems='center' mb={3}>
-      <Typography variant='h2' sx={{ color: 'primary.main' }}>Quizzes</Typography>   
+        <Typography variant='h2' sx={{ color: 'primary.main' }}>
+          Quizzes
+        </Typography>
         <Button variant='contained' color='primary' onClick={handleOpen}>
           Ask a Question
         </Button>

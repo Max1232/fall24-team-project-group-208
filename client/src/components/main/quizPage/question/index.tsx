@@ -67,7 +67,7 @@ const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
             width: 600,
             bgcolor: 'background.paper',
             boxShadow: 24,
-            p: 4
+            p: 4,
           }}>
           <Typography id='modal-title' variant='h3' component='h2'>
             {q.title}

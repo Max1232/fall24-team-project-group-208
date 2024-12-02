@@ -6,6 +6,12 @@ import AnswerView from './answer';
 import { getMetaData } from '../../../tool';
 import useAnswerPage from '../../../hooks/useAnswerPage';
 
+/**
+ * AnswerPage component
+ *
+ * This component renders the answer page for a quiz question. It displays the question,
+ * the possible answers, and provides feedback based on the user's selection.
+ */
 const AnswerPage: React.FC = () => {
   const { question } = useAnswerPage();
   const [checkboxLocked, setCheckboxLocked] = React.useState(false);
@@ -13,16 +19,12 @@ const AnswerPage: React.FC = () => {
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [isCorrect, setIsCorrect] = React.useState(false);
 
+  /**
+   * Handles the submit button click event.
+   * Shows feedback based on whether the selected answer is correct.
+   */
   const handleSubmitClick = () => {
-    console.log('Submit button clicked');
-    console.log('Current state:', {
-      selectedAnswerId,
-      checkboxLocked,
-      questionCorrectId: question?.correctAnswerId,
-    });
-
     if (!selectedAnswerId) {
-      console.log('No answer selected');
       setShowFeedback(true);
       setIsCorrect(false);
       return;
@@ -32,35 +34,39 @@ const AnswerPage: React.FC = () => {
     setShowFeedback(true);
 
     if (question?.correctAnswerId) {
-      console.log('Comparing answers:', {
-        selected: selectedAnswerId,
-        correct: question.correctAnswerId,
-        isMatch: selectedAnswerId === question.correctAnswerId,
-      });
-
       setIsCorrect(selectedAnswerId === question.correctAnswerId);
-    } else {
-      console.log('No correct answer ID found in question:', question);
     }
   };
 
+  /**
+   * Handles the checkbox change event.
+   * Locks the checkbox and sets the selected answer ID.
+   *
+   * @param answerId - The ID of the selected answer
+   */
   const handleCheckboxChange = (answerId: string) => {
-    console.log('Checkbox changed:', answerId);
     setCheckboxLocked(true);
     setSelectedAnswerId(answerId);
   };
 
+  /**
+   * Handles the close event for the feedback Snackbar.
+   */
   const handleCloseFeedback = () => {
     setShowFeedback(false);
   };
 
-  // Debug log when component renders
-  console.log('Rendering AnswerPage with:', {
-    questionId: question?._id,
-    correctAnswerId: question?.correctAnswerId,
-    selectedAnswerId,
-    checkboxLocked,
-  });
+  /**
+   * Returns the feedback message based on the selected answer and correctness.
+   *
+   * @returns The feedback message
+   */
+  const getFeedbackMessage = () => {
+    if (!selectedAnswerId) {
+      return 'Please select an answer first';
+    }
+    return isCorrect ? '🎉 Correct! Well done!' : "Sorry, that's not correct. Try again!";
+  };
 
   if (!question) {
     return (
@@ -108,11 +114,7 @@ const AnswerPage: React.FC = () => {
           onClose={handleCloseFeedback}
           severity={isCorrect ? 'success' : 'error'}
           variant='filled'>
-          {!selectedAnswerId
-            ? 'Please select an answer first'
-            : isCorrect
-              ? '🎉 Correct! Well done!'
-              : "Sorry, that's not correct. Try again!"}
+          {getFeedbackMessage()}
         </Alert>
       </Snackbar>
     </Box>

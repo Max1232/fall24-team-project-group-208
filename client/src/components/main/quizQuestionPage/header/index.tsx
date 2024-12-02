@@ -27,7 +27,6 @@ const AnswerHeader: React.FC<AnswerHeaderProps> = ({ ansCount, title }) => (
     <Typography variant='h6' className='bold_title' sx={{ ml: 'auto' }}>
       {ansCount} answers
     </Typography>
-   
   </Box>
 );
 
