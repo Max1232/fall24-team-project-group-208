@@ -5,6 +5,7 @@ import QuestionBody from './questionBody';
 import AnswerView from './answer';
 import { getMetaData } from '../../../tool';
 import useAnswerPage from '../../../hooks/useAnswerPage';
+import useCurrentUser from '../../../hooks/useCurrentUser';
 
 /**
  * AnswerPage component
@@ -17,6 +18,7 @@ const AnswerPage: React.FC = () => {
   const [selectedAnswerId, setSelectedAnswerId] = React.useState<string | null>(null);
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [isCorrect, setIsCorrect] = React.useState(false);
+  const { user } = useCurrentUser(); // Add this hook to get current user
 
   const handleSubmitClick = async () => {
     if (!question || !selectedAnswerId || !question.correctAnswerId) {
@@ -35,7 +37,7 @@ const AnswerPage: React.FC = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            username: question.askedBy,
+            username: user.username,
             isCorrect: true,
           }),
         });

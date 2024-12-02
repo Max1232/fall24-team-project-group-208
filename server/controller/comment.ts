@@ -43,7 +43,6 @@ const commentController = (socket: FakeSOSocket) => {
    *
    * @param req The AddCommentRequest object containing the comment data.
    * @param res The HTTP response object used to send back the result of the operation.
-   * @param type The type of the comment, either 'question' or 'answer'.
    *
    * @returns A Promise that resolves to void.
    */

@@ -41,7 +41,7 @@ const parseKeyword = (search: string): string[] =>
  * Checks if given question contains any tags from the given list.
  *
  * @param {Question} q - The question to check
- * @param {string[]} taglist - The list of tags to check for
+ * @param tagName
  *
  * @returns {boolean} - `true` if any tag is present in the question, `false` otherwise
  */
@@ -110,7 +110,7 @@ const sortQuestionsByUnanswered = (qlist: Question[]): Question[] =>
  * @param {Map<string, Date>} mp - A map of the most recent answer time for each question
  */
 const getMostRecentAnswerTime = (question: Question, mp: Map<string, Date>): void => {
-  // This is a private function and we can assume that the answers field is not undefined or an array of ObjectId
+  // This is a private function, and we can assume that the answers field is not undefined or an array of ObjectId
   const answers = question.answers as Answer[];
   answers.forEach((answer: Answer) => {
     if (question._id !== undefined) {
@@ -812,7 +812,7 @@ export const getTagCountMap = async (): Promise<Map<string, number> | null | { e
  *
  * @param qid The unique identifier of the question to update
  * @param tags The new array of tags to set for the question
- * @param correctAnswerIndex Optional index indicating the correct answer for quiz questions
+ * @param correctAnsIndex
  *
  * @returns The updated question with populated data, or an error object if the operation fails
  */
@@ -839,17 +839,6 @@ export const updateQuestionTagsAndIndex = async (
     const reversedIndex = answers.length - 1 - numericIndex;
     const correctAnswerId = answers[reversedIndex]._id?.toString();
 
-    console.log('Setting answer:', {
-      originalIndex: numericIndex,
-      reversedIndex,
-      correctAnswerId,
-      answerOrder: answers.map((a, i) => ({
-        id: a._id?.toString(),
-        index: i,
-        text: a.text.substring(0, 20), // First 20 chars for identification
-      })),
-    });
-
     const result = (await QuestionModel.findByIdAndUpdate(
       qid,
       { $set: { tags: processedTags, correctAnswerId } },
@@ -869,6 +858,14 @@ export const updateQuestionTagsAndIndex = async (
   }
 };
 
+/**
+ * Updates a question's correct answer index in the database.
+ *
+ *
+ * @returns The updated question with populated data, or an error object if the operation fails
+ * @param username The username of the user to update
+ * @param isCorrect A boolean indicating whether the answer was correct
+ */
 export const updateQuizReputation = async (
   username: string,
   isCorrect: boolean,

@@ -1,6 +1,10 @@
 import { createTheme } from '@mui/material/styles';
 import { ThemeOptions } from '@mui/material/styles/createTheme';
 
+/**
+ * Common typography settings for both light and dark themes.
+ * @type {ThemeOptions}
+ */
 const commonSettings: ThemeOptions = {
   typography: {
     h1: {
@@ -30,6 +34,10 @@ const commonSettings: ThemeOptions = {
   },
 };
 
+/**
+ * Light theme configuration.
+ * @type {Theme}
+ */
 const lightTheme = createTheme({
   palette: {
     mode: 'light',
@@ -48,6 +56,10 @@ const lightTheme = createTheme({
   ...commonSettings,
 });
 
+/**
+ * Dark theme configuration.
+ * @type {Theme}
+ */
 const darkTheme = createTheme({
   palette: {
     mode: 'dark',

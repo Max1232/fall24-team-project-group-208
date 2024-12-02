@@ -1,4 +1,3 @@
-// Question Document Schema
 import mongoose, { Model } from 'mongoose';
 import questionSchema from './schema/question';
 import { Question } from '../types';
