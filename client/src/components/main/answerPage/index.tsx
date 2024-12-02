@@ -46,7 +46,7 @@ const AnswerPage: React.FC = () => {
 
   return (
     <Box p={3}>
-      <Button variant='contained' color='primary' onClick={handleQuestionClickOpen} sx={{ mb:3 }}>
+      <Button variant='contained' color='primary' onClick={handleQuestionClickOpen} sx={{ mb: 3 }}>
         Ask a New Question
       </Button>
 

@@ -101,8 +101,6 @@ const useQuestionPage = () => {
       setQlist(prevQlist => prevQlist.map(q => (q._id === question._id ? question : q)));
     };
 
-
-
     socket.on('questionUpdate', handleQuestionUpdate);
     socket.on('answerUpdate', handleAnswerUpdate);
     socket.on('viewsUpdate', handleViewsUpdate);

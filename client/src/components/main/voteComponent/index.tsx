@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, IconButton, Typography } from '@mui/material';
 import ArrowCircleUpTwoToneIcon from '@mui/icons-material/ArrowCircleUpTwoTone';
-import { downvoteQuestion, upvoteQuestion } from '../../../services/questionService';
 import ArrowCircleDownTwoToneIcon from '@mui/icons-material/ArrowCircleDownTwoTone';
+import { downvoteQuestion, upvoteQuestion } from '../../../services/questionService';
 import useUserContext from '../../../hooks/useUserContext';
 import { Question } from '../../../types';
 import useVoteStatus from '../../../hooks/useVoteStatus';
