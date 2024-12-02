@@ -76,17 +76,6 @@ export interface TagData {
 }
 
 /**
- * Interface representing a list of questions with the related tag.
- *
- * name - The name of the tag.
- * description - The description of the tag.
- * questions - An array of questions associated with the tag.
- */
-export interface QuestionsWithTag extends Tag {
-  questions: Question[];
-}
-
-/**
  * Interface representing the voting data for a question, which contains:
  * - qid - The ID of the question being voted on
  * - upVotes - An array of user IDs who upvoted the question

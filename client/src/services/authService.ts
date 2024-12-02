@@ -20,7 +20,7 @@ class AuthService {
     if (!this._instances.has(windowId)) {
       const auth = getAuth(app);
       // Set persistence synchronously
-      auth.setPersistence(browserSessionPersistence);
+      auth.setPersistence(browserSessionPersistence).then(() => {});
       this._instances.set(windowId, auth);
     }
     return this._instances.get(windowId)!;
@@ -35,7 +35,7 @@ class AuthService {
   static clearAuth(windowId: string) {
     const auth = this._instances.get(windowId);
     if (auth) {
-      auth.signOut();
+      auth.signOut().then(() => {});
     }
     this._instances.delete(windowId);
   }

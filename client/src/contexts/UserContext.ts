@@ -2,11 +2,21 @@ import { createContext } from 'react';
 import { FakeSOSocket, User } from '../types';
 import { WINDOW_ID } from '../config/firebase';
 
+/**
+ * Interface representing the UserContext type.
+ * @interface
+ */
 export interface UserContextType {
   user: User;
   socket: FakeSOSocket;
 }
 
+/**
+ * Retrieves the stored user data from sessionStorage.
+ * Ensures the data is specific to the current window session.
+ *
+ * @returns {User | null} The parsed user data or null if not found.
+ */
 export const getStoredUser = (): User | null => {
   // Get the window-specific user data
   const storedWindowId = sessionStorage.getItem('auth_window_id');
@@ -26,9 +36,14 @@ export const getStoredUser = (): User | null => {
   return null;
 };
 
+/**
+ * Stores the user data in sessionStorage.
+ * If the user is null, it removes the user data from sessionStorage.
+ *
+ * @param {User | null} user - The user data to store.
+ */
 export const setStoredUser = (user: User | null) => {
   if (user) {
-    sessionStorage.setItem(`user_data_${WINDOW_ID}`, JSON.stringify(user));
     sessionStorage.setItem('auth_window_id', WINDOW_ID);
   } else {
     sessionStorage.removeItem(`user_data_${WINDOW_ID}`);
@@ -36,6 +51,10 @@ export const setStoredUser = (user: User | null) => {
   }
 };
 
+/**
+ * Creates a React context for the user data and socket connection.
+ * @type {React.Context<UserContextType | null>}
+ */
 const UserContext = createContext<UserContextType | null>(null);
 
 export default UserContext;

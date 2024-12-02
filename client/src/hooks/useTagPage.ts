@@ -35,7 +35,7 @@ const useTagPage = () => {
       }
     };
 
-    fetchData();
+    fetchData().then(() => {});
   }, []);
 
   return { tlist, clickTag };

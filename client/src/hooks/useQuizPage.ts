@@ -32,7 +32,7 @@ const useQuizPage = () => {
       }
     };
 
-    fetchData();
+    fetchData().then(() => {});
   }, []);
 
   return { qlist, clickQuestion };

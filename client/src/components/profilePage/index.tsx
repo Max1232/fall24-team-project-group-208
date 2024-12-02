@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import {
   Box,
   CircularProgress,
@@ -7,33 +7,27 @@ import {
   CardContent,
   Avatar,
   LinearProgress,
+  Alert,
 } from '@mui/material';
-import { useProfilePage } from '../../hooks/useProfilePage';
+import useProfilePage from '../../hooks/useProfilePage';
 
-/**
- * ProfilePage component that displays the user's profile information.
- * It shows a loading spinner while data is being fetched, an error message if there's an error,
- * and the profile data if available.
- *
- * @returns {React.JSX.Element} The rendered ProfilePage component.
- */
-const ProfilePage: React.FC = (): React.JSX.Element => {
+const ProfilePage: React.FC = () => {
   const { profileData, loading, error } = useProfilePage();
 
   if (loading) {
     return (
       <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh'>
-        <CircularProgress />
+        <CircularProgress size={40} thickness={4} />
       </Box>
     );
   }
 
   if (error) {
     return (
-      <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh'>
-        <Box bgcolor='error.main' color='error.contrastText' p={4} borderRadius={2}>
+      <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh' p={2}>
+        <Alert severity='error' variant='filled' sx={{ maxWidth: 600 }}>
           {error}
-        </Box>
+        </Alert>
       </Box>
     );
   }
@@ -41,7 +35,9 @@ const ProfilePage: React.FC = (): React.JSX.Element => {
   if (!profileData) {
     return (
       <Box display='flex' justifyContent='center' alignItems='center' minHeight='100vh'>
-        <Typography color='textSecondary'>No profile data available</Typography>
+        <Alert severity='info' variant='filled' sx={{ maxWidth: 600 }}>
+          No profile data available. Please try refreshing the page.
+        </Alert>
       </Box>
     );
   }
@@ -52,13 +48,12 @@ const ProfilePage: React.FC = (): React.JSX.Element => {
         <CardContent>
           <Box display='flex' alignItems='center'>
             <Avatar sx={{ width: 56, height: 56, mr: 2 }}>
-              {profileData.username.charAt(0).toUpperCase()}
-              {profileData.username.charAt(1).toUpperCase()}
+              {profileData.username.slice(0, 2).toUpperCase()}
             </Avatar>
             <Box>
               <Typography variant='h3'>{profileData.username}</Typography>
               <Typography variant='body2' color='textSecondary'>
-                Level {profileData.level ?? 1} • {profileData.reputation ?? 0} reputation points
+                Level {profileData.level || 1} • {profileData.reputation || 0} reputation points
               </Typography>
             </Box>
           </Box>
@@ -68,18 +63,21 @@ const ProfilePage: React.FC = (): React.JSX.Element => {
       <Card sx={{ width: '100%', maxWidth: 600, mb: 2 }}>
         <CardContent>
           <Typography variant='h3'>Badges</Typography>
-          <Box display='flex' flexWrap='wrap' mt={1}>
-            {profileData.badges?.map((badge, index) => (
-              <Box
-                key={index}
-                bgcolor='primary.main'
-                color='primary.contrastText'
-                p={1}
-                m={0.5}
-                borderRadius={1}>
-                {badge}
-              </Box>
-            ))}
+          <Box display='flex' flexWrap='wrap' mt={1} gap={1}>
+            {profileData.badges?.length ? (
+              profileData.badges.map((badge, index) => (
+                <Box
+                  key={index}
+                  bgcolor='primary.main'
+                  color='primary.contrastText'
+                  p={1}
+                  borderRadius={1}>
+                  {badge}
+                </Box>
+              ))
+            ) : (
+              <Typography color='textSecondary'>No badges earned yet</Typography>
+            )}
           </Box>
         </CardContent>
       </Card>
@@ -87,15 +85,17 @@ const ProfilePage: React.FC = (): React.JSX.Element => {
       <Card sx={{ width: '100%', maxWidth: 600, mb: 2 }}>
         <CardContent>
           <Typography variant='h3'>Reputation</Typography>
-          <Typography variant='body1'>{profileData.reputation ?? 0} reputation points</Typography>
+          <Typography variant='body1'>{profileData.reputation || 0} reputation points</Typography>
         </CardContent>
       </Card>
 
       <Box sx={{ width: '100%', maxWidth: 600 }}>
-        <Typography variant='h4'>Progress to Level {(profileData.level ?? 1) + 1}</Typography>
+        <Typography variant='h4' gutterBottom>
+          Progress to Level {(profileData.level || 1) + 1}
+        </Typography>
         <LinearProgress
           variant='determinate'
-          value={(profileData.reputation ?? 0) % 100}
+          value={(profileData.reputation || 0) % 100}
           sx={{ height: 40, borderRadius: 10 }}
         />
       </Box>
@@ -103,4 +103,4 @@ const ProfilePage: React.FC = (): React.JSX.Element => {
   );
 };
 
-export default ProfilePage;
+export default memo(ProfilePage);

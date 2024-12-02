@@ -6,8 +6,7 @@ import { updateQuestionTags } from '../services/questionService';
  * Custom hook to manage quiz tags for a question.
  *
  * @param {string} questionId - The ID of the question to update.
- * @param {Question} currentQuestion - The current question object.
- * @returns {Object} An object containing functions and state related to quiz tags.
+ * @param {Question} currentQuestion - The current question object
  */
 const useQuizTag = (questionId: string, currentQuestion: Question) => {
   const [isLoading, setIsLoading] = useState(false);

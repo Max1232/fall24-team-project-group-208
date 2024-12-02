@@ -1,6 +1,11 @@
 import { initializeApp } from 'firebase/app';
 import AuthService from '../services/authService';
 
+/**
+ * Firebase configuration object.
+ * Uses a unique window ID to store user data in session storage, so that
+ * multiple windows can be open simultaneously without interfering with each other.
+ * */
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,

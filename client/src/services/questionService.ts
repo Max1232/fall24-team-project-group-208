@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { Question, Tag } from '../types';
 import api from './config';
 
@@ -16,20 +15,17 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
     const params = new URLSearchParams();
     params.append('order', order);
 
-    if (search && typeof search === 'string' && search.trim()) {
+    if (search && search.trim()) {
       params.append('search', search.trim());
     }
 
-    console.log('Making request with params:', params.toString()); // Debug log
-
     const res = await api.get(`${QUESTION_API_URL}/getQuestion?${params.toString()}`);
     if (res.status !== 200) {
-      throw new Error('Error when fetching or filtering questions');
+      return [];
     }
     return res.data;
   } catch (error) {
-    console.error('Error fetching questions:', error);
-    return [];
+    throw new Error('Error when fetching or filtering questions');
   }
 };
 
@@ -38,6 +34,7 @@ const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Ques
  *
  * @param qid - The ID of the question to update
  * @param tags - The array of tags to set for the question
+ * @param correctAnswerIndex
  * @throws Error if there is an issue updating the question's tags
  */
 const updateQuestionTags = async (
@@ -61,7 +58,6 @@ const updateQuestionTags = async (
  */
 const getQuestionsByTag = async (order = 'newest', search = ''): Promise<Question[]> => {
   const res = await api.get(`${QUESTION_API_URL}/getQuestionByTag?order=${order}&search=${search}`);
-  console.log('res', res);
   if (res.status !== 200) {
     throw new Error('Error when fetching or filtering questions by tags');
   }

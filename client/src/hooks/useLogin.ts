@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   createUserWithEmailAndPassword,
@@ -72,7 +72,8 @@ const useLogin = () => {
         );
 
         if (!response.ok) {
-          throw new Error('Failed to fetch user profile');
+          const errorText = await response.text();
+          setError(errorText);
         }
 
         const userData = await response.json();
@@ -102,7 +103,7 @@ const useLogin = () => {
 
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(errorText);
+          setError(errorText);
         }
 
         const userData = await response.json();

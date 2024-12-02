@@ -31,7 +31,7 @@ const useTagSelected = (t: TagData) => {
   useEffect(() => {
     // Only fetch if the name is different from the current tag
     if (t.name && t.name !== tag.name) {
-      fetchData();
+      fetchData().then(() => {});
     }
   }, [t.name, fetchData, tag.name]);
 

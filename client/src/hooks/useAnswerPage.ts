@@ -51,7 +51,7 @@ const useAnswerPage = () => {
   ) => {
     try {
       if (targetId === undefined) {
-        throw new Error('No target ID provided.');
+        return;
       }
 
       await addComment(targetId, targetType, comment);
@@ -83,6 +83,7 @@ const useAnswerPage = () => {
     /**
      * Function to handle updates to the answers of a question.
      *
+     * @param id
      * @param answer - The updated answer object.
      */
     const handleAnswerUpdate = ({ qid: id, answer }: { qid: string; answer: Answer }) => {

@@ -53,7 +53,7 @@ const useQuestionPage = () => {
       search: newSearch,
     }));
 
-    fetchQuestions(state.questionOrder, newSearch);
+    fetchQuestions(state.questionOrder, newSearch).then(() => {});
   }, [searchParams, state.questionOrder, fetchQuestions]);
 
   // Socket event handlers

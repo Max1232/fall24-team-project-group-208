@@ -2,13 +2,19 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
 import './index.css';
 import { io } from 'socket.io-client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FakeStackOverflow from './components/fakestackoverflow';
 import { FakeSOSocket } from './types';
 
 const container = document.getElementById('root');
 
-const App = () => {
+/**
+ * Main application component.
+ * Initializes the socket connection and sets up the router.
+ *
+ * @returns {JSX.Element} The main application component.
+ */
+const App = (): React.JSX.Element => {
   const [socket, setSocket] = useState<FakeSOSocket | null>(null);
 
   const serverURL = process.env.REACT_APP_SERVER_URL;
