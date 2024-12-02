@@ -1,7 +1,8 @@
 import express, { Response } from 'express';
-import admin from 'firebase-admin';
+import admin, { ServiceAccount } from 'firebase-admin';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
+import fs from 'fs';
 import { AuthRequest, FakeSOSocket, ProfileCreatedPayload } from '../types';
 import UserModel from '../models/users';
 
@@ -11,7 +12,11 @@ const SERVICE_ACCOUNT_PATH = process.env.AUTH_KEY;
 if (!SERVICE_ACCOUNT_PATH) {
   throw new Error('AUTH_KEY is not defined in the environment variables');
 }
-const serviceAccount = require(path.resolve(SERVICE_ACCOUNT_PATH));
+
+// Read and parse the service account file synchronously
+const serviceAccount: ServiceAccount = JSON.parse(
+  fs.readFileSync(path.resolve(SERVICE_ACCOUNT_PATH), 'utf8'),
+);
 
 if (!admin.apps.length) {
   admin.initializeApp({
@@ -39,10 +44,10 @@ const authController = (socket: FakeSOSocket): express.Router => {
     try {
       const decodedToken = await admin.auth().verifyIdToken(token);
       req.user = { uid: decodedToken.uid };
-      next();
+      return next();
     } catch (error) {
       socket.emit('authError', { message: 'Invalid token' });
-      next(error);
+      return next(error);
     }
   };
 

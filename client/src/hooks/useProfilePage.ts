@@ -2,6 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import useUserContext from './useUserContext';
 import { User } from '../types';
 
+/**
+ * Custom hook to manage the profile page data.
+ * It fetches the profile data from the server and handles loading and error states.
+ *
+ * @returns {Object} An object containing profile data, loading state, error message, and a function to refresh the profile data.
+ */
 export const useProfilePage = () => {
   const { user } = useUserContext();
   const [loading, setLoading] = useState(true);
@@ -18,6 +24,10 @@ export const useProfilePage = () => {
     return null;
   });
 
+  /**
+   * Fetches the profile data from the server.
+   * If the server URL is not configured or the request fails, it tries to use cached data from localStorage.
+   */
   const fetchProfileData = useCallback(async () => {
     if (!user?.username) {
       setLoading(false);
@@ -87,6 +97,9 @@ export const useProfilePage = () => {
     fetchProfileData();
   }, [fetchProfileData]);
 
+  /**
+   * Refreshes the profile data by removing the cached data and fetching it again from the server.
+   */
   const refreshProfile = async () => {
     setLoading(true);
     localStorage.removeItem(`profile_${user.username}`);

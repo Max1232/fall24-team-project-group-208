@@ -8,6 +8,14 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+/**
+ * ProtectedRoute component to guard routes that require authentication.
+ * It checks both Firebase authentication and user context.
+ *
+ * @param {ProtectedRouteProps} props - The props for the component.
+ * @param {React.ReactNode} props.children - The child components to render if authenticated.
+ * @returns {JSX.Element} The rendered component.
+ */
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);

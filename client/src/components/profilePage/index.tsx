@@ -11,6 +11,13 @@ import {
 // eslint-disable-next-line import/no-named-as-default
 import useProfilePage from '../../hooks/useProfilePage';
 
+/**
+ * ProfilePage component that displays the user's profile information.
+ * It shows a loading spinner while data is being fetched, an error message if there's an error,
+ * and the profile data if available.
+ *
+ * @returns {JSX.Element} The rendered ProfilePage component.
+ */
 const ProfilePage: React.FC = () => {
   const { profileData, loading, error } = useProfilePage();
 
