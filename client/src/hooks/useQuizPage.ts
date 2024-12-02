@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getQuestionsByTag } from '../services/questionService';
@@ -29,8 +28,7 @@ const useQuizPage = () => {
         const res = await getQuestionsByTag('newest', 'quizQuestions');
         setQlist(res || []);
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log(e);
+        throw new Error('Failed to fetch questions by tag');
       }
     };
 

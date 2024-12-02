@@ -1,8 +1,6 @@
-// TODO: Remove unused code and fix lint issues
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
-import useUserContext from '../../../../hooks/useUserContext';
 import useQuizTag from '../../../../hooks/useQuizTag';
 import { Question } from '../../../../types';
 
@@ -39,13 +37,10 @@ const QuestionBody: React.FC<QuestionBodyProps> = ({
   text,
   askby,
   meta,
-  answerCount,
   questionID,
   question,
 }) => {
-  // TODO: Remove this stuff if it is still unused
-  const { user } = useUserContext();
-  const { addQuizTag, isLoading, error } = useQuizTag(questionID, question);
+  const { error } = useQuizTag(questionID, question);
   return (
     <Box
       id='questionBody'

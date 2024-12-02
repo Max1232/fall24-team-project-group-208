@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Button, Dialog } from '@mui/material';
+import { Box, Typography, Button, Dialog } from '@mui/material';
 import QuestionView from './question';
 import useQuizPage from '../../../hooks/useQuizPage';
 import NewQuestionPage from '../newQuestion';

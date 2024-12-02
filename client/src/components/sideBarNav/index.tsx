@@ -15,7 +15,6 @@ import {
   QuestionAnswer,
   LocalOffer,
   Quiz,
-  Settings,
   AccountCircle,
 } from '@mui/icons-material';
 

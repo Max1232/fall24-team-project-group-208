@@ -27,7 +27,6 @@ const useQuestionPage = () => {
       const res = await getQuestionsByFilter(order, searchTerm || '');
       setState(prev => ({ ...prev, qlist: res || [] }));
     } catch (error) {
-      console.error('Error fetching questions:', error);
       setState(prev => ({ ...prev, qlist: [] }));
     }
   }, []);

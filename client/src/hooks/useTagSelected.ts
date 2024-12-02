@@ -24,7 +24,7 @@ const useTagSelected = (t: TagData) => {
       const res = await getTagByName(t.name);
       setTag(res || { name: 'Error', description: 'Error' });
     } catch (e) {
-      console.error('Error fetching tag:', e);
+      throw new Error('Error while fetching tag data');
     }
   }, [t.name]);
 

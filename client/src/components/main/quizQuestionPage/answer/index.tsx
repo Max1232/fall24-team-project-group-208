@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import React, { useState } from 'react';
-import { Card, CardContent, Box, Typography, Checkbox } from '@mui/material';
+import { Card, CardContent, Box, Checkbox } from '@mui/material';
 import { handleHyperlink } from '../../../../tool';
 
 /**

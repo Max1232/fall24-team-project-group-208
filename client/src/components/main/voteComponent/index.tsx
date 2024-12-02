@@ -40,7 +40,7 @@ const VoteComponent: React.FC<VoteComponentProps> = ({ question }) => {
         }
       }
     } catch (error) {
-      console.error('Error voting:', error);
+      throw new Error('Error while voting');
     }
   };
 

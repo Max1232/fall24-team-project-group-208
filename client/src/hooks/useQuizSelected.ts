@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getQuestionsByTag } from '../services/questionService';
-import { Question, QuestionsWithTag, Tag } from '../types';
+import { QuestionsWithTag, Tag } from '../types';
 
 /**
  * Custom hook to handle fetching questions by tag name.
@@ -27,8 +27,7 @@ const useQuizSelected = (t: Tag) => {
           questions: res || [],
         });
       } catch (e) {
-        // eslint-disable-next-line no-console
-        console.log(e);
+        throw new Error('Failed to fetch questions by tag');
       }
     };
     fetchData();

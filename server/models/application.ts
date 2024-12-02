@@ -861,7 +861,7 @@ export const updateQuestionTagsAndIndex = async (
 
     // Convert string index to number and validate it
     const numericIndex = parseInt(correctAnsIndex, 10);
-    if (isNaN(numericIndex) || numericIndex < 0 || numericIndex >= question.answers.length) {
+    if (Number.isNaN(numericIndex) || numericIndex < 0 || numericIndex >= question.answers.length) {
       throw new Error('Invalid answer index');
     }
 

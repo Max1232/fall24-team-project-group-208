@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import {
   AppBar,
   Box,
@@ -30,8 +29,6 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ toggleTheme, isDarkMode, sidebarWidth }) => {
   const { val, handleInputChange, handleKeyDown, user, handleSignOut, loading } = useHeader();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <AppBar

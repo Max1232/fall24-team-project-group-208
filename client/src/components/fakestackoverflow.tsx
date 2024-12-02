@@ -6,7 +6,7 @@ import Layout from './layout';
 import Login from './login';
 import { FakeSOSocket, User } from '../types';
 import LoginContext from '../contexts/LoginContext';
-import UserContext, { getStoredUser } from '../contexts/UserContext';
+import UserContext from '../contexts/UserContext';
 import QuestionPage from './main/questionPage';
 import TagPage from './main/tagPage';
 import AnswerPage from './main/answerPage';
