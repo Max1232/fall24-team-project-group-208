@@ -44,7 +44,7 @@ const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
         }}
         onClick={handleOpen}>
         <CardContent>
-          <Typography variant='h4' component='div' gutterBottom>
+          <Typography variant='h2' component='div' gutterBottom>
             {q.title}
           </Typography>
           <Typography variant='body1' color='textSecondary'>
@@ -64,18 +64,18 @@ const QuestionView: React.FC<QuestionProps> = ({ q, clickQuestion }) => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: 400,
+            width: 600,
             bgcolor: 'background.paper',
             boxShadow: 24,
-            p: 4,
+            p: 4
           }}>
-          <Typography id='modal-title' variant='h6' component='h2'>
+          <Typography id='modal-title' variant='h3' component='h2'>
             {q.title}
           </Typography>
-          <Typography id='modal-description' sx={{ mt: 2 }}>
+          <Typography id='modal-description' variant='body1' sx={{ mt: 2 }}>
             Multiple choice question with {q.answers.length} answers
           </Typography>
-          <Typography id='modal-description' sx={{ mt: 2 }}>
+          <Typography id='modal-description' variant='body1' sx={{ mt: 2 }}>
             Tags: {q.tags.map(tag => tag.name).join(', ')}
           </Typography>
           <Button
