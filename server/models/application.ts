@@ -823,57 +823,47 @@ export const updateQuestionTagsAndIndex = async (
 ): Promise<QuestionResponse> => {
   try {
     const processedTags = await processTags(tags);
+    if (processedTags.length === 0) throw new Error('Invalid tags');
+    if (correctAnsIndex === undefined) throw new Error('Correct answer index is required');
 
-    if (processedTags.length === 0) {
-      throw new Error('Invalid tags');
-    }
+    const question = await QuestionModel.findById(qid).populate('answers');
+    if (!question) throw new Error('Question not found');
 
-    if (correctAnsIndex === undefined) {
-      throw new Error('Correct answer index is required');
-    }
-
-    const question = await QuestionModel.findById(qid);
-    if (!question) {
-      throw new Error('Question not found');
-    }
-
-    // Convert string index to number and validate it
     const numericIndex = parseInt(correctAnsIndex, 10);
     if (Number.isNaN(numericIndex) || numericIndex < 0 || numericIndex >= question.answers.length) {
       throw new Error('Invalid answer index');
     }
 
-    // Get the answer ID at the specified index
-    const correctAnswerId = question.answers[numericIndex]._id?.toString();
+    const answers = question.answers as Answer[];
+    // Reverse the index to match the display order
+    const reversedIndex = answers.length - 1 - numericIndex;
+    const correctAnswerId = answers[reversedIndex]._id?.toString();
 
-    const result = await QuestionModel.findByIdAndUpdate(
+    console.log('Setting answer:', {
+      originalIndex: numericIndex,
+      reversedIndex,
+      correctAnswerId,
+      answerOrder: answers.map((a, i) => ({
+        id: a._id?.toString(),
+        index: i,
+        text: a.text.substring(0, 20), // First 20 chars for identification
+      })),
+    });
+
+    const result = (await QuestionModel.findByIdAndUpdate(
       qid,
-      {
-        $set: {
-          tags: processedTags,
-          correctAnswerId, // Store the actual answer ID
-        },
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
-    ).populate([
-      { path: 'tags', model: TagModel },
-      { path: 'answers', model: AnswerModel },
-    ]);
+      { $set: { tags: processedTags, correctAnswerId } },
+      { new: true, runValidators: true },
+    ).populate(['tags', 'answers'])) as Question | null;
 
-    if (!result) {
-      throw new Error('Question not found');
-    }
+    if (!result) throw new Error('Question not found');
 
-    const populatedQuestion = await populateDocument(qid, 'question');
-
-    if (!populatedQuestion || 'error' in populatedQuestion) {
+    const populatedDoc = await populateDocument(qid, 'question');
+    if (!populatedDoc || 'error' in populatedDoc) {
       throw new Error('Error populating updated question');
     }
 
-    return populatedQuestion as Question;
+    return populatedDoc as Question;
   } catch (error) {
     return { error: `Error updating question: ${(error as Error).message}` };
   }

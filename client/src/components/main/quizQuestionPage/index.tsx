@@ -19,53 +19,39 @@ const AnswerPage: React.FC = () => {
   const [showFeedback, setShowFeedback] = React.useState(false);
   const [isCorrect, setIsCorrect] = React.useState(false);
 
-  /**
-   * Handles the submit button click event.
-   * Shows feedback based on whether the selected answer is correct.
-   */
   const handleSubmitClick = () => {
-    if (!selectedAnswerId) {
+    if (!question || !selectedAnswerId) {
       setShowFeedback(true);
       setIsCorrect(false);
       return;
     }
 
-    // Force feedback to show
     setShowFeedback(true);
 
-    if (question?.correctAnswerId) {
-      setIsCorrect(selectedAnswerId === question.correctAnswerId);
+    if (question.correctAnswerId) {
+      const correct = selectedAnswerId === question.correctAnswerId;
+      console.log('Answer check:', {
+        selected: selectedAnswerId,
+        correct: question.correctAnswerId,
+        isMatch: correct,
+      });
+      setIsCorrect(correct);
     }
   };
 
-  /**
-   * Handles the checkbox change event.
-   * Locks the checkbox and sets the selected answer ID.
-   *
-   * @param answerId - The ID of the selected answer
-   */
   const handleCheckboxChange = (answerId: string) => {
     setCheckboxLocked(true);
     setSelectedAnswerId(answerId);
   };
 
-  /**
-   * Handles the close event for the feedback Snackbar.
-   */
   const handleCloseFeedback = () => {
     setShowFeedback(false);
   };
 
-  /**
-   * Returns the feedback message based on the selected answer and correctness.
-   *
-   * @returns The feedback message
-   */
   const getFeedbackMessage = () => {
-    if (!selectedAnswerId) {
-      return 'Please select an answer first';
-    }
-    return isCorrect ? '🎉 Correct! Well done!' : "Sorry, that's not correct. Try again!";
+    if (!selectedAnswerId) return 'Please select an answer first';
+    if (!question?.correctAnswerId) return 'No correct answer set for this question';
+    return isCorrect ? '🎉 Correct!' : 'Incorrect, try again';
   };
 
   if (!question) {
