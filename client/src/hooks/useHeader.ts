@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { ChangeEvent, useState, KeyboardEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut, User } from 'firebase/auth';
@@ -15,7 +14,6 @@ const useHeader = () => {
       setUser(currentUser);
       setLoading(false);
 
-      // If not authenticated and not on the main page, redirect to main page
       if (!currentUser && window.location.pathname !== '/') {
         navigate('/');
       }
@@ -31,16 +29,25 @@ const useHeader = () => {
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      const searchParams = new URLSearchParams();
-      searchParams.set('search', e.currentTarget.value);
-      navigate(`/home?${searchParams.toString()}`);
+      // Get the value directly from state instead of event
+      const searchTerm = val.trim();
+
+      if (searchTerm) {
+        const searchParams = new URLSearchParams();
+        searchParams.set('search', searchTerm);
+        navigate(`/home?${searchParams.toString()}`);
+      } else {
+        navigate('/home');
+      }
+
+      // Clear the search input
+      setVal('');
     }
   };
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      // Navigate to root path instead of /login
       navigate('/', { replace: true });
     } catch (error) {
       throw new Error(`Error signing out: ${error}`);

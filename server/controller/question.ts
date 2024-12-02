@@ -36,19 +36,28 @@ const questionController = (socket: FakeSOSocket) => {
    * @returns A Promise that resolves to void.
    */
   const getQuestionsByFilter = async (req: FindQuestionRequest, res: Response): Promise<void> => {
-    const { order } = req.query;
-    const { search } = req.query;
-    const { askedBy } = req.query;
     try {
+      const { order, search, askedBy } = req.query;
+      console.log('Controller received request:', { order, search, askedBy });
+
+      // First get base list of questions
       let qlist: Question[] = await getQuestionsByOrder(order);
-      // Filter by askedBy if provided
-      if (askedBy) {
+
+      // Only apply search filter if search term exists and is valid
+      if (typeof search === 'string' && search !== 'undefined' && search.trim()) {
+        console.log('Applying search filter:', search);
+        qlist = await filterQuestionsBySearch(qlist, search);
+      }
+
+      // Apply askedBy filter if provided
+      if (typeof askedBy === 'string' && askedBy.trim()) {
         qlist = filterQuestionsByAskedBy(qlist, askedBy);
       }
-      // Filter by search keyword and tags
-      const resqlist: Question[] = await filterQuestionsBySearch(qlist, search);
-      res.json(resqlist);
+
+      console.log('Sending response with', qlist.length, 'questions');
+      res.json(qlist);
     } catch (err: unknown) {
+      console.error('Error in getQuestionsByFilter:', err);
       if (err instanceof Error) {
         res.status(500).send(`Error when fetching questions by filter: ${err.message}`);
       } else {

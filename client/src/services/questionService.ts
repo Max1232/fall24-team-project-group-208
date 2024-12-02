@@ -12,11 +12,25 @@ const QUESTION_API_URL = `${process.env.REACT_APP_SERVER_URL}/question`;
  * @throws Error if there is an issue fetching or filtering questions.
  */
 const getQuestionsByFilter = async (order = 'newest', search = ''): Promise<Question[]> => {
-  const res = await api.get(`${QUESTION_API_URL}/getQuestion?order=${order}&search=${search}`);
-  if (res.status !== 200) {
-    throw new Error('Error when fetching or filtering questions');
+  try {
+    const params = new URLSearchParams();
+    params.append('order', order);
+
+    if (search && typeof search === 'string' && search.trim()) {
+      params.append('search', search.trim());
+    }
+
+    console.log('Making request with params:', params.toString()); // Debug log
+
+    const res = await api.get(`${QUESTION_API_URL}/getQuestion?${params.toString()}`);
+    if (res.status !== 200) {
+      throw new Error('Error when fetching or filtering questions');
+    }
+    return res.data;
+  } catch (error) {
+    console.error('Error fetching questions:', error);
+    return [];
   }
-  return res.data;
 };
 
 /**
