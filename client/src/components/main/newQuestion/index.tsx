@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DialogContent,
   DialogTitle,
@@ -7,8 +7,15 @@ import {
   Button,
   Alert,
   Snackbar,
+  Dialog,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
 } from '@mui/material';
 import useNewQuestion from '../../../hooks/useNewQuestion';
+import useTagPage from '../../../hooks/useTagPage';
+import { TagData } from '../../../types';
 
 interface NewQuestionPageProps {
   onClose: () => void;
@@ -31,6 +38,7 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
     setText,
     tagNames,
     setTagNames,
+    setTagDescription,
     titleErr,
     textErr,
     tagErr,
@@ -39,6 +47,26 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
     alertMessage,
     setShowAlert,
   } = useNewQuestion();
+
+  const { tlist, clickTag } = useTagPage();
+  
+  const [openNewTagDialog, setOpenNewTagDialog] = useState(false);
+  const [newTagName, setNewTagName] = useState('');
+  const [newTagDescription, setNewTagDescription] = useState('');
+
+  const handleNewTagSubmit = () => {
+    if (newTagName && newTagDescription) {
+      setTagNames(newTagName);
+      setTagDescription(newTagDescription);
+      setOpenNewTagDialog(false);
+
+    } else if (newTagName) {
+      setTagNames(newTagName);
+      setTagDescription('');
+      setOpenNewTagDialog(false);
+
+    }
+  };
 
   /**
    * Handles the submission of the new question.
@@ -78,16 +106,22 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
           error={!!textErr}
           helperText={textErr}
         />
-        <TextField
-          margin='dense'
-          label='Tags'
-          type='text'
-          fullWidth
-          value={tagNames}
-          onChange={e => setTagNames(e.target.value)}
-          error={!!tagErr}
-          helperText={tagErr}
-        />
+        <FormControl fullWidth margin='dense'>
+          <InputLabel>Tags</InputLabel>
+          <Select
+            value={tagNames}
+            onChange={e => setTagNames(e.target.value)}
+            error={!!tagErr}>
+            {tlist.map((t: TagData) => (
+              <MenuItem key={t.name} value={t.name}>
+                {t.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Button onClick={() => setOpenNewTagDialog(true)} color='primary'>
+          Add New Tag
+        </Button>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color='primary'>
@@ -102,6 +136,35 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
           {alertMessage}
         </Alert>
       </Snackbar>
+      <Dialog open={openNewTagDialog} onClose={() => setOpenNewTagDialog(false)}>
+        <DialogTitle>Add New Tag</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin='dense'
+            label='Tag Name'
+            type='text'
+            fullWidth
+            value={newTagName}
+            onChange={e => setNewTagName(e.target.value)}
+          />
+          <TextField
+            margin='dense'
+            label='Tag Description'
+            type='text'
+            fullWidth
+            value={newTagDescription}
+            onChange={e => setNewTagDescription(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenNewTagDialog(false)} color='primary'>
+            Cancel
+          </Button>
+          <Button onClick={handleNewTagSubmit} color='primary'>
+            Add Tag
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

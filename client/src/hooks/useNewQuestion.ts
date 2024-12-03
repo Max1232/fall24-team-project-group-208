@@ -11,6 +11,7 @@ const useNewQuestion = () => {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [tagNames, setTagNames] = useState('');
+  const [tagDescription, setTagDescription] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
@@ -85,8 +86,10 @@ const useNewQuestion = () => {
     const tagnames = tagNames.split(' ').filter(tagName => tagName.trim() !== '');
     const tags = tagnames.map(tagName => ({
       name: tagName,
-      description: 'user added tag',
+      description: tagDescription,
     }));
+
+    console.log(tags);
 
     const question: Question = {
       title,
@@ -122,6 +125,7 @@ const useNewQuestion = () => {
     setText,
     tagNames,
     setTagNames,
+    setTagDescription,
     titleErr,
     textErr,
     tagErr,
