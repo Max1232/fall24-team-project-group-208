@@ -10,8 +10,7 @@ const useNewQuestion = () => {
   const { user } = useUserContext();
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
-  const [tagNames, setTagNames] = useState('');
-  const [tagDescription, setTagDescription] = useState('');
+  const [tags, setTags] = useState<Map<string, string>>(new Map());
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
@@ -52,17 +51,16 @@ const useNewQuestion = () => {
       setTextErr('');
     }
 
-    const tagnames = tagNames.split(' ').filter(tagName => tagName.trim() !== '');
-    if (tagnames.length === 0) {
+    if (tags.size === 0) {
       errorMessage = 'Should have at least 1 tag';
       setTagErr(errorMessage);
       isValid = false;
-    } else if (tagnames.length > 5) {
+    } else if (tags.size > 5) {
       errorMessage = 'Cannot have more than 5 tags';
       setTagErr(errorMessage);
       isValid = false;
     } else {
-      for (const tagName of tagnames) {
+      for (const tagName of tags.keys()) {
         if (tagName.length > 20) {
           errorMessage = 'New tag length cannot be more than 20';
           setTagErr(errorMessage);
@@ -83,18 +81,15 @@ const useNewQuestion = () => {
   const postQuestion = async (): Promise<boolean> => {
     if (!validateForm()) return false;
 
-    const tagnames = tagNames.split(' ').filter(tagName => tagName.trim() !== '');
-    const tags = tagnames.map(tagName => ({
-      name: tagName,
-      description: tagDescription,
+    const tagsArray = Array.from(tags.entries()).map(([name, description]) => ({
+      name,
+      description,
     }));
-
-    console.log(tags);
 
     const question: Question = {
       title,
       text,
-      tags,
+      tags: tagsArray,
       askedBy: user.username,
       askDateTime: new Date(),
       answers: [],
@@ -123,9 +118,8 @@ const useNewQuestion = () => {
     setTitle,
     text,
     setText,
-    tagNames,
-    setTagNames,
-    setTagDescription,
+    tags,
+    setTags,
     titleErr,
     textErr,
     tagErr,

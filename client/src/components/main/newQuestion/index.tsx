@@ -9,9 +9,7 @@ import {
   Snackbar,
   Dialog,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
+  Autocomplete,
 } from '@mui/material';
 import useNewQuestion from '../../../hooks/useNewQuestion';
 import useTagPage from '../../../hooks/useTagPage';
@@ -36,9 +34,8 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
     setTitle,
     text,
     setText,
-    tagNames,
-    setTagNames,
-    setTagDescription,
+    tags,
+    setTags,
     titleErr,
     textErr,
     tagErr,
@@ -48,23 +45,20 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
     setShowAlert,
   } = useNewQuestion();
 
-  const { tlist, clickTag } = useTagPage();
-  
+  const { tlist } = useTagPage();
+
   const [openNewTagDialog, setOpenNewTagDialog] = useState(false);
   const [newTagName, setNewTagName] = useState('');
   const [newTagDescription, setNewTagDescription] = useState('');
 
   const handleNewTagSubmit = () => {
-    if (newTagName && newTagDescription) {
-      setTagNames(newTagName);
-      setTagDescription(newTagDescription);
+    if (newTagName) {
+      setTags(prevTags => {
+        const newTags = new Map(prevTags);
+        newTags.set(newTagName, newTagDescription || '');
+        return newTags;
+      });
       setOpenNewTagDialog(false);
-
-    } else if (newTagName) {
-      setTagNames(newTagName);
-      setTagDescription('');
-      setOpenNewTagDialog(false);
-
     }
   };
 
@@ -75,7 +69,7 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
   const handleSubmit = async () => {
     const success = await postQuestion();
     if (success) {
-      onClose(); // Only close the dialog if the question was successfully posted
+      onClose();
     }
   };
 
@@ -106,19 +100,31 @@ const NewQuestionPage: React.FC<NewQuestionPageProps> = ({ onClose }: NewQuestio
           error={!!textErr}
           helperText={textErr}
         />
+
         <FormControl fullWidth margin='dense'>
-          <InputLabel>Tags</InputLabel>
-          <Select
-            value={tagNames}
-            onChange={e => setTagNames(e.target.value)}
-            error={!!tagErr}>
-            {tlist.map((t: TagData) => (
-              <MenuItem key={t.name} value={t.name}>
-                {t.name}
-              </MenuItem>
-            ))}
-          </Select>
+          <Autocomplete
+            multiple
+            id='tags-standard'
+            options={tlist.map((t: TagData) => t.name)}
+            getOptionLabel={t => t}
+            value={Array.from(tags.keys())}
+            defaultValue={newTagName ? [newTagName] : []}
+            ChipProps={{ variant: 'outlined', sx: { color: 'primary.main' } }}
+            renderInput={params => (
+              <TextField {...params} variant='standard' label='Tags' error={!!tagErr} />
+            )}
+            onChange={(event, newValue) => {
+              const newTags = new Map(tags);
+              newValue.forEach(tag => {
+                if (!newTags.has(tag)) {
+                  newTags.set(tag, '');
+                }
+              });
+              setTags(newTags);
+            }}
+          />
         </FormControl>
+
         <Button onClick={() => setOpenNewTagDialog(true)} color='primary'>
           Add New Tag
         </Button>
